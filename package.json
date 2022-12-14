@@ -1,0 +1,44 @@
+{
+  "name": "automlui",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "rm -rf ./build && NODE_ENV=production next build",
+    "start": "next start",
+    "eslint": "eslint './src/**/*' './pages/**/*'",
+    "format": "prettier --write ./src/**/*.{tsx,ts} --fix",
+    "storybook": "start-storybook -p 6006"
+  },
+  "dependencies": {
+    "@material-ui/core": "^4.11.4",
+    "@material-ui/data-grid": "^4.0.0-alpha.27",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.58",
+    "clsx": "^1.1.1",
+    "next": "10.2.0",
+    "path-to-regexp": "^6.2.0",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-use": "^17.2.4",
+    "styled-components": "^5.3.0",
+    "swr": "^0.5.6"
+  },
+  "devDependencies": {
+    "@storybook/react": "^6.2.9",
+    "@types/react": "^17.0.4",
+    "@types/react-dom": "^17.0.3",
+    "@types/styled-components": "^5.1.9",
+    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "@typescript-eslint/parser": "^4.22.0",
+    "babel-loader": "8.2.2",
+    "babel-plugin-styled-components": "1.12.0",
+    "eslint": "^7.25.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-react": "^7.23.2",
+    "prettier": "^2.2.1",
+    "typescript": "^4.2.4"
+  }
+}
