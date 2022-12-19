@@ -72,3 +72,36 @@ export const post = async (
     loading: false,
   };
 };
+
+// TODO 環境変数
+const DUMMY_API_URL = 'https://jsonplaceholder.typicode.com';
+
+export const dummyfetcher = async <T = any>(
+  path: string,
+  init?: RequestInitExtend,
+): Promise<T> => {
+  const query = new URLSearchParams(init?.params);
+  const headers: HeadersInit = {
+    ...{ 'Content-Type': 'application/json' },
+    ...init?.headers,
+  };
+
+  const res = await fetch(
+    `${DUMMY_API_URL}${path}${init?.params ? `?${query}` : ''}`,
+    {
+      ...init,
+      headers,
+    },
+  );
+
+  const text = await res.text();
+  const error = text ? JSON.parse(text) : {};
+
+  if (res.ok) {
+    return text ? JSON.parse(text) : {};
+  }
+
+  return Promise.reject({
+    ...error,
+  });
+};

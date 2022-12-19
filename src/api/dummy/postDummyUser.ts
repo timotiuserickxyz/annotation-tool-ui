@@ -3,7 +3,7 @@ import { Response, ResponseStatus } from '../types/base';
 import { getAPIUrl } from '../../utils/path';
 
 interface Path {
-  sourceName: string;
+  userId: number;
 }
 interface Params {
   column_mode: string;
@@ -14,7 +14,7 @@ interface Params {
   num_of_columns?: number;
   relative_path?: string;
 }
-type Data = {
+type DummyUser = {
   id: number;
   num_of_columns: number;
   source_dir: string;
@@ -31,12 +31,12 @@ type Data = {
   split_random_seed: number;
 } & ResponseStatus;
 
-export async function createDataset(
+export async function postDummyUser(
   path: Path,
   params: Params,
-): Promise<Response<Data>> {
+): Promise<Response<DummyUser>> {
   const { data, error } = await post(
-    getAPIUrl('dataset', 'createDataset', path),
+    getAPIUrl('dummy', 'postDummyUser', path),
     {
       params,
     },
