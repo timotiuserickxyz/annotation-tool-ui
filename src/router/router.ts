@@ -3,9 +3,9 @@ export const pathMap = {
     path: '/',
     label: 'Top',
   },
-  home: {
-    path: '/home/dashboard',
-    label: 'Home',
+  dashboard: {
+    path: '/annotation/dashboard',
+    label: 'Dashboard',
   },
 };
 export type PathMapKey = keyof typeof pathMap;

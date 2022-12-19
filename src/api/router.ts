@@ -3,6 +3,7 @@ export const pathMap = {
     getDummyUserList: '/users',
     getDummyUser: '/users/:userId',
     postDummyUser: '/users/:userId',
+    getDummyPostList: '/posts',
   },
 };
 

@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { fetcher } from '../core';
+import { dummyfetcher } from '../core';
 import { Response, ResponseError, ResponseStatus } from '../types/base';
 import { getAPIUrl } from '../../utils/path';
 
@@ -22,7 +22,7 @@ type DummyUser = {
 export function getDummyUser(userId: number): Response<DummyUser> {
   const { data, error } = useSWR<DummyUser, ResponseError>(
     getAPIUrl('dummy', 'getDummyUser', { userId }),
-    fetcher,
+    dummyfetcher,
   );
 
   return {

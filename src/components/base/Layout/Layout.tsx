@@ -24,7 +24,7 @@ export const Layout: React.FC<Props> = ({ children }) => {
               textDecoration: 'none',
             }}
           >
-            <Typography variant="h5">Template</Typography>
+            <Typography variant="h5">AnnotationTool</Typography>
           </Link>
         }
         drawerBody={<Navigation />}

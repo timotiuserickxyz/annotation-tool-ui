@@ -20,10 +20,10 @@ import { HelpOutline } from '@material-ui/icons';
 interface Props {}
 
 const navTop = {
-  home: {
-    label: 'Home',
+  dashboard: {
+    label: 'Dashboard',
     icon: <HomeOutlinedIcon />,
-    path: pathMap.home.path,
+    path: pathMap.dashboard.path,
   },
 };
 
@@ -32,12 +32,12 @@ export const Navigation: React.FC<Props> = () => {
     <>
       <List>
         <Link
-          href={navTop.home.path}
+          href={navTop.dashboard.path}
           style={{ textDecoration: 'none', color: 'rgba(0, 0, 0, 0.87)' }}
         >
           <ListItem button>
-            <ListItemIcon>{navTop.home.icon}</ListItemIcon>
-            <ListItemText primary={navTop.home.label} />
+            <ListItemIcon>{navTop.dashboard.icon}</ListItemIcon>
+            <ListItemText primary={navTop.dashboard.label} />
           </ListItem>
         </Link>
         {/* <Link

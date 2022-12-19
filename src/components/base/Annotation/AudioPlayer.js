@@ -1,8 +1,36 @@
 import React, { useEffect, useRef, useState } from "react";
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import PauseIcon from '@material-ui/icons/Pause';
 import WaveSurfer from "wavesurfer.js";
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles({
+  container: {
+    width: '100%',
+  },
+  labelRadioGroup: {
+    width: 'max-content',
+    display: 'flex',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
+  commentTextArea: {
+    width: '80%',
+    height: '100px',
+    display: 'flex',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
+  navigationContainer: {
+    width: '80%',
+    height: '100px',
+    display: 'flex',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  }
+});
 
 const formWaveSurferOptions = ref => ({
   container: ref,
@@ -19,7 +47,7 @@ const formWaveSurferOptions = ref => ({
   partialRender: true
 });
 
-export default function Waveform({ url }) {
+export default function Waveform({url}) {
   const waveformRef = useRef(null);
   const wavesurfer = useRef(null);
   const [playing, setPlay] = useState(false);
@@ -72,8 +100,11 @@ export default function Waveform({ url }) {
   };
 
   return (
-    <div style={{width: '80%', height: '80px', marginLeft: 'auto', marginRight: 'auto'}}>
-      <div style={{width: '100%', maxWidth: '430px', height: '100%', marginLeft: 'auto', marginRight: 'auto'}}>
+    <div style={{width: '80%', height: '100px', marginLeft: 'auto', marginRight: 'auto'}}>
+      <div style={{width: '100%', height: '20px', marginLeft: 'auto', marginRight: 'auto'}}>
+          {url}
+      </div>
+      <div style={{width: '100%', height: '80px', marginTop: '20px', marginLeft: 'auto', marginRight: 'auto'}}>
         <button
           style={{backgroundColor: "Black", width:'30px', height: '50px', float: 'left', paddingTop: '5px', paddingLeft: '1px', paddingRight: '1px', cursor: 'pointer',}}
           onClick={handlePlayPause}>
