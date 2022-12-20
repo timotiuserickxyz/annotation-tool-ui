@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useSetState } from 'react-use';
 import { useRouter } from 'next/router';
 import { makeStyles } from '@material-ui/core/styles';
+import { Button } from '@material-ui/core';
 
 import { getDummyUserList } from '../../../api/dummy/getDummyUserList';
 import { AnnotateData } from '../../base/Annotation/AnnotateData';
@@ -18,6 +19,7 @@ const useStyles = makeStyles({
   },
   content: {
     width: '100%',
+    marginTop: '20px',
     minHeight: '100px',
     overflow: 'hidden',
     padding: '20px',
@@ -52,6 +54,15 @@ export const Dashboard: React.FC<Props> = () => {
 
   const { data } = getDummyUserList(states.shouldFetch);
 
+  const saveAndRefreshData = () => {
+    // Save
+
+    // Refresh
+    setStates({
+      shouldFetch: true,
+    });
+  };
+
   useEffect(() => {
     if (states.shouldFetch) {
       const fetchedData = !!data ? data.map((t) => {
@@ -65,15 +76,6 @@ export const Dashboard: React.FC<Props> = () => {
       });
     }
   }, [data]);
-
-  const saveAndRefreshData = () => {
-    // Save
-
-    // Refresh
-    setStates({
-      shouldFetch: true,
-    });
-  };
 
   const goToPrevData = () => {
     const prevDataIndex = states.selectedDataIndex - 1;
@@ -112,27 +114,32 @@ export const Dashboard: React.FC<Props> = () => {
           <option>Project23456789123456789</option>
           <option>Project3</option>
         </select>
+        <Button onClick={saveAndRefreshData}>Try</Button>
       </div>
-      <br/>
-      <div className={classes.content}>
-        <div className={classes.annotateDataContainer}>
-          <AnnotateData
-            projectName={states.projectName}
-            selectedDataIndex={states.selectedDataIndex}
-            selectedAudio={states.selectedAudio}
-            onClickSave={saveAndRefreshData}
-            onClickPrev={goToPrevData}
-            onClickNext={goToNextData}
-          />
+      { !!states.projectData ? (
+        <div className={classes.content}>
+          <div className={classes.annotateDataContainer}>
+            <AnnotateData
+              projectName={states.projectName}
+              selectedDataIndex={states.selectedDataIndex}
+              selectedAudio={states.selectedAudio}
+              onClickSave={saveAndRefreshData}
+              onClickPrev={goToPrevData}
+              onClickNext={goToNextData}
+            />
+          </div>
+          <div className={classes.annotationDataContainer}>
+            <DummyData
+              data={states.projectData}
+              selectedDataIndex={states.selectedDataIndex}
+              onSelect={handleSelection}
+            />
+          </div>
         </div>
-        <div className={classes.annotationDataContainer}>
-          <DummyData
-            data={states.projectData}
-            selectedDataIndex={states.selectedDataIndex}
-            onSelect={handleSelection}
-          />
-        </div>
-      </div>
+      ) : (
+        <div></div>
+      )}
+      
     </div>
   );
 };
