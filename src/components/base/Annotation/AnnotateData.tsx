@@ -63,7 +63,7 @@ type Component = (props: Props) => React.ReactElement<Props>;
 export const AnnotateData: Component = ({ selectedDataIndex, selectedAudio, onClickSave, onClickPrev, onClickNext }) => {
   const classes = useStyles();
 
-  //if (selectedDataIndex == 0) return (<div>loading</div>);
+  if (selectedDataIndex == 0) return (<div></div>);
 
   let audioFile = '';
   if (selectedDataIndex == 0) {

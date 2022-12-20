@@ -16,9 +16,9 @@ type DummyUser = {
   company: DummyCompany;
 } & ResponseStatus;
 
-export function getDummyUserList(): Response<DummyUser[]> {
+export function getDummyUserList(shouldFetch: boolean): Response<DummyUser[]> {
   const { data, error } = useSWR<DummyUser[], ResponseError>(
-    getAPIUrl('dummy', 'getDummyUserList'),
+    shouldFetch ? getAPIUrl('dummy', 'getDummyUserList') : null,
     dummyfetcher,
   );
 

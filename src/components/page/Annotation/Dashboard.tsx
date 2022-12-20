@@ -41,23 +41,8 @@ export const Dashboard: React.FC<Props> = () => {
   const classes = useStyles();
   const router = useRouter();
 
-  let refreshCount = 0;
-
-  // const [states, setStates] = useSetState({
-  //   projectName: "Project1",
-  //   projectDataCount: fetchedData.length,
-  //   selectedDataIndex: 2,
-  //   selectedAudio: '',
-  // });
-
-  // const { data } = getDummyUserList();
-  // if (!data) return (<div>loading</div>);
-
-  // const fetchedData = !!data ? data.map((t) => {
-  //   return {...t};
-  // }) : [];
-
   const [states, setStates] = useSetState({
+    shouldFetch: false,
     projectName: '',
     projectData: null as any,
     projectDataCount: 0,
@@ -65,75 +50,55 @@ export const Dashboard: React.FC<Props> = () => {
     selectedAudio: '',
   });
 
-  // useEffect(() => {
+  const { data } = getDummyUserList(states.shouldFetch);
 
-    
-  // }, [refreshCount]);
+  useEffect(() => {
+    if (states.shouldFetch) {
+      const fetchedData = !!data ? data.map((t) => {
+        return {...t};
+      }) : [];
+      
+      setStates({
+        projectData: fetchedData,
+        projectDataCount: fetchedData ? fetchedData.length : 0,
+        selectedDataIndex: fetchedData ? 1 : 0,
+      });
+    }
+  }, [data]);
 
-  // const rawData = getDummyUserList();
-  // const fetchedData = !!rawData.data ? rawData.data.map((t) => {
-  //     return {...t};
-  //   }) : [];
+  const saveAndRefreshData = () => {
+    // Save
 
-  // function refreshData() {
-  //   const newRawData = getDummyUserList();
-  //   const newFetchedData = !!newRawData.data ? newRawData.data.map((t) => {
-  //     return {...t};
-  //   }) : [];
-
-  //   setStates({
-  //     projectData: newFetchedData,
-  //     projectDataCount: newFetchedData ? newFetchedData.length : 0,
-  //     selectedDataIndex: newFetchedData ? 1 : 0
-  //   });
-  // };
-
-  
-
-  // const saveAndRefreshData = () => {
-  //   // Save
-  //   console.log('fetching... ');
-  //   // Refresh
-  //   let { data } = getDummyUserList();
-  //   console.log('mapping... ');
-  //   let fetchedData = () => {
-  //     !!data ? data.map((t) => {
-  //       return {...t};
-  //     }) : [];
-  //   } 
-  //   console.log('stating... ');
-
-  //   console.log('projectName: ' + states.projectName);
-  //   console.log('selectedDataIndex: ' + states.selectedDataIndex);
-
-  //   setStates({
-  //         projectData: fetchedData,
-  //         projectDataCount: fetchedData.length,
-  //         selectedDataIndex: (fetchedData.length) > 0 ? 1 : 0,
-  //       });
-  // };
+    // Refresh
+    setStates({
+      shouldFetch: true,
+    });
+  };
 
   const goToPrevData = () => {
     const prevDataIndex = states.selectedDataIndex - 1;
     setStates({
+      shouldFetch: false,
       projectName: 'Project' + prevDataIndex,
-      selectedDataIndex: prevDataIndex
+      selectedDataIndex: prevDataIndex,
     });
   };
 
   const goToNextData = () => {
     const nextDataIndex = states.selectedDataIndex + 1;
     setStates({
+      shouldFetch: false,
       projectName: 'Project' + nextDataIndex,
-      selectedDataIndex: nextDataIndex
+      selectedDataIndex: nextDataIndex,
     });
   };
 
   const handleSelection = (id: number, audioPath: string) => {
     setStates({
+      shouldFetch: false,
       projectName: 'Project' + id,
       selectedDataIndex: id,
-      selectedAudio: audioPath
+      selectedAudio: audioPath,
     });
   };
 

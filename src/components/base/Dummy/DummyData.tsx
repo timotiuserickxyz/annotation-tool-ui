@@ -34,7 +34,7 @@ type Component = (props: Props) => React.ReactElement<Props>;
 export const DummyData: Component = ({ data, selectedDataIndex, onSelect }) => {
   const classes = useStyles();
 
-  if (selectedDataIndex == 0) return (<div>loading</div>);
+  if (selectedDataIndex == 0) return (<div></div>);
 
   const rows: Row[] = !!data
   ? data.map((t) => {
