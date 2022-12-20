@@ -2,7 +2,6 @@ import * as React from 'react';
 import { Radio } from '@material-ui/core';
 import { DataGrid } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
-import { getDummyUserList } from '../../../api/dummy/getDummyUserList';
 
 const useStyles = makeStyles({
   customTable: {
@@ -25,17 +24,17 @@ type Row = BaseRow & {
 };
 
 type Props = {
-  projectName: string,
+  data: any[],
   selectedDataIndex: number,
-  onSelect: (id: number) => void | Promise<void>,
+  onSelect: (id: number, audioPath: string) => void | Promise<void>,
 };
 
 type Component = (props: Props) => React.ReactElement<Props>;
 
-export const DummyData: Component = ({ projectName, selectedDataIndex, onSelect }) => {
+export const DummyData: Component = ({ data, selectedDataIndex, onSelect }) => {
   const classes = useStyles();
 
-  const { data } = getDummyUserList();
+  if (selectedDataIndex == 0) return (<div>loading</div>);
 
   const rows: Row[] = !!data
   ? data.map((t) => {
@@ -61,7 +60,7 @@ export const DummyData: Component = ({ projectName, selectedDataIndex, onSelect 
   ];
 
   const rowPerPage: number = 5;
-  const currentPage: number = Math.ceil(selectedDataIndex / rowPerPage) - 1;
+  const currentPage: number = !!data ? Math.ceil(selectedDataIndex / rowPerPage) - 1 : 0;
 
   return (
     <DataGrid
@@ -73,7 +72,7 @@ export const DummyData: Component = ({ projectName, selectedDataIndex, onSelect 
       pageSize={rowPerPage}
       selectionModel={[selectedDataIndex]}
       onSelectionModelChange={(newSelectionModel) => {
-        onSelect(newSelectionModel.selectionModel[0] as number);
+        onSelect(newSelectionModel.selectionModel[0] as number, 'test');
       }}
     />
   )

@@ -52,17 +52,24 @@ type Row = BaseRow & {
 type Props = {
   projectName: string,
   selectedDataIndex: number,
+  selectedAudio: string,
+  onClickSave: () => void | Promise<void>,
   onClickPrev: () => void | Promise<void>,
   onClickNext: () => void | Promise<void>,
 };
 
 type Component = (props: Props) => React.ReactElement<Props>;
 
-export const AnnotateData: Component = ({ projectName, selectedDataIndex, onClickPrev, onClickNext }) => {
+export const AnnotateData: Component = ({ selectedDataIndex, selectedAudio, onClickSave, onClickPrev, onClickNext }) => {
   const classes = useStyles();
 
+  //if (selectedDataIndex == 0) return (<div>loading</div>);
+
   let audioFile = '';
-  if (selectedDataIndex % 9 == 0)
+  if (selectedDataIndex == 0) {
+    audioFile = '/mono_8000hz_32bit_1.wav';
+  }
+  else if (selectedDataIndex % 9 == 0)
     audioFile = '/mono_8000hz_32bit_1.wav';
   else if (selectedDataIndex % 9 == 1)
     audioFile = '/mono_8000hz_32bit_2.wav';
@@ -107,12 +114,13 @@ export const AnnotateData: Component = ({ projectName, selectedDataIndex, onClic
       <br/>
       <br/>
       <div className={classes.container}>
-        <textarea className={classes.commentTextArea}>{comment}</textarea>
+        <textarea className={classes.commentTextArea} defaultValue={comment} />
       </div>
       <br/>
       <div className={classes.container}>
         <div className={classes.navigationContainer}>
           <Button onClick={onClickPrev}>Prev</Button>
+          <Button onClick={onClickSave}>Save</Button>
           <Button onClick={onClickNext}>Next</Button>
         </div>
       </div>
