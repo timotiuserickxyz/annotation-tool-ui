@@ -5,6 +5,9 @@ export const pathMap = {
     postDummyUser: '/users/:userId',
     getDummyPostList: '/posts',
   },
+  annotation: {
+    getProjectList: '/annotation-tool/project/list',
+  },
 };
 
 export type PathMapKey = keyof typeof pathMap;
