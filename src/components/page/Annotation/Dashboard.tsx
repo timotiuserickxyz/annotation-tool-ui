@@ -9,6 +9,9 @@ import { getDummyUserList } from '../../../api/dummy/getDummyUserList';
 import { AnnotateData } from '../../base/Annotation/AnnotateData';
 import { DummyData } from '../../base/Dummy/DummyData';
 
+import { getAPIUrl } from '../../../utils/path';
+import { mutate } from 'swr';
+
 const useStyles = makeStyles({
   root: {
     height: 'inherit',
@@ -51,7 +54,7 @@ export const Dashboard: React.FC<Props> = () => {
   const router = useRouter();
 
   const rawProjectList = getProjectList();
-  const fetchedProjectList = !!rawProjectList.data ? rawProjectList.data.configs.map((t) => {
+  const actualProjectList = !!rawProjectList.data ? rawProjectList.data.configs.map((t) => {
     return {...t};
   }) : [];
 
@@ -63,19 +66,27 @@ export const Dashboard: React.FC<Props> = () => {
     selectedAudio: '',
   });
 
-  const { data } = getDummyUserList(states.projectName);
+  const rawData = getDummyUserList(states.projectName);
+  const actualData = !!rawData.data ? rawData.data.map((t) => {
+    return {...t};
+  }) : [];
 
   const selectProject = (e: string) => {
     setStates({
       projectName: e,
+      selectedDataIndex: 0,
     });
+
+    const projectName: string = states.projectName;
+    mutate(getAPIUrl('dummy', 'getDummyUserList', {projectName}));
   };
 
   const saveAndRefreshData = () => {
     // Save
     
     // Refresh
-    
+    const projectName: string = states.projectName;
+    mutate(getAPIUrl('dummy', 'getDummyUserList', {projectName}));
   };
 
   const goToPrevData = () => {
@@ -108,14 +119,16 @@ export const Dashboard: React.FC<Props> = () => {
           onChange={(e) => selectProject(e.target.value)}
         >
           <option></option>
-          {fetchedProjectList && fetchedProjectList.map(p => 
+          <option>Project1</option>
+          <option>Project2</option>
+          {actualProjectList && actualProjectList.map(p => 
             (<option key={p.project_name} value={p.project_name}>{p.project_name}</option>)
           )} 
         </select>
         <Button onClick={saveAndRefreshData}>Try</Button>
         <h3>{states.projectName}</h3>
       </div>
-      { !!states.projectData ? (
+      { actualData && actualData.length > 0 ? (
         <div className={classes.content}>
           <div className={classes.annotateDataContainer}>
             <AnnotateData
@@ -129,7 +142,7 @@ export const Dashboard: React.FC<Props> = () => {
           </div>
           <div className={classes.annotationDataContainer}>
             <DummyData
-              data={states.projectData}
+              data={actualData}
               selectedDataIndex={states.selectedDataIndex}
               onSelect={handleSelection}
             />

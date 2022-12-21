@@ -7,6 +7,11 @@ export const pathMap = {
   },
   annotation: {
     getProjectList: '/annotation-tool/project/list',
+    getProjectDetail: '/annotation-tool/project/:projectName',
+    getDataList: '/annotation-tool/project/data/:projectName',
+    getWavList: '/annotation-tool/project/source/wav/list/:projectName',
+    postData: '/annotation-tool/project/data/new/:projectName',
+    updateData: '/annotation-tool/project/data/new/:projectName/:recordId',
   },
 };
 
