@@ -18,7 +18,7 @@ type Project = {
 
 export function getProjectDetail(projectName: string): Response<Project> {
   const { data, error } = useSWR<Project, ResponseError>(
-    getAPIUrl('annotation', 'getProjectDetail', {projectName}),
+    projectName ? getAPIUrl('annotation', 'getProjectDetail', {projectName}) : null,
     fetcher,
   );
 

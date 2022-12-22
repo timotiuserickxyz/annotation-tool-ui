@@ -9,13 +9,13 @@ interface Wav {
   updated_at: string;
   windows: string;
 }
-type WavList = {
+type ProjectWavList = {
   files: Wav[];
 } & ResponseStatus;
 
-export function getWavList(projectName: string): Response<WavList> {
-  const { data, error } = useSWR<WavList, ResponseError>(
-    getAPIUrl('annotation', 'getWavList', {projectName}),
+export function getProjectWavList(projectName: string): Response<ProjectWavList> {
+  const { data, error } = useSWR<ProjectWavList, ResponseError>(
+    projectName ? getAPIUrl('annotation', 'getProjectWavList', {projectName}) : null,
     fetcher,
   );
 

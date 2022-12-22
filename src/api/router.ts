@@ -1,6 +1,6 @@
 export const pathMap = {
   dummy: {
-    getDummyUserList: '/users',
+    getDummyUserList: '/users/:projectName',
     getDummyUser: '/users/:userId',
     postDummyUser: '/users/:userId',
     getDummyPostList: '/posts',
@@ -8,10 +8,11 @@ export const pathMap = {
   annotation: {
     getProjectList: '/annotation-tool/project/list',
     getProjectDetail: '/annotation-tool/project/:projectName',
-    getDataList: '/annotation-tool/project/data/:projectName',
-    getWavList: '/annotation-tool/project/source/wav/list/:projectName',
-    postData: '/annotation-tool/project/data/new/:projectName',
-    updateData: '/annotation-tool/project/data/new/:projectName/:recordId',
+    getProjectWavList: '/annotation-tool/project/source/wav/list/:projectName',
+    getProjectDataList: '/annotation-tool/project/data/:projectName',
+    postProjectData: '/annotation-tool/project/data/new/:projectName',
+    updateProjectData: '/annotation-tool/project/data/update/:projectName/:recordId',
+    deleteProjectData: '/annotation-tool/project/data/delete/:projectName/:recordId',
   },
 };
 

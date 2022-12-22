@@ -2,7 +2,7 @@ import { post } from '../core';
 import { Response, ResponseStatus } from '../types/base';
 import { getAPIUrl } from '../../utils/path';
 
-type Data = {
+type ProjectData = {
   record_id: number;
   sequence_number: number;
   file_name: string;
@@ -12,8 +12,8 @@ type Data = {
   comment: string;
 } & ResponseStatus;
 
-export async function postData(projectName: string, params: any[]): Promise<Response<Data>> {
-  const { data, error } = await post(getAPIUrl('annotation', 'postData', {projectName}), {
+export async function deleteProjectData(projectName: string, recordId: number, params: any[]): Promise<Response<ProjectData>> {
+  const { data, error } = await post(getAPIUrl('annotation', 'deleteProjectData', {projectName, recordId}), {
     params
   });
   

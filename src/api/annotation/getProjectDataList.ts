@@ -3,7 +3,7 @@ import { fetcher } from '../core';
 import { Response, ResponseError, ResponseStatus } from '../types/base';
 import { getAPIUrl } from '../../utils/path';
 
-interface Data {
+interface ProjectData {
   record_id: number;
   sequence_number: number;
   file_name: string;
@@ -12,14 +12,14 @@ interface Data {
   status: string;
   comment: string;
 }
-type DataList = {
+type ProjectDataList = {
   project_name: string;
-  data: Data[];
+  data: ProjectData[];
 } & ResponseStatus;
 
-export function getDataList(projectName: string): Response<DataList> {
-  const { data, error } = useSWR<DataList, ResponseError>(
-    getAPIUrl('annotation', 'getDataList', {projectName}),
+export function getProjectDataList(projectName: string): Response<ProjectDataList> {
+  const { data, error } = useSWR<ProjectDataList, ResponseError>(
+    projectName ? getAPIUrl('annotation', 'getProjectDataList', {projectName}) : null,
     fetcher,
   );
 
