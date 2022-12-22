@@ -13,9 +13,9 @@ type ProjectWavList = {
   files: Wav[];
 } & ResponseStatus;
 
-export function getProjectWavList(projectName: string): Response<ProjectWavList> {
+export function getProjectWavList(param: string): Response<ProjectWavList> {
   const { data, error } = useSWR<ProjectWavList, ResponseError>(
-    projectName ? getAPIUrl('annotation', 'getProjectWavList', {projectName}) : null,
+    param ? getAPIUrl('annotation', 'getProjectWavList', {projectName: param}) : null,
     fetcher,
   );
 

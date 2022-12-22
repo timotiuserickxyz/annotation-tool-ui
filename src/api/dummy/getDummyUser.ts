@@ -19,9 +19,9 @@ type DummyUser = {
   company: DummyCompany;
 } & ResponseStatus;
 
-export function getDummyUser(userId: number): Response<DummyUser> {
+export function getDummyUser(param: number): Response<DummyUser> {
   const { data, error } = useSWR<DummyUser, ResponseError>(
-    getAPIUrl('dummy', 'getDummyUser', { userId }),
+    getAPIUrl('dummy', 'getDummyUser', { userId: param }),
     dummyfetcher,
   );
 

@@ -1,10 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSetState } from 'react-use';
 import { useRouter } from 'next/router';
 import { makeStyles } from '@material-ui/core/styles';
 import { Button } from '@material-ui/core';
 
 import { getProjectList } from '../../../api/annotation/getProjectList';
+import { getProjectDetail } from '../../../api/annotation/getProjectDetail';
+import { getProjectDataList } from '../../../api/annotation/getProjectDataList';
+
 import { getDummyUserList } from '../../../api/dummy/getDummyUserList';
 import { AnnotateData } from '../../base/Annotation/AnnotateData';
 import { DummyData } from '../../base/Dummy/DummyData';
@@ -53,62 +56,58 @@ export const Dashboard: React.FC<Props> = () => {
   const classes = useStyles();
   const router = useRouter();
 
+  const [projectName, setProjectName] = useState<string>('');
+  const [selectedDataIndex, setSelectedDataIndex] = useState<number>(0);
+  const [selectedAudio, setSelectedAudio] = useState<string>('');
+
   const rawProjectList = getProjectList();
   const actualProjectList = !!rawProjectList.data ? rawProjectList.data.configs.map((t) => {
     return {...t};
   }) : [];
 
-  const [states, setStates] = useSetState({
-    projectName: '',
-    projectData: null as any,
-    projectDataCount: 0,
-    selectedDataIndex: 0,
-    selectedAudio: '',
-  });
+  const rawProjectDetail = getProjectDetail(projectName);
+  const projectDetail = !!rawProjectDetail && !!rawProjectDetail.data ? rawProjectDetail.data : null;
 
-  const rawData = getDummyUserList(states.projectName);
-  const actualData = !!rawData.data ? rawData.data.map((t) => {
+  //const rawProjectData = getProjectDataList(projectName);
+  // const projectData = !!rawProjectData && !!rawProjectData.data ? rawProjectData.data.data.map((t) => {
+  //   return {...t};
+  // }) : [];
+
+  const rawProjectData = getDummyUserList(projectName ? true : false);
+  const projectData = !!rawProjectData && !!rawProjectData.data ? rawProjectData.data.map((t) => {
     return {...t};
   }) : [];
 
-  const selectProject = (e: string) => {
-    setStates({
-      projectName: e,
-      selectedDataIndex: 0,
-    });
+  const projectDataCount = projectData.length;
 
-    const projectName: string = states.projectName;
-    mutate(getAPIUrl('dummy', 'getDummyUserList', {projectName}));
+  const selectProject = (e: string) => {
+    setProjectName(e);
+    setSelectedDataIndex(0);
+
+    // await mutate(getAPIUrl('annotation', 'getProjectDetail', {projectName: e}));
+    // await mutate(getAPIUrl('annotation', 'getProjectDataList', {projectName: e}));
   };
 
   const saveAndRefreshData = () => {
     // Save
     
     // Refresh
-    const projectName: string = states.projectName;
-    mutate(getAPIUrl('dummy', 'getDummyUserList', {projectName}));
+    
   };
 
   const goToPrevData = () => {
-    const prevDataIndex = states.selectedDataIndex - 1;
-    setStates({
-      selectedDataIndex: prevDataIndex,
-    });
+    const prevDataIndex = selectedDataIndex - 1;
+    setSelectedDataIndex(prevDataIndex);
   };
 
   const goToNextData = () => {
-    const nextDataIndex = states.selectedDataIndex + 1;
-    setStates({
-      selectedDataIndex: nextDataIndex,
-    });
+    const nextDataIndex = selectedDataIndex + 1;
+    setSelectedDataIndex(nextDataIndex);
   };
 
   const handleSelection = (id: number, audioPath: string) => {
-    setStates({
-      projectName: 'Project' + id,
-      selectedDataIndex: id,
-      selectedAudio: audioPath,
-    });
+    setSelectedDataIndex(id);
+    setSelectedAudio(audioPath);
   };
 
   return (
@@ -126,15 +125,15 @@ export const Dashboard: React.FC<Props> = () => {
           )} 
         </select>
         <Button onClick={saveAndRefreshData}>Try</Button>
-        <h3>{states.projectName}</h3>
+        <h3>{projectName}</h3>
       </div>
-      { actualData && actualData.length > 0 ? (
+      { projectData && projectData.length > 0 ? (
         <div className={classes.content}>
           <div className={classes.annotateDataContainer}>
             <AnnotateData
-              projectName={states.projectName}
-              selectedDataIndex={states.selectedDataIndex}
-              selectedAudio={states.selectedAudio}
+              projectName={projectName}
+              selectedDataIndex={selectedDataIndex}
+              selectedAudio={selectedAudio}
               onClickSave={saveAndRefreshData}
               onClickPrev={goToPrevData}
               onClickNext={goToNextData}
@@ -142,14 +141,14 @@ export const Dashboard: React.FC<Props> = () => {
           </div>
           <div className={classes.annotationDataContainer}>
             <DummyData
-              data={actualData}
-              selectedDataIndex={states.selectedDataIndex}
+              data={projectData}
+              selectedDataIndex={selectedDataIndex}
               onSelect={handleSelection}
             />
           </div>
         </div>
       ) : (
-        <div></div>
+        <div>Project not selected yet or does not have any data</div>
       )}
     </div>
   );

@@ -12,8 +12,8 @@ type ProjectData = {
   comment: string;
 } & ResponseStatus;
 
-export async function deleteProjectData(projectName: string, recordId: number, params: any[]): Promise<Response<ProjectData>> {
-  const { data, error } = await post(getAPIUrl('annotation', 'deleteProjectData', {projectName, recordId}), {
+export async function deleteProjectData(param1: string, param2: number, params: any[]): Promise<Response<ProjectData>> {
+  const { data, error } = await post(getAPIUrl('annotation', 'deleteProjectData', {projectName: param1, recordId: param2}), {
     params
   });
   

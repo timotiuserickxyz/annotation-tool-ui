@@ -12,8 +12,8 @@ type ProjectData = {
   comment: string;
 } & ResponseStatus;
 
-export async function postProjectData(projectName: string, params: any[]): Promise<Response<ProjectData>> {
-  const { data, error } = await post(getAPIUrl('annotation', 'postProjectData', {projectName}), {
+export async function postProjectData(param: string, params: any[]): Promise<Response<ProjectData>> {
+  const { data, error } = await post(getAPIUrl('annotation', 'postProjectData', {projectName: param}), {
     params
   });
   

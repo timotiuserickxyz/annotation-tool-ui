@@ -1,6 +1,6 @@
 export const pathMap = {
   dummy: {
-    getDummyUserList: '/users/:projectName',
+    getDummyUserList: '/users',
     getDummyUser: '/users/:userId',
     postDummyUser: '/users/:userId',
     getDummyPostList: '/posts',

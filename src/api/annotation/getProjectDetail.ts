@@ -16,9 +16,9 @@ type Project = {
   source_path: SourcePath;
 } & ResponseStatus;
 
-export function getProjectDetail(projectName: string): Response<Project> {
+export function getProjectDetail(param: string): Response<Project> {
   const { data, error } = useSWR<Project, ResponseError>(
-    projectName ? getAPIUrl('annotation', 'getProjectDetail', {projectName}) : null,
+    param ? getAPIUrl('annotation', 'getProjectDetail', {projectName: param}) : null,
     fetcher,
   );
 
