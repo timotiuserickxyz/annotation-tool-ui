@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import PauseIcon from '@material-ui/icons/Pause';
-import WaveSurfer from "wavesurfer.js";
+// import WaveSurfer from "wavesurfer.js";
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
@@ -47,42 +47,49 @@ const formWaveSurferOptions = ref => ({
   partialRender: true
 });
 
-export default function Waveform({url}) {
+export default function Waveform({filePath, fileName}) {
   const waveformRef = useRef(null);
   const wavesurfer = useRef(null);
   const [playing, setPlay] = useState(false);
   const [volume, setVolume] = useState(0.5);
 
-  // create new WaveSurfer instance
-  // On component mount and when url changes
+
   useEffect(() => {
-    setPlay(false);
-
-    const options = formWaveSurferOptions(waveformRef.current);
-    wavesurfer.current = WaveSurfer.create(options);
-
-    wavesurfer.current.load(url);
-
-    wavesurfer.current.on("ready", function() {
-      // https://wavesurfer-js.org/docs/methods.html
-      // wavesurfer.current.play();
-      // setPlay(true);
-
-      // make sure object stillavailable when file loaded
-      if (wavesurfer.current) {
-        wavesurfer.current.setVolume(volume);
-        setVolume(volume);
-      }
-    });
-
-    wavesurfer.current.on("finish", function() {
+    const create = async () => {
       setPlay(false);
-    });
 
-    // Removes events, elements and disconnects Web Audio nodes.
-    // when component unmount
-    return () => wavesurfer.current.destroy();
-  }, [url]);
+      const WaveSurfer = (await import("wavesurfer.js")).default;
+
+      const options = formWaveSurferOptions(waveformRef.current);
+
+      wavesurfer.current = WaveSurfer.create(options);
+      wavesurfer.current.load(filePath);
+
+      wavesurfer.current.on("ready", function() {
+        // https://wavesurfer-js.org/docs/methods.html
+        // wavesurfer.current.play();
+        // setPlay(true);
+
+        // make sure object still available when file loaded
+        if (wavesurfer.current) {
+          wavesurfer.current.setVolume(volume);
+          setVolume(volume);
+        }
+      });
+
+      wavesurfer.current.on("finish", function() {
+        setPlay(false);
+      });
+    };
+
+    create();
+
+    return () => {
+      if (wavesurfer.current) {
+        wavesurfer.current.destroy();
+      }
+    };
+  }, [filePath]);
 
   const handlePlayPause = () => {
     setPlay(!playing);
@@ -102,7 +109,7 @@ export default function Waveform({url}) {
   return (
     <div style={{width: '80%', height: '100px', marginLeft: 'auto', marginRight: 'auto'}}>
       <div style={{width: '100%', height: '20px', marginLeft: 'auto', marginRight: 'auto'}}>
-          {url}
+          {fileName}
       </div>
       <div style={{width: '100%', height: '80px', marginTop: '20px', marginLeft: 'auto', marginRight: 'auto'}}>
         <button

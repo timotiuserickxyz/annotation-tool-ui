@@ -1,4 +1,4 @@
-import { post } from '../core';
+import { remove } from '../core';
 import { Response, ResponseStatus } from '../types/base';
 import { getAPIUrl } from '../../utils/path';
 
@@ -13,7 +13,7 @@ type ProjectData = {
 } & ResponseStatus;
 
 export async function deleteProjectData(param1: string, param2: number, params: any[]): Promise<Response<ProjectData>> {
-  const { data, error } = await post(getAPIUrl('annotation', 'deleteProjectData', {projectName: param1, recordId: param2}), {
+  const { data, error } = await remove(getAPIUrl('annotation', 'deleteProjectData', {projectName: param1, recordId: param2}), {
     params
   });
   

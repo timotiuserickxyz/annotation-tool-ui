@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import {
   Radio,
   Button,
@@ -7,7 +7,8 @@ import {
   FormControl,
   FormControlLabel } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import AudioPlayer from "./AudioPlayer";
+import AudioPlayer from './AudioPlayer';
+import { API_URL } from '../../../api/core';
 
 const useStyles = makeStyles({
   container: {
@@ -42,17 +43,14 @@ export type BaseRow = {
   tableData?: {id: string | number, checked: boolean | undefined};
 };
 
-type Row = BaseRow & {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-};
-
 type Props = {
   projectName: string,
-  selectedDataIndex: number,
+  projectLabelList: string[],
   selectedAudio: string,
+  selectedLabel: string,
+  selectedComment: string,
+  handleChangeLabel: (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void | Promise<void>,
+  handleChangeComment: (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void | Promise<void>,
   onClickSave: () => void | Promise<void>,
   onClickPrev: () => void | Promise<void>,
   onClickNext: () => void | Promise<void>,
@@ -60,38 +58,41 @@ type Props = {
 
 type Component = (props: Props) => React.ReactElement<Props>;
 
-export const AnnotateData: Component = ({ selectedDataIndex, selectedAudio, onClickSave, onClickPrev, onClickNext }) => {
+export const AnnotateData: Component = ({ projectName, projectLabelList, selectedAudio, selectedLabel, handleChangeLabel, selectedComment, handleChangeComment, onClickSave, onClickPrev, onClickNext }) => {
   const classes = useStyles();
 
-  let audioFile = '';
-  if (selectedDataIndex == 0) {
-    audioFile = '/mono_8000hz_32bit_1.wav';
-  }
-  else if (selectedDataIndex % 9 == 0)
-    audioFile = '/mono_8000hz_32bit_1.wav';
-  else if (selectedDataIndex % 9 == 1)
-    audioFile = '/mono_8000hz_32bit_2.wav';
-  else if (selectedDataIndex % 9 == 2)
-    audioFile = '/mono_11025hz_32bit_1.wav';
-  else if (selectedDataIndex % 9 == 3)
-    audioFile = '/mono_44100hz_32bit_1.wav';
-  else if (selectedDataIndex % 9 == 4)
-    audioFile = '/mono_44100hz_32bit_2.wav';
-  else if (selectedDataIndex % 9 == 5)
-    audioFile = '/mono_44100hz_32bit_3.wav';
-  else if (selectedDataIndex % 9 == 6)
-    audioFile = '/mono_48000hz_32bit_1.wav';
-  else if (selectedDataIndex % 9 == 7)
-    audioFile = '/mono_48000hz_32bit_2.wav';
-  else if (selectedDataIndex % 9 == 8)
-    audioFile = '/stereo_11025hz_32bit_1.wav';
+  // Select audio file
+  // let audioFile = '';
+  // if (selectedDataIndex == 0) {
+  //   audioFile = '/mono_8000hz_32bit_1.wav';
+  // }
+  // else if (selectedDataIndex % 9 == 0)
+  //   audioFile = '/mono_8000hz_32bit_1.wav';
+  // else if (selectedDataIndex % 9 == 1)
+  //   audioFile = '/mono_8000hz_32bit_2.wav';
+  // else if (selectedDataIndex % 9 == 2)
+  //   audioFile = '/mono_11025hz_32bit_1.wav';
+  // else if (selectedDataIndex % 9 == 3)
+  //   audioFile = '/mono_44100hz_32bit_1.wav';
+  // else if (selectedDataIndex % 9 == 4)
+  //   audioFile = '/mono_44100hz_32bit_2.wav';
+  // else if (selectedDataIndex % 9 == 5)
+  //   audioFile = '/mono_44100hz_32bit_3.wav';
+  // else if (selectedDataIndex % 9 == 6)
+  //   audioFile = '/mono_48000hz_32bit_1.wav';
+  // else if (selectedDataIndex % 9 == 7)
+  //   audioFile = '/mono_48000hz_32bit_2.wav';
+  // else if (selectedDataIndex % 9 == 8)
+  //   audioFile = '/stereo_11025hz_32bit_1.wav';
 
-  const comment = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin tortor ante, elementum vel turpis a, tincidunt semper augue. Nulla vel nulla posuere, elementum orci non, tempus urna. Integer ornare interdum ligula vel faucibus. Curabitur erat odio, ornare non metus at, bibendum molestie tortor. Nunc sit amet augue sapien. Proin diam erat, egestas et finibus in, blandit a lectus. Vivamus nibh velit, accumsan non erat at, volutpat bibendum ipsum. Pellentesque est sem, luctus in convallis ut, feugiat ut ligula. Proin pretium congue orci, ut luctus sapien congue quis.';
+  const selectedAudioPath = API_URL + '/annotation-project/source/wav/' + projectName + '/' + selectedAudio;
 
   return (
     <div>
       <div className={classes.container}>
-        <AudioPlayer url={audioFile} />
+        {
+          selectedAudio != '' ? (<AudioPlayer filePath={selectedAudioPath} fileName={selectedAudio}  />) : ''
+        }
       </div>
       <br/>
       <br/>
@@ -99,20 +100,23 @@ export const AnnotateData: Component = ({ selectedDataIndex, selectedAudio, onCl
         <FormControl className={classes.labelRadioGroup}>
           <FormLabel id="demo-radio-buttons-group-label">Label</FormLabel>
           <RadioGroup
-            aria-labelledby="demo-radio-buttons-group-label"
-            defaultValue="female"
-            name="radio-buttons-group"
+            value={selectedLabel}
+            onChange={handleChangeLabel}
           >
-            <FormControlLabel control={<Radio />} value="good" label="Good" />
-            <FormControlLabel control={<Radio />} value="mid" label="Mid" />
-            <FormControlLabel control={<Radio />} value="bad" label="Bad" />
+            {projectLabelList && projectLabelList.map(dataLabel => 
+              (<FormControlLabel
+                  control={<Radio />}
+                  value={dataLabel}
+                  label={dataLabel}
+                />)
+            )}
           </RadioGroup>
         </FormControl>
       </div>
       <br/>
       <br/>
       <div className={classes.container}>
-        <textarea className={classes.commentTextArea} defaultValue={comment} />
+        <textarea className={classes.commentTextArea} onChange={handleChangeComment} value={selectedComment ? selectedComment : ''} />
       </div>
       <br/>
       <div className={classes.container}>

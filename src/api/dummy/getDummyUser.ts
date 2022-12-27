@@ -3,9 +3,6 @@ import { dummyfetcher } from '../core';
 import { Response, ResponseError, ResponseStatus } from '../types/base';
 import { getAPIUrl } from '../../utils/path';
 
-interface Path {
-  userId: number;
-}
 interface DummyCompany {
   name: string;
   catchPhrase: string;

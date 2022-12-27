@@ -20,7 +20,7 @@ type ProjectDataList = {
 export function getProjectDataList(param: string): Response<ProjectDataList> {
   const { data, error } = useSWR<ProjectDataList, ResponseError>(
     param ? getAPIUrl('annotation', 'getProjectDataList', {projectName: param}) : null,
-    fetcher,
+    fetcher
   );
 
   return {

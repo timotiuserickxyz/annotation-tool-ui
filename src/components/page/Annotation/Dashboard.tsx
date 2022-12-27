@@ -1,19 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { useSetState } from 'react-use';
-import { useRouter } from 'next/router';
+import React, { useState } from 'react';
+import { mutate } from 'swr';
 import { makeStyles } from '@material-ui/core/styles';
-import { Button } from '@material-ui/core';
 
+import { getAPIUrl } from '../../../utils/path';
 import { getProjectList } from '../../../api/annotation/getProjectList';
 import { getProjectDetail } from '../../../api/annotation/getProjectDetail';
 import { getProjectDataList } from '../../../api/annotation/getProjectDataList';
+import { updateProjectData } from '../../../api/annotation/updateProjectData';
 
-import { getDummyUserList } from '../../../api/dummy/getDummyUserList';
 import { AnnotateData } from '../../base/Annotation/AnnotateData';
-import { DummyData } from '../../base/Dummy/DummyData';
-
-import { getAPIUrl } from '../../../utils/path';
-import { mutate } from 'swr';
+import { AnnotationData } from '../../base/Annotation/AnnotationData';
 
 const useStyles = makeStyles({
   root: {
@@ -54,11 +50,12 @@ interface Props {}
 
 export const Dashboard: React.FC<Props> = () => {
   const classes = useStyles();
-  const router = useRouter();
 
   const [projectName, setProjectName] = useState<string>('');
-  const [selectedDataIndex, setSelectedDataIndex] = useState<number>(0);
+  const [selectedTableIndex, setSelectedTableIndex] = useState<number>(0);
   const [selectedAudio, setSelectedAudio] = useState<string>('');
+  const [selectedLabel, setSelectedLabel] = useState<string>('');
+  const [selectedComment, setSelectedComment] = useState<string>('');
 
   const rawProjectList = getProjectList();
   const actualProjectList = !!rawProjectList.data ? rawProjectList.data.configs.map((t) => {
@@ -66,48 +63,86 @@ export const Dashboard: React.FC<Props> = () => {
   }) : [];
 
   const rawProjectDetail = getProjectDetail(projectName);
-  const projectDetail = !!rawProjectDetail && !!rawProjectDetail.data ? rawProjectDetail.data : null;
-
-  //const rawProjectData = getProjectDataList(projectName);
-  // const projectData = !!rawProjectData && !!rawProjectData.data ? rawProjectData.data.data.map((t) => {
-  //   return {...t};
-  // }) : [];
-
-  const rawProjectData = getDummyUserList(projectName ? true : false);
-  const projectData = !!rawProjectData && !!rawProjectData.data ? rawProjectData.data.map((t) => {
+  // const projectDetail = !!rawProjectDetail && !!rawProjectDetail.data ? rawProjectDetail.data : null;
+  const projectLabelList = !!rawProjectDetail && !!rawProjectDetail.data ? rawProjectDetail.data.label_option.label_option : [];
+  
+  const rawProjectData = getProjectDataList(projectName);
+  const projectData = !!rawProjectData && !!rawProjectData.data ? rawProjectData.data.data.map((t) => {
     return {...t};
   }) : [];
 
   const projectDataCount = projectData.length;
 
-  const selectProject = (e: string) => {
+  const selectProject = async (e: string) => {
     setProjectName(e);
-    setSelectedDataIndex(0);
-
-    // await mutate(getAPIUrl('annotation', 'getProjectDetail', {projectName: e}));
-    // await mutate(getAPIUrl('annotation', 'getProjectDataList', {projectName: e}));
+    setSelectedTableIndex(0);
+    setSelectedAudio('');
+    setSelectedLabel('');
+    setSelectedComment('');
   };
 
   const saveAndRefreshData = () => {
+    const params = {
+      label: selectedLabel,
+      comment: selectedComment
+    }
+
+    const selectedData = projectData[selectedTableIndex - 1];
+
     // Save
+    updateProjectData(projectName, selectedData.record_id, params);
     
     // Refresh
-    
+    // mutate(getAPIUrl('annotation', 'getProjectDetail', {projectName: projectName}));
+    mutate(getAPIUrl('annotation', 'getProjectDataList', {projectName: projectName}));
+  };
+
+  const handleChangeLabel = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    const value = (event.target as HTMLInputElement).value;
+    setSelectedLabel(value);
+  };
+  
+  const handleChangeComment = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    const value = (event.target as HTMLInputElement).value;
+    setSelectedComment(value);
   };
 
   const goToPrevData = () => {
-    const prevDataIndex = selectedDataIndex - 1;
-    setSelectedDataIndex(prevDataIndex);
+    if (selectedTableIndex > 1)
+    {
+      const prevTableIndex = selectedTableIndex - 1;
+      setSelectedTableIndex(prevTableIndex);
+
+      const dataIndex = prevTableIndex - 1;
+      setSelectedAudio(projectData[dataIndex].file_name);
+      setSelectedLabel(projectData[dataIndex].label);
+      setSelectedComment(projectData[dataIndex].comment);
+    }
   };
 
   const goToNextData = () => {
-    const nextDataIndex = selectedDataIndex + 1;
-    setSelectedDataIndex(nextDataIndex);
+    if (selectedTableIndex < projectDataCount)
+    {
+      const nextDataIndex = selectedTableIndex + 1;
+      setSelectedTableIndex(nextDataIndex);
+
+      const dataIndex = nextDataIndex - 1;
+      setSelectedAudio(projectData[dataIndex].file_name);
+      setSelectedLabel(projectData[dataIndex].label);
+      setSelectedComment(projectData[dataIndex].comment);
+    }
   };
 
-  const handleSelection = (id: number, audioPath: string) => {
-    setSelectedDataIndex(id);
-    setSelectedAudio(audioPath);
+  const handleSelection = (tableIndex: number) => {
+    if (tableIndex >= 1 && tableIndex <= projectDataCount)
+    {
+      setSelectedTableIndex(tableIndex);
+
+      const dataIndex = tableIndex - 1;
+      setSelectedAudio(projectData[dataIndex].file_name);
+      setSelectedLabel(projectData[dataIndex].label);
+      setSelectedComment(projectData[dataIndex].comment);
+    }
   };
 
   return (
@@ -118,31 +153,31 @@ export const Dashboard: React.FC<Props> = () => {
           onChange={(e) => selectProject(e.target.value)}
         >
           <option></option>
-          <option>Project1</option>
-          <option>Project2</option>
           {actualProjectList && actualProjectList.map(p => 
             (<option key={p.project_name} value={p.project_name}>{p.project_name}</option>)
           )} 
         </select>
-        <Button onClick={saveAndRefreshData}>Try</Button>
-        <h3>{projectName}</h3>
       </div>
       { projectData && projectData.length > 0 ? (
         <div className={classes.content}>
           <div className={classes.annotateDataContainer}>
             <AnnotateData
               projectName={projectName}
-              selectedDataIndex={selectedDataIndex}
+              projectLabelList={projectLabelList}
               selectedAudio={selectedAudio}
+              selectedLabel={selectedLabel}
+              selectedComment={selectedComment}
+              handleChangeLabel={handleChangeLabel}
+              handleChangeComment={handleChangeComment}
               onClickSave={saveAndRefreshData}
               onClickPrev={goToPrevData}
               onClickNext={goToNextData}
             />
           </div>
           <div className={classes.annotationDataContainer}>
-            <DummyData
+            <AnnotationData
               data={projectData}
-              selectedDataIndex={selectedDataIndex}
+              selectedTableIndex={selectedTableIndex}
               onSelect={handleSelection}
             />
           </div>

@@ -6,13 +6,12 @@ export const pathMap = {
     getDummyPostList: '/posts',
   },
   annotation: {
-    getProjectList: '/annotation-tool/project/list',
-    getProjectDetail: '/annotation-tool/project/:projectName',
-    getProjectWavList: '/annotation-tool/project/source/wav/list/:projectName',
-    getProjectDataList: '/annotation-tool/project/data/:projectName',
-    postProjectData: '/annotation-tool/project/data/new/:projectName',
-    updateProjectData: '/annotation-tool/project/data/update/:projectName/:recordId',
-    deleteProjectData: '/annotation-tool/project/data/delete/:projectName/:recordId',
+    getProjectList: '/annotation-project/list',
+    getProjectDetail: '/annotation-project/:projectName',
+    getProjectDataList: '/annotation-project/data/:projectName',
+    postProjectData: '/annotation-project/data/new/:projectName',
+    updateProjectData: '/annotation-project/data/update/:projectName/:recordId',
+    deleteProjectData: '/annotation-project/data/delete/:projectName/:recordId',
   },
 };
 

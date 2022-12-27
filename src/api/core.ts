@@ -7,7 +7,7 @@ interface RequestInitExtend extends RequestInit {
 }
 
 // TODO 環境変数
-const API_URL = 'http://localhost:5042/api/v0';
+export const API_URL = 'http://localhost:5042/api/v0';
 
 export const fetcher = async <T = any>(
   path: string,
@@ -52,6 +52,74 @@ export const post = async (
     ...init,
     headers,
     method: init?.method ?? 'POST',
+    body,
+  });
+
+  const text = await res.text();
+  const error = text ? JSON.parse(text) : {};
+
+  if (res.ok) {
+    return {
+      data: text ? JSON.parse(text) : {},
+      error: null,
+      loading: false,
+    };
+  }
+
+  return {
+    data: null,
+    error,
+    loading: false,
+  };
+};
+
+export const put = async (
+  path: string,
+  init?: RequestInitExtend,
+): Promise<Response<any>> => {
+  const body = init?.body ?? JSON.stringify(init?.params);
+  const headers: HeadersInit = {
+    ...{ 'Content-Type': 'application/json' },
+    ...init?.headers,
+  };
+  const res = await fetch(`${API_URL}${path}`, {
+    ...init,
+    headers,
+    method: init?.method ?? 'PUT',
+    body,
+  });
+
+  const text = await res.text();
+  const error = text ? JSON.parse(text) : {};
+
+  if (res.ok) {
+    return {
+      data: text ? JSON.parse(text) : {},
+      error: null,
+      loading: false,
+    };
+  }
+
+  return {
+    data: null,
+    error,
+    loading: false,
+  };
+};
+
+export const remove = async (
+  path: string,
+  init?: RequestInitExtend,
+): Promise<Response<any>> => {
+  const body = init?.body ?? JSON.stringify(init?.params);
+  const headers: HeadersInit = {
+    ...{ 'Content-Type': 'application/json' },
+    ...init?.headers,
+  };
+  const res = await fetch(`${API_URL}${path}`, {
+    ...init,
+    headers,
+    method: init?.method ?? 'DELETE',
     body,
   });
 
