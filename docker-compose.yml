@@ -1,0 +1,14 @@
+version: '3'
+services:
+  ui:
+    image: annotation-tool-ui:0.0.1
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APPINSIGHT_INSTRUMENTATION_KEY: 987-876-765-654-543
+    ports:
+      - 3001:3001
+    environment:
+      TZ: Asia/Tokyo
+      NEXT_TELEMETRY_DISABLED: 1
