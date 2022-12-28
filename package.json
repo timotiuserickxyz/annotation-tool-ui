@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next -p 3001",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3001",
     "eslint": "eslint './src/**/*' './pages/**/*'",
     "format": "prettier --write ./src/**/*.{tsx,ts} --fix",
     "storybook": "start-storybook -p 6006"
