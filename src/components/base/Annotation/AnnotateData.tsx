@@ -35,7 +35,7 @@ const useStyles = makeStyles({
     marginRight: 'auto',
     alignItems: 'center',
     justifyContent: 'space-between',
-  }
+  },
 });
 
 export type BaseRow = {
@@ -47,6 +47,8 @@ type Props = {
   projectName: string,
   projectLabelList: string[],
   selectedAudio: string,
+  selectedAudioStartTime: number,
+  selectedAudioEndTime: number,
   selectedLabel: string,
   selectedComment: string,
   handleChangeLabel: (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void | Promise<void>,
@@ -58,7 +60,7 @@ type Props = {
 
 type Component = (props: Props) => React.ReactElement<Props>;
 
-export const AnnotateData: Component = ({ projectName, projectLabelList, selectedAudio, selectedLabel, handleChangeLabel, selectedComment, handleChangeComment, onClickSave, onClickPrev, onClickNext }) => {
+export const AnnotateData: Component = ({ projectName, projectLabelList, selectedAudio, selectedAudioStartTime, selectedAudioEndTime, selectedLabel, handleChangeLabel, selectedComment, handleChangeComment, onClickSave, onClickPrev, onClickNext }) => {
   const classes = useStyles();
 
   // Select audio file
@@ -91,10 +93,9 @@ export const AnnotateData: Component = ({ projectName, projectLabelList, selecte
     <div>
       <div className={classes.container}>
         {
-          selectedAudio != '' ? (<AudioPlayer filePath={selectedAudioPath} fileName={selectedAudio}  />) : ''
+          selectedAudio != '' ? (<AudioPlayer filePath={selectedAudioPath} fileName={selectedAudio} startTime={selectedAudioStartTime} endTime={selectedAudioEndTime}  />) : ''
         }
       </div>
-      <br/>
       <br/>
       <div className={classes.container}>
         <FormControl className={classes.labelRadioGroup}>
@@ -114,15 +115,13 @@ export const AnnotateData: Component = ({ projectName, projectLabelList, selecte
         </FormControl>
       </div>
       <br/>
-      <br/>
       <div className={classes.container}>
         <textarea className={classes.commentTextArea} onChange={handleChangeComment} value={selectedComment ? selectedComment : ''} />
       </div>
-      <br/>
       <div className={classes.container}>
         <div className={classes.navigationContainer}>
           <Button onClick={onClickPrev}>Prev</Button>
-          <Button onClick={onClickSave}>Save</Button>
+          <Button onClick={onClickSave}>Save & Next</Button>
           <Button onClick={onClickNext}>Next</Button>
         </div>
       </div>

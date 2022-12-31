@@ -12,7 +12,7 @@ type ProjectData = {
   comment: string;
 } & ResponseStatus;
 
-export async function deleteProjectData(param1: string, param2: number, params: any[]): Promise<Response<ProjectData>> {
+export async function deleteProjectData(param1: string, param2: number, params: any): Promise<Response<ProjectData>> {
   const { data, error } = await remove(getAPIUrl('annotation', 'deleteProjectData', {projectName: param1, recordId: param2}), {
     params
   });

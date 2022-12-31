@@ -8,6 +8,8 @@ export const pathMap = {
   annotation: {
     getProjectList: '/annotation-project/list',
     getProjectDetail: '/annotation-project/:projectName',
+    getRawFileList: '/dataset/source/list/:folderName',
+    getRawFileDataList: '/dataset/source/load/:folderName/:fileName',
     getProjectDataList: '/annotation-project/data/:projectName',
     postProjectData: '/annotation-project/data/new/:projectName',
     updateProjectData: '/annotation-project/data/update/:projectName/:recordId',
