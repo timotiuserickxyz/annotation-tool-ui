@@ -51,6 +51,8 @@ export default function Waveform({filePath, fileName, startTime, endTime}) {
   const [volume, setVolume] = useState(0.5);
   const [zoom, setZoom] = useState(0);
 
+  // Do not switch the order
+  // Region creator should be put before audio player creator
   useEffect(() => {
     if (wavesurfer.current) {
       wavesurfer.current.clearRegions();

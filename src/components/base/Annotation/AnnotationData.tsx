@@ -36,15 +36,6 @@ type Component = (props: Props) => React.ReactElement<Props>;
 export const AnnotationData: Component = ({ rawFileName, rawFileData, projectData, selectedTableIndex, onSelect }) => {
   const classes = useStyles();
 
-  if (rawFileData.length > 0 && selectedTableIndex == 0)
-  {
-    selectedTableIndex = 1;
-  }
-  else if (rawFileData.length <= 0)
-  {
-    return (<div></div>);
-  }
-
   const rows: Row[] = !!rawFileData
   ? rawFileData.map((t) => {
       return {...t};
@@ -112,7 +103,7 @@ export const AnnotationData: Component = ({ rawFileName, rawFileData, projectDat
       autoHeight
       rows={rows}
       columns={columns}
-      // page={currentPage}
+      // page={currentPage} // Buggy caused by sorting/filtering
       pageSize={rowPerPage}
       disableColumnSelector={true}
       selectionModel={[selectedTableIndex]}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { mutate } from 'swr';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -114,6 +114,13 @@ export const Dashboard: React.FC<Props> = () => {
     setSelectedComment('');
   };
 
+  useEffect(() => {
+    if (selectedTableIndex == 0 && dataCount > 0) {
+      setSelectedTableIndex(1);
+      refreshSelection(0);
+    }
+  }, [rawFileData]);
+
   const saveAndRefreshData = async() => {
     if (selectedLabel == '')
     {
@@ -129,17 +136,30 @@ export const Dashboard: React.FC<Props> = () => {
       comment: selectedComment
     }
 
+    let response: any = null;
+    let errorMessage = '';
+
     if (selectedProjectData == null)
     {
       // Create
-      await postProjectData(projectName, params);
-
-      // setSelectedProjectData
+      response = await postProjectData(projectName, params);
     }
     else
     {
       // Update
-      await updateProjectData(projectName, selectedProjectData.record_id, params);
+      response = await updateProjectData(projectName, selectedProjectData.record_id, params);
+    }
+
+    if (response.error) {
+      errorMessage = 'InternalServerError';
+    }
+    else if (response.data && response.data.error) {
+      errorMessage = response.data.error.message;
+    }
+
+    if (errorMessage != '') {
+      alert(errorMessage);
+      return;
     }
     
     // Refresh
