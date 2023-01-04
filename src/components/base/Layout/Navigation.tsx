@@ -1,5 +1,6 @@
 import React from 'react';
 import HomeOutlinedIcon from '@material-ui/icons/HomeOutlined';
+import SettingsIcon from '@material-ui/icons/Settings';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -9,7 +10,6 @@ import { pathMap } from '../../../router/router';
 import Link from '../../base/Link';
 
 // Useful stuffs
-// import SettingsIcon from '@material-ui/icons/Settings';
 // import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
 // import ComputerIcon from '@material-ui/icons/Computer';
 // import AssignmentIcon from '@material-ui/icons/Assignment';
@@ -25,6 +25,11 @@ const navTop = {
     icon: <HomeOutlinedIcon />,
     path: pathMap.dashboard.path,
   },
+  settings: {
+    label: 'Settings',
+    icon: <SettingsIcon />,
+    path: pathMap.settings.path,
+  },
 };
 
 export const Navigation: React.FC<Props> = () => {
@@ -38,6 +43,15 @@ export const Navigation: React.FC<Props> = () => {
           <ListItem button>
             <ListItemIcon>{navTop.dashboard.icon}</ListItemIcon>
             <ListItemText primary={navTop.dashboard.label} />
+          </ListItem>
+        </Link>
+        <Link
+          href={navTop.settings.path}
+          style={{ textDecoration: 'none', color: 'rgba(0, 0, 0, 0.87)' }}
+        >
+          <ListItem button>
+            <ListItemIcon>{navTop.settings.icon}</ListItemIcon>
+            <ListItemText primary={navTop.settings.label} />
           </ListItem>
         </Link>
         {/* <Link

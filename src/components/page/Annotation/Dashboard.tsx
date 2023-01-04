@@ -133,7 +133,7 @@ export const Dashboard: React.FC<Props> = () => {
       channel: selectedRawFileData.Channel,
       sequence_number: selectedRawFileData.Sequence_number,
       label: selectedLabel,
-      comment: selectedComment
+      comment: selectedComment,
     }
 
     let response: any = null;
