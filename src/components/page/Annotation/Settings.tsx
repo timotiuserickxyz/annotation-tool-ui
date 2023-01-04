@@ -69,7 +69,6 @@ export const Settings: React.FC<Props> = () => {
   const [rawFolderName, setRawFolderName] = useState<string>('');
   const [wavFolderName, setWavFolderName] = useState<string>('');
   const [createdProjectName, setCreatedProjectName] = useState<string>('');
-  const [selectedTableIndex, setSelectedTableIndex] = useState<number>(0);
 
   const tempProjectList = getProjectList();
   const projectList = !!tempProjectList.data ? tempProjectList.data.configs.map((t) => {

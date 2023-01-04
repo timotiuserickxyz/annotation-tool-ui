@@ -40,10 +40,6 @@ export const AnnotationProjects: Component = ({ projects, onClickDelete }) => {
     })
   : [];
 
-  function getRawFolderFromProject(params: any) {
-    return params.row.source_path.raw_source_path;
-  }
-
   const columns = [
     { field: 'project_name', headerName: 'Project Name', flex: 1 },
     { field: 'raw',
