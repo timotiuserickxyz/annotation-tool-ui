@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import PauseIcon from '@material-ui/icons/Pause';
 import { makeStyles } from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const useStyles = makeStyles({
   audioPlayerContainer: {
@@ -35,10 +36,17 @@ const useStyles = makeStyles({
     cursor: 'pointer',
   },
   waveForm: {
-    width: 'calc(100% - 30px)',
+    width: 'calc(100% - 51px)',
     height: '50px',
     float: 'left',
     border: 'solid 1px Black',
+  },
+  loading: {
+    float: 'left',
+    marginTop: '15px',
+    marginLeft: '3px',
+    width: '18px !important',
+    height: '18px !important',
   },
 });
 
@@ -47,6 +55,7 @@ export default function Waveform({filePath, fileName, startTime, endTime}) {
 
   const waveformRef = useRef(null);
   const wavesurfer = useRef(null);
+  const [loading, setLoading] = useState(false);
   const [playing, setPlay] = useState(false);
   const [volume, setVolume] = useState(0.5);
   const [zoom, setZoom] = useState(0);
@@ -63,7 +72,17 @@ export default function Waveform({filePath, fileName, startTime, endTime}) {
         drag: false,
         resize: false,
         color: 'hsla(0, 100%, 50%, 0.3)',
-      })
+      });
+
+      if (playing)
+      {
+        wavesurfer.current.play(startTime, endTime);
+      }
+      else
+      {
+        wavesurfer.current.play(startTime, endTime);
+        wavesurfer.current.playPause();
+      }
     }
   }, [startTime, endTime]);
 
@@ -104,6 +123,8 @@ export default function Waveform({filePath, fileName, startTime, endTime}) {
         ]
       });
 
+      setLoading(true);
+
       wavesurfer.current.load(filePath);
 
       wavesurfer.current.on("ready", function() {
@@ -115,7 +136,21 @@ export default function Waveform({filePath, fileName, startTime, endTime}) {
         if (wavesurfer.current) {
           wavesurfer.current.setVolume(volume);
           wavesurfer.current.zoom(zoom);
+          setLoading(false);
         }
+      });
+
+      wavesurfer.current.on("error", function(e) {
+        if (e == 'Error: HTTP error status: 404')
+        {
+          alert(filePath + ' not found');
+        }
+        else
+        {
+          alert('Error loading ' + filePath);
+        }
+
+        setLoading(false);
       });
 
       wavesurfer.current.on('region-click', function(region, e) {
@@ -138,6 +173,7 @@ export default function Waveform({filePath, fileName, startTime, endTime}) {
   }, [filePath]);
 
   const handlePlayPause = () => {
+    if (loading) return;
     setPlay(!playing);
     wavesurfer.current.playPause();
   };
@@ -174,6 +210,7 @@ export default function Waveform({filePath, fileName, startTime, endTime}) {
         <div className={classes.waveForm}>
           <div id="waveform" ref={waveformRef} />
         </div>
+        { loading ? <CircularProgress className={classes.loading} /> : ''}
         <div style={{marginTop: '-20px'}}>
           <input
             type="range"
