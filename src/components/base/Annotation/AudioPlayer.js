@@ -61,6 +61,18 @@ export default function Waveform({filePath, fileName, startTime, endTime}) {
   const [zoom, setZoom] = useState(0);
 
   // Do not switch the order
+  // Destructor should be put first
+  useEffect(() => {
+    return () => {
+      // componentwillunmount in functional component.
+      // Anything in here is fired on component unmount.
+      if (wavesurfer.current) {
+        wavesurfer.current.destroy();
+      }
+    }
+  }, []);
+
+  // Do not switch the order
   // Region creator should be put before audio player creator
   useEffect(() => {
     if (wavesurfer.current) {
@@ -86,6 +98,8 @@ export default function Waveform({filePath, fileName, startTime, endTime}) {
     }
   }, [startTime, endTime]);
 
+  // Do not switch the order
+  // Waveform creator should be put lastly
   useEffect(() => {
     const create = async () => {
       setPlay(false);
