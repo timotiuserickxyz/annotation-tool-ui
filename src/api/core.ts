@@ -7,7 +7,7 @@ interface RequestInitExtend extends RequestInit {
 }
 
 // TODO 環境変数
-export const API_URL = 'http://localhost:5042/api/v0';
+export const API_URL = 'http://20.243.80.153:5042/api/v0';
 
 export const fetcher = async <T = any>(
   path: string,
