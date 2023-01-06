@@ -26,15 +26,12 @@ const useStyles = makeStyles({
     display: 'flex',
     marginLeft: 'auto',
     marginRight: 'auto',
+    resize: 'none',
   },
   navigationContainer: {
     width: '80%',
     height: '100px',
-    display: 'flex',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    display: 'inline-block',
   },
 });
 
@@ -97,6 +94,8 @@ export const AnnotateData: Component = ({ projectName, projectLabelList, selecte
         }
       </div>
       <br/>
+      <br/>
+      <br/>
       <div className={classes.container}>
         <FormControl className={classes.labelRadioGroup}>
           <FormLabel id="demo-radio-buttons-group-label">Label</FormLabel>
@@ -118,7 +117,8 @@ export const AnnotateData: Component = ({ projectName, projectLabelList, selecte
       <div className={classes.container}>
         <textarea className={classes.commentTextArea} onChange={handleChangeComment} value={selectedComment ? selectedComment : ''} />
       </div>
-      <div className={classes.container}>
+      <br/>
+      <div className={classes.container} style={{textAlign: 'center'}}>
         <div className={classes.navigationContainer}>
           <Button onClick={onClickPrev}>Prev</Button>
           <Button onClick={onClickSave}>Save & Next</Button>

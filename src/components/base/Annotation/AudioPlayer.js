@@ -237,6 +237,7 @@ export default function Waveform({filePath, fileName, startTime, endTime}) {
             step=".025"
             onChange={onVolumeChange}
             defaultValue={volume}
+            style={{width: '40%'}}
           />
           <label htmlFor="volume">Volume</label>
         </div>
@@ -250,6 +251,7 @@ export default function Waveform({filePath, fileName, startTime, endTime}) {
             step="1"
             onChange={onZoomChange}
             defaultValue={zoom}
+            style={{width: '40%'}}
           />
           <label htmlFor="zoom">Zoom</label>
         </div>
