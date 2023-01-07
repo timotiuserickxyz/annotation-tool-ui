@@ -9,9 +9,12 @@ import { getWavFolderList } from '../../../api/annotation/getWavFolderList';
 import { postProject } from '../../../api/annotation/postProject';
 import { putProject } from '../../../api/annotation/putProject';
 import { deleteProject } from '../../../api/annotation/deleteProject';
+import { postProjectLabel } from '../../../api/annotation/postProjectLabel';
+import { deleteProjectLabel } from '../../../api/annotation/deleteProjectLabel';
 
 import { AnnotationProjects } from '../../base/Annotation/AnnotationProjects';
-import { Button } from '@material-ui/core';
+import { Button, TextField, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
+
 
 const useStyles = makeStyles({
   root: {
@@ -43,21 +46,24 @@ const useStyles = makeStyles({
   content: {
     width: '100%',
     marginTop: '20px',
-    minHeight: '100px',
+    height: '710px',
     overflow: 'hidden',
     padding: '20px',
     backgroundColor: 'white',
     border: 'solid 1px lightGray',
     borderRadius: '5px',
   },
-  annotateDataContainer: {
-    width: '25%',
-    float: 'left',
-  },
-  annotationDataContainer: {
-    width: '75%',
-    float: 'left',
-  },
+  modalContent: {
+    position: 'absolute' as 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '400',
+    bgcolor: 'white',
+    border: '2px solid #000',
+    boxShadow: '24',
+    p: '4',
+  }
 });
 
 interface Props {}
@@ -69,6 +75,13 @@ export const Settings: React.FC<Props> = () => {
   const [rawFolderName, setRawFolderName] = useState<string>('');
   const [wavFolderName, setWavFolderName] = useState<string>('');
   const [createdProjectName, setCreatedProjectName] = useState<string>('');
+
+  const [selectedProjectName, setSelectedProjectName] = useState<string>('');
+  const [newProjectLabel, setNewProjectLabel] = useState<string>('');
+
+  const [openModal, setOpenModal] = useState<boolean>(false);
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
 
   const tempProjectList = getProjectList();
   const projectList = !!tempProjectList.data ? tempProjectList.data.configs.map((t) => {
@@ -164,7 +177,12 @@ export const Settings: React.FC<Props> = () => {
     setCreatedProjectName(projectName);
   };
 
-  const deleteAndRefreshProject = async (targetProjectName: string) => {
+  const deleteProjectAndRefreshProject = async (targetProjectName: string) => {
+    if (confirm('Are you sure to delete project: ' + targetProjectName + '?') == false)
+    {
+      return;
+    }
+
     const params = {
         names: [
             targetProjectName
@@ -191,6 +209,80 @@ export const Settings: React.FC<Props> = () => {
     await mutate(getAPIUrl('annotation', 'getProjectList'));
   };
 
+  const deleteLabelAndRefreshProject = async (targetProjectName: string, targetLabelName: string) => {
+    if (confirm('Are you sure to delete label: ' + targetLabelName + ' from project ' + targetProjectName + '?') == false)
+    {
+      return;
+    }
+
+    const params = {
+        label_option: targetLabelName
+    }
+
+    let errorMessage = '';
+
+    const response = await deleteProjectLabel(targetProjectName, params);
+
+    if (response.error) {
+        errorMessage = 'InternalServerError';
+    }
+    else if (response.data && response.data.error) {
+        errorMessage = response.data.error.message;
+    }
+
+    if (errorMessage != '') {
+        alert(errorMessage);
+        return;
+    }
+        
+    // Refresh
+    await mutate(getAPIUrl('annotation', 'getProjectList'));
+  };
+
+  const prepareCreateNewLabel = async (targetProjectName: string) => {
+    setSelectedProjectName(targetProjectName);
+    setNewProjectLabel('');
+    setOpenModal(true);
+  };
+
+  const createNewLabelAndRefresh = async() => {
+    if (selectedProjectName == '')
+    {
+      alert('Selected project is empty');
+      return;
+    }
+    else if (newProjectLabel == '')
+    {
+      alert('New label is empty');
+      return;
+    }
+
+    const params = {
+        label_option: newProjectLabel,
+    }
+
+    let errorMessage = '';
+
+    const response = await postProjectLabel(selectedProjectName, params);
+
+    if (response.error) {
+        errorMessage = 'InternalServerError';
+    }
+    else if (response.data && response.data.error) {
+        errorMessage = response.data.error.message;
+    }
+
+    if (errorMessage != '') {
+        alert(errorMessage);
+        return;
+    }
+        
+    // Refresh
+    await mutate(getAPIUrl('annotation', 'getProjectList'));
+
+    setOpenModal(false);
+  };
+
   const changeProjectName = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     const value = (event.target as HTMLInputElement).value;
     setProjectName(value);
@@ -202,6 +294,11 @@ export const Settings: React.FC<Props> = () => {
 
   const selectWavFolder = async (e: string) => {
     setWavFolderName(e);
+  };
+
+  const changeNewProjectLabel = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    const value = event.target.value;
+    setNewProjectLabel(value);
   };
 
   return (
@@ -232,15 +329,34 @@ export const Settings: React.FC<Props> = () => {
           )} 
         </select>
         <Button className={classes.headerItem} onClick={save}>
-            Create
+            Create New
         </Button>
       </div>
       <div className={classes.content}>
         <AnnotationProjects
             projects={projectList}
-            onClickDelete={deleteAndRefreshProject}
+            onClickDeleteProject={deleteProjectAndRefreshProject}
+            onClickDeleteLabel={deleteLabelAndRefreshProject}
+            onClickCreateLabel={prepareCreateNewLabel}
         />
       </div>
+      <Dialog open={openModal} onClose={handleCloseModal}>
+        <DialogTitle>Create New Label</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            
+          </DialogContentText>
+          <TextField
+            autoFocus
+            value={newProjectLabel}
+            onChange={changeNewProjectLabel}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseModal}>Cancel</Button>
+          <Button onClick={createNewLabelAndRefresh}>Submit</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

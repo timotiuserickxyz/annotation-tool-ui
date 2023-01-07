@@ -2,14 +2,46 @@ import * as React from 'react';
 import { DataGrid } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
 import { Button } from '@material-ui/core';
-import DeleteIcon from '@material-ui/icons/Delete';
+import HighlightOff from '@material-ui/icons/HighlightOff';
 
 const useStyles = makeStyles({
+  tableContainer: {
+    width: '100%',
+    height: '100%',
+  },
   customTable: {
     '&.MuiDataGrid-root .MuiDataGrid-cell:focus': {
-      outline: 'none',
+      outline: 'none !important',
     },
-  }
+    '& .MuiDataGrid-renderingZone': {
+      maxHeight: 'none !important',
+    },
+    '& .MuiDataGrid-cell': {
+      lineHeight: 'unset !important',
+      maxHeight: 'none !important',
+      whiteSpace: 'normal',
+      padding: '10px',
+      display: 'flex',
+      alignItems: 'center',
+    },
+    '& .MuiDataGrid-row': {
+      maxHeight: 'none !important',
+    },
+    '& .MuiDataGrid-row:hover': {
+      backgroundColor: 'white !important',
+    }
+  },
+  labelList: {
+    padding: '10px',
+  },
+  labelText: {
+    width: '100px',
+    display: 'inline-block',
+  },
+  deleteButton: {
+    minWidth: '40px !important',
+    width: '40px',
+  },
 });
 
 export type BaseRow = {
@@ -26,12 +58,14 @@ type Row = BaseRow & {
 
 type Props = {
   projects: any[],
-  onClickDelete: (targetProjectName: string) => void | Promise<void>,
+  onClickDeleteProject: (targetProjectName: string) => void | Promise<void>,
+  onClickDeleteLabel: (targetProjectName: string, targetLabelName: string) => void | Promise<void>,
+  onClickCreateLabel: (targetProjectName: string) => void | Promise<void>,
 };
 
 type Component = (props: Props) => React.ReactElement<Props>;
 
-export const AnnotationProjects: Component = ({ projects, onClickDelete }) => {
+export const AnnotationProjects: Component = ({ projects, onClickDeleteProject, onClickDeleteLabel, onClickCreateLabel }) => {
   const classes = useStyles();
 
   const rows: Row[] = !!projects
@@ -52,12 +86,33 @@ export const AnnotationProjects: Component = ({ projects, onClickDelete }) => {
       flex: 1,
       valueGetter: (params: any) => params.row.source_path.wav_source_path.replace(/^.*[\\\/]/, '')
     },
+    { field: 'label',
+      headerName: 'Labels',
+      flex: 1,
+      renderCell: (params: any = {}) => (
+        <ul className={classes.labelList}>
+          {params.row.label_option.label_option.map((label: string) => 
+            (<li>
+              <span className={classes.labelText}>{label}</span>
+              <Button className={classes.deleteButton} onClick={() => onClickDeleteLabel(params.row.project_name, label)}>
+                <HighlightOff />
+              </Button>
+            </li>)
+          )}
+          <li>
+            <Button onClick={() => onClickCreateLabel(params.row.project_name)}>
+              Create New
+            </Button>
+          </li>
+        </ul>
+      ),
+    },
     { field: 'action',
       headerName: 'Action',
       flex: 0.5,
       renderCell: (params: any = {}) => (
-        <Button onClick={() => onClickDelete(params.row.project_name)}>
-          <DeleteIcon />
+        <Button className={classes.deleteButton} onClick={() => onClickDeleteProject(params.row.project_name)}>
+          <HighlightOff />
         </Button>
       ),
     },
@@ -66,15 +121,17 @@ export const AnnotationProjects: Component = ({ projects, onClickDelete }) => {
   const rowPerPage: number = 10;
 
   return (
-    <DataGrid
-      className={classes.customTable}
-      getRowId={(row) => row.project_name}
-      autoHeight
-      rows={rows}
-      columns={columns}
-      pageSize={rowPerPage}
-      disableColumnSelector={true}
-    />
+    <div className={classes.tableContainer}>
+      <DataGrid
+        className={classes.customTable}
+        getRowId={(row) => row.project_name}
+        rows={rows}
+        columns={columns}
+        pageSize={rowPerPage}
+        disableColumnSelector={true}
+        disableSelectionOnClick={true}
+      />
+    </div>
   )
 };
   

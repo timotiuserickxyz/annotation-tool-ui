@@ -5,6 +5,10 @@ import { Tooltip } from '@material-ui/core';
 // import { Radio } from '@material-ui/core';
 
 const useStyles = makeStyles({
+  tableContainer: {
+    width: '100%',
+    height: '100%',
+  },
   customTable: {
     '&.MuiDataGrid-root .MuiDataGrid-cell:focus': {
       outline: 'none',
@@ -109,7 +113,7 @@ export const AnnotationDataList: Component = ({ rawFileName, rawFileData, projec
   //const currentPage: number = !!rawFileData ? Math.ceil(selectedDataTableIndex / rowPerPage) - 1 : 0;
 
   return (
-    <div style={{width: '100%', height: '100%'}}>
+    <div className={classes.tableContainer}>
       <DataGrid
         className={classes.customTable}
         getRowId={(row) => row.LineId}

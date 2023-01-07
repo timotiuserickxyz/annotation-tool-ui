@@ -3,6 +3,10 @@ import { DataGrid } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
+  tableContainer: {
+    width: '100%',
+    height: '100%',
+  },
   customTable: {
     '&.MuiDataGrid-root .MuiDataGrid-cell:focus': {
       outline: 'none',
@@ -43,7 +47,7 @@ export const RawFileList: Component = ({ rawFile, rawFileName, onSelect }) => {
   const rowPerPage: number = 100;
 
   return (
-    <div style={{height: '100%'}}>
+    <div className={classes.tableContainer}>
       <DataGrid
         className={classes.customTable}
         getRowId={(row) => row.name}
