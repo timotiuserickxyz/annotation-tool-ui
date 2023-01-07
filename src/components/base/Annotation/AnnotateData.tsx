@@ -13,6 +13,7 @@ import { API_URL } from '../../../api/core';
 const useStyles = makeStyles({
   container: {
     width: '100%',
+    marginTop: '-20px',
   },
   labelRadioGroup: {
     width: 'max-content',
@@ -96,6 +97,7 @@ export const AnnotateData: Component = ({ projectName, projectLabelList, selecte
       <br/>
       <br/>
       <br/>
+      <br/>
       <div className={classes.container}>
         <FormControl className={classes.labelRadioGroup}>
           <FormLabel id="demo-radio-buttons-group-label">Label</FormLabel>
@@ -114,9 +116,11 @@ export const AnnotateData: Component = ({ projectName, projectLabelList, selecte
         </FormControl>
       </div>
       <br/>
+      <br/>
       <div className={classes.container}>
         <textarea className={classes.commentTextArea} onChange={handleChangeComment} value={selectedComment ? selectedComment : ''} />
       </div>
+      <br/>
       <br/>
       <div className={classes.container} style={{textAlign: 'center'}}>
         <div className={classes.navigationContainer}>

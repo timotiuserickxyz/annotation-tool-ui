@@ -11,8 +11,9 @@ import { getProjectDataList } from '../../../api/annotation/getProjectDataList';
 import { postProjectData } from '../../../api/annotation/postProjectData';
 import { updateProjectData } from '../../../api/annotation/updateProjectData';
 
+import { RawFileList } from '../../base/Annotation/RawFileList';
 import { AnnotateData } from '../../base/Annotation/AnnotateData';
-import { AnnotationData } from '../../base/Annotation/AnnotationData';
+import { AnnotationDataList } from '../../base/Annotation/AnnotationDataList';
 
 const useStyles = makeStyles({
   root: {
@@ -37,19 +38,31 @@ const useStyles = makeStyles({
   content: {
     width: '100%',
     marginTop: '20px',
-    minHeight: '100px',
+    height: '710px',
     overflow: 'hidden',
-    padding: '20px',
+    padding: '0px',
     backgroundColor: 'white',
     border: 'solid 1px lightGray',
     borderRadius: '5px',
   },
-  annotateDataContainer: {
-    width: '25%',
+  rawFileListContainer: {
+    width: '15%',
+    height: '100%',
     float: 'left',
   },
-  annotationDataContainer: {
-    width: '75%',
+  subcontent: {
+    width: '85%',
+    height: '100%',
+    float: 'left',
+    padding: '20px',
+  },
+  annotateDataContainer: {
+    width: '35%',
+    float: 'left',
+  },
+  annotationDataListContainer: {
+    width: '65%',
+    height: '100%',
     float: 'left',
   },
 });
@@ -61,7 +74,8 @@ export const Dashboard: React.FC<Props> = () => {
 
   const [projectName, setProjectName] = useState<string>('');
   const [rawFileName, setRawFileName] = useState<string>('');
-  const [selectedTableIndex, setSelectedTableIndex] = useState<number>(0);
+  const [selectedFileTableIndex, setSelectedFileTableIndex] = useState<number>(0);
+  const [selectedDataTableIndex, setSelectedDataTableIndex] = useState<number>(0);
   const [selectedAudio, setSelectedAudio] = useState<string>('');
   const [selectedAudioStartTime, setSelectedAudioStartTime] = useState<number>(0);
   const [selectedAudioEndTime, setSelectedAudioEndTime] = useState<number>(0);
@@ -100,23 +114,24 @@ export const Dashboard: React.FC<Props> = () => {
   const selectProject = async (e: string) => {
     setProjectName(e);
     setRawFileName('');
-    setSelectedTableIndex(0);
+    setSelectedFileTableIndex(0);
+    setSelectedDataTableIndex(0);
     setSelectedAudio('');
     setSelectedLabel('');
     setSelectedComment('');
   };
 
-  const selectRawFile = async (e: string) => {
-    setRawFileName(e);
-    setSelectedTableIndex(0);
+  const selectRawFile = (fileName: string) => {
+    setRawFileName(fileName);
+    setSelectedDataTableIndex(0);
     setSelectedAudio('');
     setSelectedLabel('');
     setSelectedComment('');
   };
 
   useEffect(() => {
-    if (selectedTableIndex == 0 && dataCount > 0) {
-      setSelectedTableIndex(1);
+    if (selectedDataTableIndex == 0 && dataCount > 0) {
+      setSelectedDataTableIndex(1);
       refreshSelection(0);
     }
   }, [rawFileData]);
@@ -167,10 +182,10 @@ export const Dashboard: React.FC<Props> = () => {
     await mutate(getAPIUrl('annotation', 'getProjectDataList', {projectName: projectName}));
 
     // Go to next data
-    if (selectedTableIndex < dataCount)
+    if (selectedDataTableIndex < dataCount)
     {
-      const nextDataIndex = selectedTableIndex + 1;
-      setSelectedTableIndex(nextDataIndex);
+      const nextDataIndex = selectedDataTableIndex + 1;
+      setSelectedDataTableIndex(nextDataIndex);
 
       const dataIndex = nextDataIndex - 1;
       refreshSelection(dataIndex);
@@ -188,10 +203,10 @@ export const Dashboard: React.FC<Props> = () => {
   };
 
   const goToNextData = () => {
-    if (selectedTableIndex < dataCount)
+    if (selectedDataTableIndex < dataCount)
     {
-      const nextDataIndex = selectedTableIndex + 1;
-      setSelectedTableIndex(nextDataIndex);
+      const nextDataIndex = selectedDataTableIndex + 1;
+      setSelectedDataTableIndex(nextDataIndex);
 
       const dataIndex = nextDataIndex - 1;
       refreshSelection(dataIndex);
@@ -199,22 +214,22 @@ export const Dashboard: React.FC<Props> = () => {
   };
 
   const goToPrevData = () => {
-    if (selectedTableIndex > 1)
+    if (selectedDataTableIndex > 1)
     {
-      const prevTableIndex = selectedTableIndex - 1;
-      setSelectedTableIndex(prevTableIndex);
+      const prevDataTableIndex = selectedDataTableIndex - 1;
+      setSelectedDataTableIndex(prevDataTableIndex);
 
-      const dataIndex = prevTableIndex - 1;
+      const dataIndex = prevDataTableIndex - 1;
       refreshSelection(dataIndex);
     }
   };
 
-  const handleSelection = (tableIndex: number) => {
-    if (tableIndex >= 1 && tableIndex <= dataCount)
+  const handleSelection = (dataTableIndex: number) => {
+    if (dataTableIndex >= 1 && dataTableIndex <= dataCount)
     {
-      setSelectedTableIndex(tableIndex);
+      setSelectedDataTableIndex(dataTableIndex);
 
-      const dataIndex = tableIndex - 1;
+      const dataIndex = dataTableIndex - 1;
       refreshSelection(dataIndex);
     }
   };
@@ -273,7 +288,7 @@ export const Dashboard: React.FC<Props> = () => {
             (<option key={p.project_name} value={p.project_name}>{p.project_name}</option>)
           )} 
         </select>
-        <h2 className={classes.headerItem}>Source File:</h2>
+        {/* <h2 className={classes.headerItem}>Source File:</h2>
         <select className={classes.customDropdown}
             onChange={(e) => selectRawFile(e.target.value)}
           >
@@ -281,38 +296,51 @@ export const Dashboard: React.FC<Props> = () => {
           {rawFileList && rawFileList.map(f => 
             (<option key={f.name} value={f.name}>{f.name}</option>)
           )} 
-        </select>
+        </select> */}
       </div>
-      { rawFileData && rawFileData.length > 0 ? (
+      { projectName && rawFileList.length > 0 ? (
         <div className={classes.content}>
-          <div className={classes.annotateDataContainer}>
-            <AnnotateData
-              projectName={projectName}
-              projectLabelList={projectLabelList}
-              selectedAudio={selectedAudio}
-              selectedAudioStartTime={selectedAudioStartTime}
-              selectedAudioEndTime={selectedAudioEndTime}
-              selectedLabel={selectedLabel}
-              selectedComment={selectedComment}
-              handleChangeLabel={handleChangeLabel}
-              handleChangeComment={handleChangeComment}
-              onClickSave={saveAndRefreshData}
-              onClickPrev={goToPrevData}
-              onClickNext={goToNextData}
-            />
-          </div>
-          <div className={classes.annotationDataContainer}>
-            <AnnotationData
+          <div className={classes.rawFileListContainer}>
+            <RawFileList
+              rawFile={rawFileList}
               rawFileName={rawFileName}
-              rawFileData={rawFileData}
-              projectData={projectData}
-              selectedTableIndex={selectedTableIndex}
-              onSelect={handleSelection}
+              onSelect={selectRawFile}
             />
           </div>
+          { rawFileData && rawFileData.length > 0 ? (
+            <div className={classes.subcontent}>
+              <div className={classes.annotateDataContainer}>
+                <AnnotateData
+                  projectName={projectName}
+                  projectLabelList={projectLabelList}
+                  selectedAudio={selectedAudio}
+                  selectedAudioStartTime={selectedAudioStartTime}
+                  selectedAudioEndTime={selectedAudioEndTime}
+                  selectedLabel={selectedLabel}
+                  selectedComment={selectedComment}
+                  handleChangeLabel={handleChangeLabel}
+                  handleChangeComment={handleChangeComment}
+                  onClickSave={saveAndRefreshData}
+                  onClickPrev={goToPrevData}
+                  onClickNext={goToNextData}
+                />
+              </div>
+              <div className={classes.annotationDataListContainer}>
+                <AnnotationDataList
+                  rawFileName={rawFileName}
+                  rawFileData={rawFileData}
+                  projectData={projectData}
+                  selectedDataTableIndex={selectedDataTableIndex}
+                  onSelect={handleSelection}
+                />
+              </div>
+            </div>
+          ) : (
+            <div></div>
+          )}
         </div>
       ) : (
-        <div>Project not selected yet or does not have any data</div>
+        <div></div>
       )}
     </div>
   );
