@@ -15,6 +15,10 @@ import { RawFileList } from '../../base/Annotation/RawFileList';
 import { AnnotateData } from '../../base/Annotation/AnnotateData';
 import { AnnotationDataList } from '../../base/Annotation/AnnotationDataList';
 
+import {
+  Button
+} from '@material-ui/core';
+
 const useStyles = makeStyles({
   root: {
     height: 'inherit',
@@ -74,15 +78,16 @@ export const Dashboard: React.FC<Props> = () => {
 
   const [projectName, setProjectName] = useState<string>('');
   const [rawFileName, setRawFileName] = useState<string>('');
-  const [selectedFileTableIndex, setSelectedFileTableIndex] = useState<number>(0);
+
   const [selectedDataTableIndex, setSelectedDataTableIndex] = useState<number>(0);
+  const [selectedRawFileData, setSelectedRawFileData] = useState<any>(null);
   const [selectedAudio, setSelectedAudio] = useState<string>('');
   const [selectedAudioStartTime, setSelectedAudioStartTime] = useState<number>(0);
   const [selectedAudioEndTime, setSelectedAudioEndTime] = useState<number>(0);
+  const [selectedProjectData, setSelectedProjectData] = useState<any>(null);
+  
   const [selectedLabel, setSelectedLabel] = useState<string>('');
   const [selectedComment, setSelectedComment] = useState<string>('');
-  const [selectedRawFileData, setSelectedRawFileData] = useState<any>(null);
-  const [selectedProjectData, setSelectedProjectData] = useState<any>(null);
 
   const tempProjectList = getProjectList();
   const projectList = !!tempProjectList.data ? tempProjectList.data.configs.map((t) => {
@@ -114,7 +119,6 @@ export const Dashboard: React.FC<Props> = () => {
   const selectProject = async (e: string) => {
     setProjectName(e);
     setRawFileName('');
-    setSelectedFileTableIndex(0);
     setSelectedDataTableIndex(0);
     setSelectedAudio('');
     setSelectedLabel('');
@@ -288,15 +292,13 @@ export const Dashboard: React.FC<Props> = () => {
             (<option key={p.project_name} value={p.project_name}>{p.project_name}</option>)
           )} 
         </select>
-        {/* <h2 className={classes.headerItem}>Source File:</h2>
-        <select className={classes.customDropdown}
-            onChange={(e) => selectRawFile(e.target.value)}
-          >
-          <option></option>
-          {rawFileList && rawFileList.map(f => 
-            (<option key={f.name} value={f.name}>{f.name}</option>)
-          )} 
-        </select> */}
+        { projectName && rawFileList.length > 0 ? (
+          <Button className={classes.headerItem}>
+              Download
+          </Button>
+        ) : (
+          <div></div>
+        )}
       </div>
       { projectName && rawFileList.length > 0 ? (
         <div className={classes.content}>

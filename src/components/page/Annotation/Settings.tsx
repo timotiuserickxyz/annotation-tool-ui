@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { mutate } from 'swr';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -12,8 +12,18 @@ import { deleteProject } from '../../../api/annotation/deleteProject';
 import { postProjectLabel } from '../../../api/annotation/postProjectLabel';
 import { deleteProjectLabel } from '../../../api/annotation/deleteProjectLabel';
 
-import { AnnotationProjects } from '../../base/Annotation/AnnotationProjects';
-import { Button, TextField, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
+import { AnnotationProjectList } from '../../base/Annotation/AnnotationProjectList';
+import {
+  Button,
+  TextField,
+  Select,
+  MenuItem,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from '@material-ui/core';
 
 
 const useStyles = makeStyles({
@@ -29,19 +39,10 @@ const useStyles = makeStyles({
     float: 'left',
     marginRight: '10px',
   },
-  customTextbox: {
-    float: 'left',
-    marginRight: '30px',
-    textAlign: 'left',
-    paddingLeft: '10px',
-    paddingRight: '10px',
-  },
-  customDropdown: {
-    float: 'left',
-    marginRight: '30px',
-    textAlign: 'center',
-    paddingLeft: '10px',
-    paddingRight: '10px',
+  customForm: {
+    width: '100%',
+    marginTop: '-15px',
+    marginBottom: '20px',
   },
   content: {
     width: '100%',
@@ -53,17 +54,6 @@ const useStyles = makeStyles({
     border: 'solid 1px lightGray',
     borderRadius: '5px',
   },
-  modalContent: {
-    position: 'absolute' as 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: '400',
-    bgcolor: 'white',
-    border: '2px solid #000',
-    boxShadow: '24',
-    p: '4',
-  }
 });
 
 interface Props {}
@@ -71,17 +61,21 @@ interface Props {}
 export const Settings: React.FC<Props> = () => {
   const classes = useStyles();
 
-  const [projectName, setProjectName] = useState<string>('');
-  const [rawFolderName, setRawFolderName] = useState<string>('');
-  const [wavFolderName, setWavFolderName] = useState<string>('');
-  const [createdProjectName, setCreatedProjectName] = useState<string>('');
+  const [newProjectName, setNewProjectName] = useState<string>('');
+  const [newRawFolderName, setNewRawFolderName] = useState<string>('');
+  const [newWavFolderName, setNewWavFolderName] = useState<string>('');
 
   const [selectedProjectName, setSelectedProjectName] = useState<string>('');
   const [newProjectLabel, setNewProjectLabel] = useState<string>('');
 
-  const [openModal, setOpenModal] = useState<boolean>(false);
-  const handleOpenModal = () => setOpenModal(true);
-  const handleCloseModal = () => setOpenModal(false);
+  const [openCreateProjectModal, setOpenCreateProjectModal] = useState<boolean>(false);
+  const handleCloseCreateProjectModal = () => setOpenCreateProjectModal(false);
+
+  const [openEditProjectModal, setOpenEditProjectModal] = useState<boolean>(false);
+  const handleCloseEditProjectModal = () => setOpenEditProjectModal(false);
+
+  const [openLabelModal, setOpenLabelModal] = useState<boolean>(false);
+  const handleCloseLabelModal = () => setOpenLabelModal(false);
 
   const tempProjectList = getProjectList();
   const projectList = !!tempProjectList.data ? tempProjectList.data.configs.map((t) => {
@@ -98,95 +92,152 @@ export const Settings: React.FC<Props> = () => {
     return {...t};
   }) : [];
 
-  useEffect(() => {
-    const updateAndRefreshProject = async () => {
-        const params = {
-            raw_source: rawFolderName,
-            wav_source: wavFolderName,
-        }
-    
-        let errorMessage = '';
-    
-        const response = await putProject(projectName, params);
-    
-        if (response.error) {
-            errorMessage = 'InternalServerError';
-        }
-        else if (response.data && response.data.error) {
-            errorMessage = response.data.error.message;
-        }
-    
-        if (errorMessage != '') {
-            alert(errorMessage);
-            return;
-        }
-        
-        // Refresh
-        await mutate(getAPIUrl('annotation', 'getProjectList'));
+  const initializeAllInputs = () => {
+    setNewProjectName('');
+    setNewRawFolderName('');
+    setNewWavFolderName('');
+    setSelectedProjectName('');
+    setNewProjectLabel('');
+  };
 
-        setProjectName('');
-        setRawFolderName('');
-        setWavFolderName('');
-        setCreatedProjectName('');
-    }
-    
-    if (createdProjectName != '')
-    {
-        updateAndRefreshProject();
-    }
+  const prepareCreateProject = () => {
+    initializeAllInputs();
+    setOpenCreateProjectModal(true);
+  };
 
-  }, [createdProjectName]);
+  const prepareEditProject = (targetProjectName: string, targetProjectRawFolderName: string, targetProjectWavFolderName: string) => {
+    initializeAllInputs();
+    setNewRawFolderName(targetProjectRawFolderName);
+    setNewWavFolderName(targetProjectWavFolderName);
+    setSelectedProjectName(targetProjectName);
+    setOpenEditProjectModal(true);
+  };
 
-  const save = async() => {
-    if (projectName == '')
+  const createProjectAndRefresh = async() => {
+    if (newProjectName == '')
     {
       alert('Project name is empty');
       return;
     }
-    else if (rawFolderName == '')
+    else if (newRawFolderName == '')
     {
       alert('Source folder not chosen yet');
       return;
     }
-    else if (wavFolderName == '')
+    else if (newWavFolderName == '')
     {
       alert('Wav folder not chosen yet');
       return;
     }
 
+    // Create new project
+    const params1 = {
+      project_name: newProjectName,
+    }
+
+    let createProjectErrorMessage = '';
+
+    const createProjectResponse = await postProject(params1);
+
+    if (createProjectResponse.error) {
+      createProjectErrorMessage = 'InternalServerError';
+    }
+    else if (createProjectResponse.data && createProjectResponse.data.error) {
+      createProjectErrorMessage = createProjectResponse.data.error.message;
+    }
+
+    if (createProjectErrorMessage != '') {
+      alert(createProjectErrorMessage);
+      return;
+    }
+
+    // Edit the project
+    const params2 = {
+      raw_source: newRawFolderName,
+      wav_source: newWavFolderName,
+    }
+
+    let editProjectErrorMessage = '';
+
+    const editProjectResponse = await putProject(newProjectName, params2);
+
+    if (editProjectResponse.error) {
+      editProjectErrorMessage = 'InternalServerError';
+    }
+    else if (editProjectResponse.data && editProjectResponse.data.error) {
+      editProjectErrorMessage = editProjectResponse.data.error.message;
+    }
+
+    if (editProjectErrorMessage != '') {
+      alert(editProjectErrorMessage);
+      return;
+    }
+
+    // Refresh
+    await mutate(getAPIUrl('annotation', 'getProjectList'));
+
+    initializeAllInputs();
+
+    setOpenCreateProjectModal(false);
+  };
+
+  const editProjectAndRefresh = async() => {
+    if (selectedProjectName == '')
+    {
+      alert('Project not selected yet');
+      return;
+    }
+    else if (newRawFolderName == '')
+    {
+      alert('Source folder not chosen yet');
+      return;
+    }
+    else if (newWavFolderName == '')
+    {
+      alert('Wav folder not chosen yet');
+      return;
+    }
+
+    // Edit the project
     const params = {
-        project_name: projectName,
+      raw_source: newRawFolderName,
+      wav_source: newWavFolderName,
     }
 
-    let errorMessage = '';
+    let editProjectErrorMessage = '';
 
-    const response = await postProject(params);
+    const editProjectResponse = await putProject(selectedProjectName, params);
 
-    if (response.error) {
-        errorMessage = 'InternalServerError';
+    if (editProjectResponse.error) {
+      editProjectErrorMessage = 'InternalServerError';
     }
-    else if (response.data && response.data.error) {
-        errorMessage = response.data.error.message;
-    }
-
-    if (errorMessage != '') {
-        alert(errorMessage);
-        return;
+    else if (editProjectResponse.data && editProjectResponse.data.error) {
+      editProjectErrorMessage = editProjectResponse.data.error.message;
     }
 
-    setCreatedProjectName(projectName);
+    if (editProjectErrorMessage != '') {
+      alert(editProjectErrorMessage);
+      return;
+    }
+
+    // Refresh
+    await mutate(getAPIUrl('annotation', 'getProjectList'));
+
+    initializeAllInputs();
+
+    setOpenEditProjectModal(false);
   };
 
   const deleteProjectAndRefreshProject = async (targetProjectName: string) => {
-    if (confirm('Are you sure to delete project: ' + targetProjectName + '?') == false)
+    if (confirm('Are you sure to delete project "' + targetProjectName + '"?') == false)
     {
       return;
     }
 
     const params = {
-        names: [
-            targetProjectName
-        ]
+      names: [
+        targetProjectName
+      ]
     }
 
     let errorMessage = '';
@@ -194,58 +245,28 @@ export const Settings: React.FC<Props> = () => {
     const response = await deleteProject(params);
 
     if (response.error) {
-        errorMessage = 'InternalServerError';
+      errorMessage = 'InternalServerError';
     }
     else if (response.data && response.data.error) {
-        errorMessage = response.data.error.message;
+      errorMessage = response.data.error.message;
     }
 
     if (errorMessage != '') {
-        alert(errorMessage);
-        return;
-    }
-        
-    // Refresh
-    await mutate(getAPIUrl('annotation', 'getProjectList'));
-  };
-
-  const deleteLabelAndRefreshProject = async (targetProjectName: string, targetLabelName: string) => {
-    if (confirm('Are you sure to delete label: ' + targetLabelName + ' from project ' + targetProjectName + '?') == false)
-    {
+      alert(errorMessage);
       return;
     }
-
-    const params = {
-        label_option: targetLabelName
-    }
-
-    let errorMessage = '';
-
-    const response = await deleteProjectLabel(targetProjectName, params);
-
-    if (response.error) {
-        errorMessage = 'InternalServerError';
-    }
-    else if (response.data && response.data.error) {
-        errorMessage = response.data.error.message;
-    }
-
-    if (errorMessage != '') {
-        alert(errorMessage);
-        return;
-    }
         
     // Refresh
     await mutate(getAPIUrl('annotation', 'getProjectList'));
   };
 
-  const prepareCreateNewLabel = async (targetProjectName: string) => {
+  const prepareCreateLabel = (targetProjectName: string) => {
+    initializeAllInputs();
     setSelectedProjectName(targetProjectName);
-    setNewProjectLabel('');
-    setOpenModal(true);
+    setOpenLabelModal(true);
   };
 
-  const createNewLabelAndRefresh = async() => {
+  const createLabelAndRefresh = async() => {
     if (selectedProjectName == '')
     {
       alert('Selected project is empty');
@@ -258,7 +279,7 @@ export const Settings: React.FC<Props> = () => {
     }
 
     const params = {
-        label_option: newProjectLabel,
+      label_option: newProjectLabel,
     }
 
     let errorMessage = '';
@@ -266,34 +287,66 @@ export const Settings: React.FC<Props> = () => {
     const response = await postProjectLabel(selectedProjectName, params);
 
     if (response.error) {
-        errorMessage = 'InternalServerError';
+      errorMessage = 'InternalServerError';
     }
     else if (response.data && response.data.error) {
-        errorMessage = response.data.error.message;
+      errorMessage = response.data.error.message;
     }
 
     if (errorMessage != '') {
-        alert(errorMessage);
-        return;
+      alert(errorMessage);
+      return;
     }
         
     // Refresh
     await mutate(getAPIUrl('annotation', 'getProjectList'));
 
-    setOpenModal(false);
+    setOpenLabelModal(false);
   };
 
-  const changeProjectName = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    const value = (event.target as HTMLInputElement).value;
-    setProjectName(value);
+  const deleteLabelAndRefreshProject = async (targetProjectName: string, targetLabelName: string) => {
+    if (confirm('Are you sure to delete label "' + targetLabelName + '" from project "' + targetProjectName + '"?') == false)
+    {
+      return;
+    }
+
+    const params = {
+      label_option: targetLabelName
+    }
+
+    let errorMessage = '';
+
+    const response = await deleteProjectLabel(targetProjectName, params);
+
+    if (response.error) {
+      errorMessage = 'InternalServerError';
+    }
+    else if (response.data && response.data.error) {
+      errorMessage = response.data.error.message;
+    }
+
+    if (errorMessage != '') {
+      alert(errorMessage);
+      return;
+    }
+        
+    // Refresh
+    await mutate(getAPIUrl('annotation', 'getProjectList'));
   };
 
-  const selectRawFolder = async (e: string) => {
-    setRawFolderName(e);
+  const changeNewProjectName = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    const value = event.target.value;
+    setNewProjectName(value);
   };
 
-  const selectWavFolder = async (e: string) => {
-    setWavFolderName(e);
+  const selectNewRawFolder = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    setNewRawFolderName(value);
+  };
+
+  const selectNewWavFolder = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    setNewWavFolderName(value);
   };
 
   const changeNewProjectLabel = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -304,57 +357,129 @@ export const Settings: React.FC<Props> = () => {
   return (
     <div className={classes.root}>
       <div className={classes.header}>
-        <h2 className={classes.headerItem}>Project Name:</h2>
-        <input type="text" className={classes.customTextbox}
-            value={projectName} onChange={changeProjectName}
-        />
-        <h2 className={classes.headerItem}>Source Folder:</h2>
-        <select className={classes.customDropdown}
-            value={rawFolderName}
-            onChange={(e) => selectRawFolder(e.target.value)}
-          >
-          <option></option>
-          {rawFolderList && rawFolderList.map(f => 
-            (<option key={f.name} value={f.name}>{f.name}</option>)
-          )} 
-        </select>
-        <h2 className={classes.headerItem}>Wav Folder:</h2>
-        <select className={classes.customDropdown}
-            value={wavFolderName}
-            onChange={(e) => selectWavFolder(e.target.value)}
-          >
-          <option></option>
-          {wavFolderList && wavFolderList.map(f => 
-            (<option key={f.name} value={f.name}>{f.name}</option>)
-          )} 
-        </select>
-        <Button className={classes.headerItem} onClick={save}>
+        <Button className={classes.headerItem} onClick={prepareCreateProject}>
             Create New
         </Button>
       </div>
       <div className={classes.content}>
-        <AnnotationProjects
+        <AnnotationProjectList
             projects={projectList}
+            onClickEditProject={prepareEditProject}
             onClickDeleteProject={deleteProjectAndRefreshProject}
             onClickDeleteLabel={deleteLabelAndRefreshProject}
-            onClickCreateLabel={prepareCreateNewLabel}
+            onClickCreateLabel={prepareCreateLabel}
         />
       </div>
-      <Dialog open={openModal} onClose={handleCloseModal}>
+      <Dialog open={openCreateProjectModal} onClose={handleCloseCreateProjectModal}>
+        <DialogTitle>Create New Project</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Project Name
+          </DialogContentText>
+          <TextField
+            className={classes.customForm}
+            autoFocus={true}
+            value={newProjectName}
+            onChange={changeNewProjectName}
+          />
+          <br/>
+          <DialogContentText>
+            Source Folder
+          </DialogContentText>
+          <Select
+            className={classes.customForm}
+            value={newRawFolderName}
+            onChange={selectNewRawFolder}
+          >
+            <MenuItem></MenuItem>
+            {rawFolderList && rawFolderList.map(f => 
+              (<MenuItem value={f.name}>{f.name}</MenuItem>)
+            )} 
+          </Select>
+          <br/>
+          <DialogContentText>
+            Wav Folder
+          </DialogContentText>
+          <Select
+            className={classes.customForm}
+            value={newWavFolderName}
+            onChange={selectNewWavFolder}
+          >
+            <MenuItem></MenuItem>
+            {wavFolderList && wavFolderList.map(f => 
+              (<MenuItem value={f.name}>{f.name}</MenuItem>)
+            )} 
+          </Select>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseCreateProjectModal}>Cancel</Button>
+          <Button onClick={createProjectAndRefresh}>Submit</Button>
+        </DialogActions>
+      </Dialog>
+      
+      <Dialog open={openEditProjectModal} onClose={handleCloseEditProjectModal}>
+        <DialogTitle>Edit Project</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Project Name
+          </DialogContentText>
+          <TextField
+            className={classes.customForm}
+            autoFocus={true}
+            value={selectedProjectName}
+            disabled={true}
+          />
+          <br/>
+          <DialogContentText>
+            Source Folder
+          </DialogContentText>
+          <Select
+            className={classes.customForm}
+            value={newRawFolderName}
+            onChange={selectNewRawFolder}
+          >
+            <MenuItem></MenuItem>
+            {rawFolderList && rawFolderList.map(f => 
+              (<MenuItem value={f.name}>{f.name}</MenuItem>)
+            )} 
+          </Select>
+          <br/>
+          <DialogContentText>
+            Wav Folder
+          </DialogContentText>
+          <Select
+            className={classes.customForm}
+            value={newWavFolderName}
+            onChange={selectNewWavFolder}
+          >
+            <MenuItem></MenuItem>
+            {wavFolderList && wavFolderList.map(f => 
+              (<MenuItem value={f.name}>{f.name}</MenuItem>)
+            )} 
+          </Select>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseEditProjectModal}>Cancel</Button>
+          <Button onClick={editProjectAndRefresh}>Submit</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={openLabelModal} onClose={handleCloseLabelModal}>
         <DialogTitle>Create New Label</DialogTitle>
         <DialogContent>
           <DialogContentText>
             
           </DialogContentText>
           <TextField
-            autoFocus
+            className={classes.customForm}
+            autoFocus={true}
             value={newProjectLabel}
             onChange={changeNewProjectLabel}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseModal}>Cancel</Button>
-          <Button onClick={createNewLabelAndRefresh}>Submit</Button>
+          <Button onClick={handleCloseLabelModal}>Cancel</Button>
+          <Button onClick={createLabelAndRefresh}>Submit</Button>
         </DialogActions>
       </Dialog>
     </div>

@@ -15,6 +15,16 @@ const useStyles = makeStyles({
     width: '100%',
     marginTop: '-20px',
   },
+  labelContainer: {
+    width: '80%',
+    height: '300px',
+    padding: '20px',
+    border: 'solid 1px black',
+    display: 'flex',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    overflowY: 'scroll',
+  },
   labelRadioGroup: {
     width: 'max-content',
     display: 'flex',
@@ -29,9 +39,14 @@ const useStyles = makeStyles({
     marginRight: 'auto',
     resize: 'none',
   },
+  bottomContainer: {
+    width: '100%',
+    marginTop: '-20px',
+    textAlign: 'center',
+  },
   navigationContainer: {
     width: '80%',
-    height: '100px',
+    height: '50px',
     display: 'inline-block',
   },
 });
@@ -97,23 +112,24 @@ export const AnnotateData: Component = ({ projectName, projectLabelList, selecte
       <br/>
       <br/>
       <br/>
-      <br/>
       <div className={classes.container}>
-        <FormControl className={classes.labelRadioGroup}>
-          <FormLabel id="demo-radio-buttons-group-label">Label</FormLabel>
-          <RadioGroup
-            value={selectedLabel}
-            onChange={handleChangeLabel}
-          >
-            {projectLabelList && projectLabelList.map(dataLabel => 
-              (<FormControlLabel
-                  control={<Radio />}
-                  value={dataLabel}
-                  label={dataLabel}
-                />)
-            )}
-          </RadioGroup>
-        </FormControl>
+        <div className={classes.labelContainer}>
+          <FormControl className={classes.labelRadioGroup}>
+            <FormLabel id="demo-radio-buttons-group-label">Label</FormLabel>
+            <RadioGroup
+              value={selectedLabel}
+              onChange={handleChangeLabel}
+            >
+              {projectLabelList && projectLabelList.map(dataLabel => 
+                (<FormControlLabel
+                    control={<Radio />}
+                    value={dataLabel}
+                    label={dataLabel}
+                  />)
+              )}
+            </RadioGroup>
+          </FormControl>
+        </div>
       </div>
       <br/>
       <br/>
@@ -122,7 +138,7 @@ export const AnnotateData: Component = ({ projectName, projectLabelList, selecte
       </div>
       <br/>
       <br/>
-      <div className={classes.container} style={{textAlign: 'center'}}>
+      <div className={classes.bottomContainer}>
         <div className={classes.navigationContainer}>
           <Button onClick={onClickPrev}>Prev</Button>
           <Button onClick={onClickSave}>Save & Next</Button>

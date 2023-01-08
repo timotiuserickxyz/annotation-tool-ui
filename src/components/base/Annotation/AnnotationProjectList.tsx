@@ -2,6 +2,7 @@ import * as React from 'react';
 import { DataGrid } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
 import { Button } from '@material-ui/core';
+import Edit from '@material-ui/icons/Edit';
 import HighlightOff from '@material-ui/icons/HighlightOff';
 
 const useStyles = makeStyles({
@@ -15,6 +16,7 @@ const useStyles = makeStyles({
     },
     '& .MuiDataGrid-renderingZone': {
       maxHeight: 'none !important',
+      overflowY: 'scroll',
     },
     '& .MuiDataGrid-cell': {
       lineHeight: 'unset !important',
@@ -38,7 +40,7 @@ const useStyles = makeStyles({
     width: '100px',
     display: 'inline-block',
   },
-  deleteButton: {
+  customButton: {
     minWidth: '40px !important',
     width: '40px',
   },
@@ -58,14 +60,15 @@ type Row = BaseRow & {
 
 type Props = {
   projects: any[],
+  onClickEditProject: (targetProjectName: string, targetProjectRawFolderName: string, targetProjectWavFolderName: string) => void | Promise<void>,
   onClickDeleteProject: (targetProjectName: string) => void | Promise<void>,
-  onClickDeleteLabel: (targetProjectName: string, targetLabelName: string) => void | Promise<void>,
   onClickCreateLabel: (targetProjectName: string) => void | Promise<void>,
+  onClickDeleteLabel: (targetProjectName: string, targetLabelName: string) => void | Promise<void>,
 };
 
 type Component = (props: Props) => React.ReactElement<Props>;
 
-export const AnnotationProjects: Component = ({ projects, onClickDeleteProject, onClickDeleteLabel, onClickCreateLabel }) => {
+export const AnnotationProjectList: Component = ({ projects, onClickEditProject, onClickDeleteProject, onClickCreateLabel, onClickDeleteLabel }) => {
   const classes = useStyles();
 
   const rows: Row[] = !!projects
@@ -94,7 +97,7 @@ export const AnnotationProjects: Component = ({ projects, onClickDeleteProject, 
           {params.row.label_option.label_option.map((label: string) => 
             (<li>
               <span className={classes.labelText}>{label}</span>
-              <Button className={classes.deleteButton} onClick={() => onClickDeleteLabel(params.row.project_name, label)}>
+              <Button className={classes.customButton} onClick={() => onClickDeleteLabel(params.row.project_name, label)}>
                 <HighlightOff />
               </Button>
             </li>)
@@ -111,9 +114,18 @@ export const AnnotationProjects: Component = ({ projects, onClickDeleteProject, 
       headerName: 'Action',
       flex: 0.5,
       renderCell: (params: any = {}) => (
-        <Button className={classes.deleteButton} onClick={() => onClickDeleteProject(params.row.project_name)}>
-          <HighlightOff />
-        </Button>
+        <div>
+          <Button className={classes.customButton} onClick={() => onClickEditProject(
+            params.row.project_name,
+            params.row.source_path.raw_source_path.replace(/^.*[\\\/]/, ''),
+            params.row.source_path.wav_source_path.replace(/^.*[\\\/]/, '')
+            )}>
+            <Edit />
+          </Button>
+          <Button className={classes.customButton} onClick={() => onClickDeleteProject(params.row.project_name)}>
+            <HighlightOff />
+          </Button>
+        </div>
       ),
     },
   ];
