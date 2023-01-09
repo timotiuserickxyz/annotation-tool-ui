@@ -16,6 +16,7 @@ const useStyles = makeStyles({
     },
     '& .MuiDataGrid-renderingZone': {
       maxHeight: 'none !important',
+      overflowX: 'hidden',
       overflowY: 'scroll',
     },
     '& .MuiDataGrid-cell': {
@@ -112,7 +113,7 @@ export const AnnotationProjectList: Component = ({ projects, onClickEditProject,
     },
     { field: 'action',
       headerName: 'Action',
-      flex: 0.5,
+      flex: 1,
       renderCell: (params: any = {}) => (
         <div>
           <Button className={classes.customButton} onClick={() => onClickEditProject(
