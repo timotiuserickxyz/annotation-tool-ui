@@ -61,6 +61,9 @@ export const RawFileList: Component = ({ rawFile, rawFileName, onSelect }) => {
           const fileName = newSelectionModel.selectionModel[0] as string;
           onSelect(fileName);
         }}
+        rowsPerPageOptions={[100]}
+        hideFooterRowCount={true}
+        hideFooterSelectedRowCount={true}
       />
     </div>
   )

@@ -15,10 +15,19 @@ const useStyles = makeStyles({
     width: '100%',
     marginTop: '-20px',
   },
+  chunkingContainer: {
+    width: '80%',
+    height: '120px',
+    padding: '10px',
+    border: 'solid 1px black',
+    display: 'flex',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
   labelContainer: {
     width: '80%',
-    height: '300px',
-    padding: '20px',
+    height: '200px',
+    padding: '10px',
     border: 'solid 1px black',
     display: 'flex',
     marginLeft: 'auto',
@@ -38,6 +47,7 @@ const useStyles = makeStyles({
     marginLeft: 'auto',
     marginRight: 'auto',
     resize: 'none',
+    padding: '10px',
   },
   bottomContainer: {
     width: '100%',
@@ -113,6 +123,21 @@ export const AnnotateData: Component = ({ projectName, projectLabelList, selecte
       <br/>
       <br/>
       <div className={classes.container}>
+        <div className={classes.chunkingContainer}>
+          <FormControl className={classes.labelRadioGroup}>
+            <FormLabel id="demo-radio-buttons-group-label">Chunking</FormLabel>
+            <RadioGroup
+              // value={selectedLabel}
+              // onChange={handleChangeLabel}
+            >
+              <FormControlLabel control={<Radio />} value="Talk Unit" label="Talk Unit" />
+              <FormControlLabel control={<Radio />} value="Whole Wav" label="Whole Wav" />
+            </RadioGroup>
+          </FormControl>
+        </div>
+      </div>
+      <br/>
+      <div className={classes.container}>
         <div className={classes.labelContainer}>
           <FormControl className={classes.labelRadioGroup}>
             <FormLabel id="demo-radio-buttons-group-label">Label</FormLabel>
@@ -132,11 +157,9 @@ export const AnnotateData: Component = ({ projectName, projectLabelList, selecte
         </div>
       </div>
       <br/>
-      <br/>
       <div className={classes.container}>
-        <textarea className={classes.commentTextArea} onChange={handleChangeComment} value={selectedComment ? selectedComment : ''} />
+        <textarea className={classes.commentTextArea} onChange={handleChangeComment} value={selectedComment ? selectedComment : ''} placeholder="Comment" />
       </div>
-      <br/>
       <br/>
       <div className={classes.bottomContainer}>
         <div className={classes.navigationContainer}>

@@ -116,7 +116,7 @@ export const Dashboard: React.FC<Props> = () => {
 
   const dataCount = rawFileData.length;
 
-  const selectProject = async (e: string) => {
+  const selectProject = (e: string) => {
     setProjectName(e);
     setRawFileName('');
     setSelectedDataTableIndex(0);
