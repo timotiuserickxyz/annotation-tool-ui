@@ -87,8 +87,12 @@ export const Dashboard: React.FC<Props> = () => {
   const [selectedAudioEndTime, setSelectedAudioEndTime] = useState<number>(0);
   const [selectedProjectData, setSelectedProjectData] = useState<any>(null);
   
+  const [currentSequence, setCurrentSequence] = useState<number>(0);
+  const [selectedSequence, setSelectedSequence] = useState<number>(0);
   const [selectedLabel, setSelectedLabel] = useState<string>('');
   const [selectedComment, setSelectedComment] = useState<string>('');
+
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const tempProjectList = getProjectList();
   const projectList = !!tempProjectList.data ? tempProjectList.data.configs.map((t) => {
@@ -122,6 +126,8 @@ export const Dashboard: React.FC<Props> = () => {
     setRawFileName('');
     setSelectedDataTableIndex(0);
     setSelectedAudio('');
+    setCurrentSequence(0);
+    setSelectedSequence(0);
     setSelectedLabel('');
     setSelectedComment('');
   };
@@ -130,6 +136,8 @@ export const Dashboard: React.FC<Props> = () => {
     setRawFileName(fileName);
     setSelectedDataTableIndex(0);
     setSelectedAudio('');
+    setCurrentSequence(0);
+    setSelectedSequence(0);
     setSelectedLabel('');
     setSelectedComment('');
   };
@@ -141,6 +149,20 @@ export const Dashboard: React.FC<Props> = () => {
     }
   }, [rawFileData]);
 
+  useEffect(() => {
+    if (isSaving == true
+      && projectName != ''
+      && rawFileName != ''
+      && selectedRawFileData
+      && projectData && projectData.length > 0
+    ) {
+      const dataIndex = selectedDataTableIndex - 1;
+      refreshSelection(dataIndex);
+
+      setIsSaving(false);
+    }
+  }, [isSaving]);
+
   const saveAndRefreshData = async() => {
     if (selectedLabel == '')
     {
@@ -151,7 +173,7 @@ export const Dashboard: React.FC<Props> = () => {
     const params = {
       file_name: rawFileName,
       channel: selectedRawFileData.Channel,
-      sequence_number: selectedRawFileData.Sequence_number,
+      sequence_number: selectedSequence,
       label: selectedLabel,
       comment: selectedComment,
     }
@@ -186,15 +208,12 @@ export const Dashboard: React.FC<Props> = () => {
     // mutate(getAPIUrl('annotation', 'getProjectDetail', {projectName: projectName}));
     await mutate(getAPIUrl('annotation', 'getProjectDataList', {projectName: projectName}));
 
-    // Go to next data
-    if (selectedDataTableIndex < dataCount)
-    {
-      const nextDataIndex = selectedDataTableIndex + 1;
-      setSelectedDataTableIndex(nextDataIndex);
+    setIsSaving(true);
+  };
 
-      const dataIndex = nextDataIndex - 1;
-      refreshSelection(dataIndex);
-    }
+  const handleChangeSequence = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Number.parseInt((event.target as HTMLInputElement).value);console.log('sequence: ' + value);
+    setSelectedSequence(value);
   };
 
   const handleChangeLabel = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -210,10 +229,10 @@ export const Dashboard: React.FC<Props> = () => {
   const goToNextData = () => {
     if (selectedDataTableIndex < dataCount)
     {
-      const nextDataIndex = selectedDataTableIndex + 1;
-      setSelectedDataTableIndex(nextDataIndex);
+      const nextDataTableIndex = selectedDataTableIndex + 1;
+      setSelectedDataTableIndex(nextDataTableIndex);
 
-      const dataIndex = nextDataIndex - 1;
+      const dataIndex = nextDataTableIndex - 1;
       refreshSelection(dataIndex);
     }
   };
@@ -259,9 +278,10 @@ export const Dashboard: React.FC<Props> = () => {
     const sequenceNumber = selectedRawFileData.Sequence_number;
     const channel = selectedRawFileData.Channel;
 
-    const existingProjectDataList = projectData.filter(
+    // Possibility of chunked by whole wav
+    let existingProjectDataList: any[] = projectData.filter(
       o => o.file_name === rawFileName
-        && o.sequence_number === sequenceNumber
+        && o.sequence_number === -1
         && o.channel === channel
     );
 
@@ -270,14 +290,38 @@ export const Dashboard: React.FC<Props> = () => {
       const existingProjectData = existingProjectDataList.pop();
 
       setSelectedProjectData(existingProjectData);
+      setCurrentSequence(existingProjectData ? existingProjectData.sequence_number : '');
+      setSelectedSequence(existingProjectData ? existingProjectData.sequence_number : '');
       setSelectedLabel(existingProjectData ? existingProjectData.label : '');
       setSelectedComment(existingProjectData ? existingProjectData.comment : '');
     }
     else
     {
-      setSelectedProjectData(null);
-      setSelectedLabel('');
-      setSelectedComment('');
+      // Turns out to be chunked by talk unit
+      existingProjectDataList = projectData.filter(
+        o => o.file_name === rawFileName
+          && o.sequence_number === sequenceNumber
+          && o.channel === channel
+      );
+
+      if (existingProjectDataList.length > 0)
+      {
+        const existingProjectData = existingProjectDataList.pop();
+
+        setSelectedProjectData(existingProjectData);
+        setCurrentSequence(sequenceNumber);
+        setSelectedSequence(existingProjectData ? existingProjectData.sequence_number : '');
+        setSelectedLabel(existingProjectData ? existingProjectData.label : '');
+        setSelectedComment(existingProjectData ? existingProjectData.comment : '');
+      }
+      else
+      {
+        setSelectedProjectData(null);
+        setCurrentSequence(sequenceNumber);
+        setSelectedSequence(sequenceNumber);
+        setSelectedLabel('');
+        setSelectedComment('');
+      }
     }
   }
 
@@ -323,8 +367,11 @@ export const Dashboard: React.FC<Props> = () => {
                   selectedAudio={selectedAudio}
                   selectedAudioStartTime={selectedAudioStartTime}
                   selectedAudioEndTime={selectedAudioEndTime}
+                  currentSequence={currentSequence}
+                  selectedSequence={selectedSequence}
                   selectedLabel={selectedLabel}
                   selectedComment={selectedComment}
+                  handleChangeSequence={handleChangeSequence}
                   handleChangeLabel={handleChangeLabel}
                   handleChangeComment={handleChangeComment}
                   onClickSave={saveAndRefreshData}

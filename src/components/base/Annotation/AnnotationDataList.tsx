@@ -57,9 +57,10 @@ export const AnnotationDataList: Component = ({ rawFileName, rawFileData, projec
   : [];
 
   function getLabelFromProject(params: any) {
-    const filteredProjectData = projectData.filter(o =>
+    // Possibility of chunked by whole wav
+    let filteredProjectData: any[] = projectData.filter(o =>
       o.file_name === rawFileName
-      && o.sequence_number === params.row.Sequence_number
+      && o.sequence_number === -1
       && o.channel === params.row.Channel
     );
 
@@ -67,6 +68,21 @@ export const AnnotationDataList: Component = ({ rawFileName, rawFileData, projec
     {
       const existingProjectData = filteredProjectData.pop();
       return existingProjectData.label;
+    }
+    else
+    {
+      // Turns out to be chunked by talk unit
+      filteredProjectData = projectData.filter(o =>
+        o.file_name === rawFileName
+        && o.sequence_number === params.row.Sequence_number
+        && o.channel === params.row.Channel
+      );
+
+      if (filteredProjectData.length > 0)
+      {
+        const existingProjectData = filteredProjectData.pop();
+        return existingProjectData.label;
+      }
     }
     
     return '';
