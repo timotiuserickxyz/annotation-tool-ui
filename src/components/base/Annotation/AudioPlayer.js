@@ -58,7 +58,7 @@ export default function Waveform({filePath, fileName, startTime, endTime}) {
   const [loading, setLoading] = useState(false);
   const [playing, setPlay] = useState(false);
   const [volume, setVolume] = useState(0.5);
-  const [zoom, setZoom] = useState(0);
+  const [zoom, setZoom] = useState(5);
 
   // Do not switch the order
   // Destructor should be put first
