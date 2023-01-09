@@ -25,7 +25,6 @@ import {
   DialogTitle,
 } from '@material-ui/core';
 
-
 const useStyles = makeStyles({
   root: {
     height: 'inherit',
@@ -339,13 +338,13 @@ export const Settings: React.FC<Props> = () => {
     setNewProjectName(value);
   };
 
-  const selectNewRawFolder = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value;
+  const selectNewRawFolder = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const value = event.target.value as string;
     setNewRawFolderName(value);
   };
 
-  const selectNewWavFolder = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value;
+  const selectNewWavFolder = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const value = event.target.value as string;
     setNewWavFolderName(value);
   };
 
