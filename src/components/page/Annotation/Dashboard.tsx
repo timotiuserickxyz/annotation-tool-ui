@@ -9,7 +9,8 @@ import { getProjectDetail } from '../../../api/annotation/getProjectDetail';
 import { getRawFileDataList } from '../../../api/annotation/getRawFileDataList';
 import { getProjectDataList } from '../../../api/annotation/getProjectDataList';
 import { postProjectData } from '../../../api/annotation/postProjectData';
-import { updateProjectData } from '../../../api/annotation/updateProjectData';
+import { putProjectData } from '../../../api/annotation/putProjectData';
+import { downloadProjectData } from '../../../api/annotation/downloadProjectData';
 
 import { RawFileList } from '../../base/Annotation/RawFileList';
 import { AnnotateData } from '../../base/Annotation/AnnotateData';
@@ -166,7 +167,7 @@ export const Dashboard: React.FC<Props> = () => {
     else
     {
       // Update
-      response = await updateProjectData(projectName, selectedProjectData.record_id, params);
+      response = await putProjectData(projectName, selectedProjectData.record_id, params);
     }
 
     if (response.error) {
@@ -280,6 +281,10 @@ export const Dashboard: React.FC<Props> = () => {
     }
   }
 
+  const handleDownload = () => {
+    downloadProjectData(projectName);
+  };
+
   return (
     <div className={classes.root}>
       <div className={classes.header}>
@@ -293,7 +298,7 @@ export const Dashboard: React.FC<Props> = () => {
           )} 
         </select>
         { projectName && rawFileList.length > 0 ? (
-          <Button className={classes.headerItem}>
+          <Button className={classes.headerItem} onClick={handleDownload}>
               Download
           </Button>
         ) : (

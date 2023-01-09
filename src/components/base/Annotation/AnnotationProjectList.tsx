@@ -64,7 +64,7 @@ type Props = {
   onClickEditProject: (targetProjectName: string, targetProjectRawFolderName: string, targetProjectWavFolderName: string) => void | Promise<void>,
   onClickDeleteProject: (targetProjectName: string) => void | Promise<void>,
   onClickCreateLabel: (targetProjectName: string) => void | Promise<void>,
-  onClickDeleteLabel: (targetProjectName: string, targetLabelName: string) => void | Promise<void>,
+  onClickDeleteLabel: (targetProjectName: string, targetProjectLabel: string) => void | Promise<void>,
 };
 
 type Component = (props: Props) => React.ReactElement<Props>;
