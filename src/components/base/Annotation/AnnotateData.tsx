@@ -69,6 +69,7 @@ export type BaseRow = {
 type Props = {
   projectName: string,
   projectLabelList: string[],
+  projectData: any[],
   selectedAudio: string,
   selectedAudioStartTime: number,
   selectedAudioEndTime: number,
@@ -86,7 +87,7 @@ type Props = {
 
 type Component = (props: Props) => React.ReactElement<Props>;
 
-export const AnnotateData: Component = ({ projectName, projectLabelList, selectedAudio, selectedAudioStartTime, selectedAudioEndTime, currentSequence, selectedSequence, selectedLabel, handleChangeSequence, handleChangeLabel, selectedComment, handleChangeComment, onClickSave, onClickPrev, onClickNext }) => {
+export const AnnotateData: Component = ({ projectName, projectLabelList, projectData, selectedAudio, selectedAudioStartTime, selectedAudioEndTime, currentSequence, selectedSequence, selectedLabel, handleChangeSequence, handleChangeLabel, selectedComment, handleChangeComment, onClickSave, onClickPrev, onClickNext }) => {
   const classes = useStyles();
 
   // Select audio file
@@ -119,7 +120,13 @@ export const AnnotateData: Component = ({ projectName, projectLabelList, selecte
     <div>
       <div className={classes.container}>
         {
-          selectedAudio != '' ? (<AudioPlayer filePath={selectedAudioPath} fileName={selectedAudio} startTime={selectedAudioStartTime} endTime={selectedAudioEndTime}  />) : ''
+          selectedAudio != '' ? (<AudioPlayer
+            filePath={selectedAudioPath}
+            fileName={selectedAudio}
+            startTime={selectedAudioStartTime}
+            endTime={selectedAudioEndTime}
+            isWholeWav={selectedSequence === -1}
+          />) : ''
         }
       </div>
       <br/>
@@ -135,8 +142,8 @@ export const AnnotateData: Component = ({ projectName, projectLabelList, selecte
               value={selectedSequence.toString()}
               onChange={handleChangeSequence}
             >
-              <FormControlLabel control={<Radio />} label="Talk Unit" value={currentSequence.toString()} checked={currentSequence === selectedSequence && currentSequence !== -1} disabled={currentSequence === -1} />
-              <FormControlLabel control={<Radio />} label="Whole Wav" value={'-1'} checked={-1 === selectedSequence} />
+              <FormControlLabel control={<Radio />} label="Talk Unit" value={currentSequence.toString()} disabled={projectData.length >= 1 && selectedSequence === -1} />
+              <FormControlLabel control={<Radio />} label="Whole Wav" value={'-1'} disabled={projectData.length >= 1 && selectedSequence !== -1} />
             </RadioGroup>
           </FormControl>
         </div>

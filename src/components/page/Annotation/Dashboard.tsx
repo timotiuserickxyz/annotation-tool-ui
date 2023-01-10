@@ -282,16 +282,22 @@ export const Dashboard: React.FC<Props> = () => {
     let existingProjectDataList: any[] = projectData.filter(
       o => o.file_name === rawFileName
         && o.sequence_number === -1
-        && o.channel === channel
     );
 
     if (existingProjectDataList.length > 0)
     {
+      // but is it really this channel?
+      existingProjectDataList = projectData.filter(
+        o => o.file_name === rawFileName
+          && o.sequence_number === -1
+          && o.channel === channel
+      );
+
       const existingProjectData = existingProjectDataList.pop();
 
-      setSelectedProjectData(existingProjectData);
-      setCurrentSequence(existingProjectData ? existingProjectData.sequence_number : '');
-      setSelectedSequence(existingProjectData ? existingProjectData.sequence_number : '');
+      setSelectedProjectData(existingProjectData ? existingProjectData : null);
+      setCurrentSequence(sequenceNumber);
+      setSelectedSequence(-1);
       setSelectedLabel(existingProjectData ? existingProjectData.label : '');
       setSelectedComment(existingProjectData ? existingProjectData.comment : '');
     }
@@ -310,7 +316,7 @@ export const Dashboard: React.FC<Props> = () => {
 
         setSelectedProjectData(existingProjectData);
         setCurrentSequence(sequenceNumber);
-        setSelectedSequence(existingProjectData ? existingProjectData.sequence_number : '');
+        setSelectedSequence(existingProjectData ? existingProjectData.sequence_number : sequenceNumber);
         setSelectedLabel(existingProjectData ? existingProjectData.label : '');
         setSelectedComment(existingProjectData ? existingProjectData.comment : '');
       }
@@ -364,6 +370,9 @@ export const Dashboard: React.FC<Props> = () => {
                 <AnnotateData
                   projectName={projectName}
                   projectLabelList={projectLabelList}
+                  projectData={projectData.filter(
+                    o => o.file_name === rawFileName
+                  )}
                   selectedAudio={selectedAudio}
                   selectedAudioStartTime={selectedAudioStartTime}
                   selectedAudioEndTime={selectedAudioEndTime}
@@ -381,9 +390,10 @@ export const Dashboard: React.FC<Props> = () => {
               </div>
               <div className={classes.annotationDataListContainer}>
                 <AnnotationDataList
-                  rawFileName={rawFileName}
                   rawFileData={rawFileData}
-                  projectData={projectData}
+                  projectData={projectData.filter(
+                    o => o.file_name === rawFileName
+                  )}
                   selectedDataTableIndex={selectedDataTableIndex}
                   onSelect={handleSelection}
                 />

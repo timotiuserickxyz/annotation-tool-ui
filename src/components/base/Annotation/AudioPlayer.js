@@ -50,7 +50,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function Waveform({filePath, fileName, startTime, endTime}) {
+export default function Waveform({filePath, fileName, startTime, endTime, isWholeWav}) {
   const classes = useStyles();
 
   const waveformRef = useRef(null);
@@ -75,7 +75,10 @@ export default function Waveform({filePath, fileName, startTime, endTime}) {
   // Do not switch the order
   // Region creator should be put before audio player creator
   useEffect(() => {
-    if (wavesurfer.current) {
+    if (wavesurfer.current && isWholeWav) {
+      wavesurfer.current.clearRegions();
+    }
+    else if (wavesurfer.current && !isWholeWav) {
       wavesurfer.current.clearRegions();
       wavesurfer.current.addRegion({
         start: startTime,
@@ -96,7 +99,7 @@ export default function Waveform({filePath, fileName, startTime, endTime}) {
         wavesurfer.current.playPause();
       }
     }
-  }, [startTime, endTime]);
+  }, [startTime, endTime, isWholeWav]);
 
   // Do not switch the order
   // Waveform creator should be put lastly
@@ -123,16 +126,7 @@ export default function Waveform({filePath, fileName, startTime, endTime}) {
         plugins: [
           RegionsPlugin.create({
             regionsMinLength: 2,
-            regions: [
-              {
-                start: startTime,
-                end: endTime,
-                loop: true,
-                drag: false,
-                resize: false,
-                color: 'hsla(0, 100%, 50%, 0.3)',
-              }
-            ]
+            regions: []
           })
         ]
       });
@@ -151,6 +145,28 @@ export default function Waveform({filePath, fileName, startTime, endTime}) {
           wavesurfer.current.setVolume(volume);
           wavesurfer.current.zoom(zoom);
           setLoading(false);
+
+          if (wavesurfer.current && !isWholeWav) {
+            wavesurfer.current.clearRegions();
+            wavesurfer.current.addRegion({
+              start: startTime,
+              end: endTime,
+              loop: true,
+              drag: false,
+              resize: false,
+              color: 'hsla(0, 100%, 50%, 0.3)',
+            });
+      
+            if (playing)
+            {
+              wavesurfer.current.play(startTime, endTime);
+            }
+            else
+            {
+              wavesurfer.current.play(startTime, endTime);
+              wavesurfer.current.playPause();
+            }
+          }
         }
       });
 

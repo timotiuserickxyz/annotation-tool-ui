@@ -38,7 +38,6 @@ type Row = BaseRow & {
 };
 
 type Props = {
-  rawFileName: string,
   rawFileData: any[],
   projectData: any[],
   selectedDataTableIndex: number,
@@ -47,7 +46,7 @@ type Props = {
 
 type Component = (props: Props) => React.ReactElement<Props>;
 
-export const AnnotationDataList: Component = ({ rawFileName, rawFileData, projectData, selectedDataTableIndex, onSelect }) => {
+export const AnnotationDataList: Component = ({ rawFileData, projectData, selectedDataTableIndex, onSelect }) => {
   const classes = useStyles();
 
   const rows: Row[] = !!rawFileData
@@ -59,8 +58,7 @@ export const AnnotationDataList: Component = ({ rawFileName, rawFileData, projec
   function getLabelFromProject(params: any) {
     // Possibility of chunked by whole wav
     let filteredProjectData: any[] = projectData.filter(o =>
-      o.file_name === rawFileName
-      && o.sequence_number === -1
+      o.sequence_number === -1
       && o.channel === params.row.Channel
     );
 
@@ -73,8 +71,7 @@ export const AnnotationDataList: Component = ({ rawFileName, rawFileData, projec
     {
       // Turns out to be chunked by talk unit
       filteredProjectData = projectData.filter(o =>
-        o.file_name === rawFileName
-        && o.sequence_number === params.row.Sequence_number
+        o.sequence_number === params.row.Sequence_number
         && o.channel === params.row.Channel
       );
 
