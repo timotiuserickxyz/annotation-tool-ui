@@ -1,8 +1,8 @@
 import React from 'react';
-import { ProjectSettings } from '../../src/components/page/Annotation/ProjectSettings';
+import { FileSettings } from '../../src/components/page/Annotation/FileSettings';
 
 const annotationFileSettings: React.FC = () => {
-  return <ProjectSettings />;
+  return <FileSettings />;
 };
 
 export default annotationFileSettings;

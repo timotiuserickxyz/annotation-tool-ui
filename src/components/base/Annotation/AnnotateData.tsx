@@ -67,8 +67,8 @@ export type BaseRow = {
 };
 
 type Props = {
-  projectName: string,
-  projectLabelList: string[],
+  selectedProjectName: string,
+  selectedProjectLabelList: string[],
   projectData: any[],
   selectedAudio: string,
   selectedAudioStartTime: number,
@@ -87,7 +87,7 @@ type Props = {
 
 type Component = (props: Props) => React.ReactElement<Props>;
 
-export const AnnotateData: Component = ({ projectName, projectLabelList, projectData, selectedAudio, selectedAudioStartTime, selectedAudioEndTime, currentSequence, selectedSequence, selectedLabel, handleChangeSequence, handleChangeLabel, selectedComment, handleChangeComment, onClickSave, onClickPrev, onClickNext }) => {
+export const AnnotateData: Component = ({ selectedProjectName, selectedProjectLabelList, projectData, selectedAudio, selectedAudioStartTime, selectedAudioEndTime, currentSequence, selectedSequence, selectedLabel, handleChangeSequence, handleChangeLabel, selectedComment, handleChangeComment, onClickSave, onClickPrev, onClickNext }) => {
   const classes = useStyles();
 
   // Select audio file
@@ -114,7 +114,7 @@ export const AnnotateData: Component = ({ projectName, projectLabelList, project
   // else if (selectedDataIndex % 9 == 8)
   //   audioFile = '/stereo_11025hz_32bit_1.wav';
 
-  const selectedAudioPath = API_URL + '/annotation-project/source/wav/' + projectName + '/' + selectedAudio;
+  const selectedAudioPath = API_URL + '/annotation-project/source/wav/' + selectedProjectName + '/' + selectedAudio;
 
   return (
     <div>
@@ -159,7 +159,7 @@ export const AnnotateData: Component = ({ projectName, projectLabelList, project
               value={selectedLabel}
               onChange={handleChangeLabel}
             >
-              {projectLabelList && projectLabelList.map(dataLabel => 
+              {selectedProjectLabelList && selectedProjectLabelList.map(dataLabel => 
                 (<FormControlLabel
                     control={<Radio />}
                     value={dataLabel}

@@ -241,7 +241,7 @@ export const ProjectSettings: React.FC<Props> = () => {
     setOpenDeleteProjectModal(true);
   };
 
-  const deleteProjectAndRefreshProject = async () => {
+  const deleteProjectAndRefresh = async () => {
     const params = {
       names: [
         selectedProjectName
@@ -325,7 +325,7 @@ export const ProjectSettings: React.FC<Props> = () => {
     setOpenDeleteLabelModal(true);
   };
 
-  const deleteLabelAndRefreshProject = async () => {
+  const deleteLabelAndRefresh = async () => {
     const params = {
       label_option: selectedProjectLabel
     }
@@ -390,6 +390,7 @@ export const ProjectSettings: React.FC<Props> = () => {
             onClickDeleteLabel={prepareDeleteLabel}
         />
       </div>
+
       <Dialog open={openCreateProjectModal} onClose={handleCloseCreateProjectModal}>
         <DialogTitle>Create New Project</DialogTitle>
         <DialogContent>
@@ -488,12 +489,12 @@ export const ProjectSettings: React.FC<Props> = () => {
         <DialogTitle>Delete Project</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you to delete project "{selectedProjectName}"?
+            Are you sure to delete project "{selectedProjectName}"?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDeleteProjectModal}>Cancel</Button>
-          <Button onClick={deleteProjectAndRefreshProject}>Submit</Button>
+          <Button onClick={deleteProjectAndRefresh}>Submit</Button>
         </DialogActions>
       </Dialog>
 
@@ -520,12 +521,12 @@ export const ProjectSettings: React.FC<Props> = () => {
         <DialogTitle>Delete Label</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you to delete label "{selectedProjectLabel}" from project "{selectedProjectName}"?
+            Are you sure to delete label "{selectedProjectLabel}" from project "{selectedProjectName}"?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDeleteLabelModal}>Cancel</Button>
-          <Button onClick={deleteLabelAndRefreshProject}>Submit</Button>
+          <Button onClick={deleteLabelAndRefresh}>Submit</Button>
         </DialogActions>
       </Dialog>
     </div>

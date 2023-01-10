@@ -37,13 +37,10 @@ const useStyles = makeStyles({
   labelList: {
     padding: '10px',
   },
-  labelText: {
-    width: '100px',
-    display: 'inline-block',
-  },
   customButton: {
     minWidth: '40px !important',
     width: '40px',
+    marginLeft: '5px',
   },
 });
 
@@ -97,7 +94,7 @@ export const AnnotationProjectList: Component = ({ projects, onClickEditProject,
         <ul className={classes.labelList}>
           {params.row.label_option.label_option.map((label: string) => 
             (<li>
-              <span className={classes.labelText}>{label}</span>
+              <span>{label}</span>
               <Button className={classes.customButton} onClick={() => onClickDeleteLabel(params.row.project_name, label)}>
                 <HighlightOff />
               </Button>

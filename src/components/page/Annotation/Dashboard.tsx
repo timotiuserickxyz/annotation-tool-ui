@@ -12,7 +12,7 @@ import { postProjectData } from '../../../api/annotation/postProjectData';
 import { putProjectData } from '../../../api/annotation/putProjectData';
 import { downloadProjectData } from '../../../api/annotation/downloadProjectData';
 
-import { RawFileList } from '../../base/Annotation/RawFileList';
+import { DashboardRawFileList } from '../../base/Annotation/DashboardRawFileList';
 import { AnnotateData } from '../../base/Annotation/AnnotateData';
 import { AnnotationDataList } from '../../base/Annotation/AnnotationDataList';
 
@@ -77,8 +77,8 @@ interface Props {}
 export const Dashboard: React.FC<Props> = () => {
   const classes = useStyles();
 
-  const [projectName, setProjectName] = useState<string>('');
-  const [rawFileName, setRawFileName] = useState<string>('');
+  const [selectedProjectName, setSelectedProjectName] = useState<string>('');
+  const [selectedRawFileName, setSelectedRawFileName] = useState<string>('');
 
   const [selectedDataTableIndex, setSelectedDataTableIndex] = useState<number>(0);
   const [selectedRawFileData, setSelectedRawFileData] = useState<any>(null);
@@ -99,8 +99,8 @@ export const Dashboard: React.FC<Props> = () => {
     return {...t};
   }) : [];
 
-  const tempProjectDetail = getProjectDetail(projectName);
-  const projectLabelList = !!tempProjectDetail && !!tempProjectDetail.data ? tempProjectDetail.data.label_option.label_option : [];
+  const tempProjectDetail = getProjectDetail(selectedProjectName);
+  const selectedProjectLabelList = !!tempProjectDetail && !!tempProjectDetail.data ? tempProjectDetail.data.label_option.label_option : [];
   const rawFileFolderPath = !!tempProjectDetail && !!tempProjectDetail.data ? tempProjectDetail.data.source_path.raw_source_path : '';
   const rawFileFolderName = (!!rawFileFolderPath ? rawFileFolderPath.split('/').pop() : '') as string;
 
@@ -109,12 +109,12 @@ export const Dashboard: React.FC<Props> = () => {
     return {...t};
   }) : [];
 
-  const rawRawFileData = getRawFileDataList(rawFileFolderName, rawFileName);
+  const rawRawFileData = getRawFileDataList(rawFileFolderName, selectedRawFileName);
   const rawFileData = !!rawRawFileData && !!rawRawFileData.data ? rawRawFileData.data.map((t) => {
     return {...t};
   }) : [];
 
-  const tempProjectData = getProjectDataList(projectName);
+  const tempProjectData = getProjectDataList(selectedProjectName);
   const projectData = !!tempProjectData && !!tempProjectData.data ? tempProjectData.data.data.map((t) => {
     return {...t};
   }) : [];
@@ -122,8 +122,8 @@ export const Dashboard: React.FC<Props> = () => {
   const dataCount = rawFileData.length;
 
   const selectProject = (e: string) => {
-    setProjectName(e);
-    setRawFileName('');
+    setSelectedProjectName(e);
+    setSelectedRawFileName('');
     setSelectedDataTableIndex(0);
     setSelectedAudio('');
     setCurrentSequence(0);
@@ -133,7 +133,7 @@ export const Dashboard: React.FC<Props> = () => {
   };
 
   const selectRawFile = (fileName: string) => {
-    setRawFileName(fileName);
+    setSelectedRawFileName(fileName);
     setSelectedDataTableIndex(0);
     setSelectedAudio('');
     setCurrentSequence(0);
@@ -151,8 +151,8 @@ export const Dashboard: React.FC<Props> = () => {
 
   useEffect(() => {
     if (isSaving == true
-      && projectName != ''
-      && rawFileName != ''
+      && selectedProjectName != ''
+      && selectedRawFileName != ''
       && selectedRawFileData
       && projectData && projectData.length > 0
     ) {
@@ -171,7 +171,7 @@ export const Dashboard: React.FC<Props> = () => {
     }
 
     const params = {
-      file_name: rawFileName,
+      file_name: selectedRawFileName,
       channel: selectedRawFileData.Channel,
       sequence_number: selectedSequence,
       label: selectedLabel,
@@ -184,12 +184,12 @@ export const Dashboard: React.FC<Props> = () => {
     if (selectedProjectData == null)
     {
       // Create
-      response = await postProjectData(projectName, params);
+      response = await postProjectData(selectedProjectName, params);
     }
     else
     {
       // Update
-      response = await putProjectData(projectName, selectedProjectData.record_id, params);
+      response = await putProjectData(selectedProjectName, selectedProjectData.record_id, params);
     }
 
     if (response.error) {
@@ -205,8 +205,8 @@ export const Dashboard: React.FC<Props> = () => {
     }
     
     // Refresh
-    // mutate(getAPIUrl('annotation', 'getProjectDetail', {projectName: projectName}));
-    await mutate(getAPIUrl('annotation', 'getProjectDataList', {projectName: projectName}));
+    // mutate(getAPIUrl('annotation', 'getProjectDetail', {projectName: selectedProjectName}));
+    await mutate(getAPIUrl('annotation', 'getProjectDataList', {projectName: selectedProjectName}));
 
     setIsSaving(true);
   };
@@ -280,7 +280,7 @@ export const Dashboard: React.FC<Props> = () => {
 
     // Possibility of chunked by whole wav
     let existingProjectDataList: any[] = projectData.filter(
-      o => o.file_name === rawFileName
+      o => o.file_name === selectedRawFileName
         && o.sequence_number === -1
     );
 
@@ -288,7 +288,7 @@ export const Dashboard: React.FC<Props> = () => {
     {
       // but is it really this channel?
       existingProjectDataList = projectData.filter(
-        o => o.file_name === rawFileName
+        o => o.file_name === selectedRawFileName
           && o.sequence_number === -1
           && o.channel === channel
       );
@@ -305,7 +305,7 @@ export const Dashboard: React.FC<Props> = () => {
     {
       // Turns out to be chunked by talk unit
       existingProjectDataList = projectData.filter(
-        o => o.file_name === rawFileName
+        o => o.file_name === selectedRawFileName
           && o.sequence_number === sequenceNumber
           && o.channel === channel
       );
@@ -332,7 +332,7 @@ export const Dashboard: React.FC<Props> = () => {
   }
 
   const handleDownload = () => {
-    downloadProjectData(projectName);
+    downloadProjectData(selectedProjectName);
   };
 
   return (
@@ -347,7 +347,7 @@ export const Dashboard: React.FC<Props> = () => {
             (<option key={p.project_name} value={p.project_name}>{p.project_name}</option>)
           )} 
         </select>
-        { projectName && rawFileList.length > 0 ? (
+        { selectedProjectName && rawFileList.length > 0 ? (
           <Button className={classes.headerItem} onClick={handleDownload}>
               Download
           </Button>
@@ -355,12 +355,12 @@ export const Dashboard: React.FC<Props> = () => {
           <div></div>
         )}
       </div>
-      { projectName && rawFileList.length > 0 ? (
+      { selectedProjectName && rawFileList.length > 0 ? (
         <div className={classes.content}>
           <div className={classes.rawFileListContainer}>
-            <RawFileList
-              rawFile={rawFileList}
-              rawFileName={rawFileName}
+            <DashboardRawFileList
+              rawFileList={rawFileList}
+              selectedRawFileName={selectedRawFileName}
               onSelect={selectRawFile}
             />
           </div>
@@ -368,10 +368,10 @@ export const Dashboard: React.FC<Props> = () => {
             <div className={classes.subcontent}>
               <div className={classes.annotateDataContainer}>
                 <AnnotateData
-                  projectName={projectName}
-                  projectLabelList={projectLabelList}
+                  selectedProjectName={selectedProjectName}
+                  selectedProjectLabelList={selectedProjectLabelList}
                   projectData={projectData.filter(
-                    o => o.file_name === rawFileName
+                    o => o.file_name === selectedRawFileName
                   )}
                   selectedAudio={selectedAudio}
                   selectedAudioStartTime={selectedAudioStartTime}
@@ -392,7 +392,7 @@ export const Dashboard: React.FC<Props> = () => {
                 <AnnotationDataList
                   rawFileData={rawFileData}
                   projectData={projectData.filter(
-                    o => o.file_name === rawFileName
+                    o => o.file_name === selectedRawFileName
                   )}
                   selectedDataTableIndex={selectedDataTableIndex}
                   onSelect={handleSelection}

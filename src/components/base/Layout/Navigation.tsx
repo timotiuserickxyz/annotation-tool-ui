@@ -60,6 +60,15 @@ export const Navigation: React.FC<Props> = () => {
             <ListItemText primary={navTop.projectSettings.label} />
           </ListItem>
         </Link>
+        <Link
+          href={navTop.fileSettings.path}
+          style={{ textDecoration: 'none', color: 'rgba(0, 0, 0, 0.87)' }}
+        >
+          <ListItem button>
+            <ListItemIcon>{navTop.fileSettings.icon}</ListItemIcon>
+            <ListItemText primary={navTop.fileSettings.label} />
+          </ListItem>
+        </Link>
         {/* <Link
           href={navTop.training.path}
           style={{ textDecoration: 'none', color: 'rgba(0, 0, 0, 0.87)' }}

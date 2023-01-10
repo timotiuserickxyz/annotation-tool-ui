@@ -14,6 +14,7 @@ export const pathMap = {
     postProjectLabel: '/annotation-project/label/new/:projectName',
     deleteProjectLabel: '/annotation-project/label/delete/:projectName',
     getWavFolderList: '/wav-data/list',
+    getWavFileList: '/wav-data/list/:folderName',
     getRawFolderList: '/dataset/source/list',
     getRawFileList: '/dataset/source/list/:folderName',
     getRawFileDataList: '/dataset/source/load/:folderName/:fileName',

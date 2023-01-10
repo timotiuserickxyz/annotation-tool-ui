@@ -13,6 +13,9 @@ const useStyles = makeStyles({
     '&.MuiDataGrid-root .MuiDataGrid-cell:focus': {
       outline: 'none',
     },
+    '& .MuiDataGrid-row': {
+      cursor: 'pointer',
+    },
   }
 });
 
@@ -137,7 +140,6 @@ export const AnnotationDataList: Component = ({ rawFileData, projectData, select
         disableColumnSelector={true}
         selectionModel={[selectedDataTableIndex]}
         onSelectionModelChange={(newSelectionModel) => {
-          console.log('selectedDataTableIndex: ' + newSelectionModel.selectionModel[0]);
           const index = newSelectionModel.selectionModel[0] as number;
           onSelect(index);
         }}
