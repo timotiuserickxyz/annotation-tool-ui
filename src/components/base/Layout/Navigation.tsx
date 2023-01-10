@@ -1,6 +1,7 @@
 import React from 'react';
 import HomeOutlinedIcon from '@material-ui/icons/HomeOutlined';
 import SettingsIcon from '@material-ui/icons/Settings';
+import SettingsApplicationsIcon from '@material-ui/icons/SettingsApplications';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -25,10 +26,15 @@ const navTop = {
     icon: <HomeOutlinedIcon />,
     path: pathMap.dashboard.path,
   },
-  settings: {
-    label: 'Settings',
+  projectSettings: {
+    label: 'Project Settings',
     icon: <SettingsIcon />,
-    path: pathMap.settings.path,
+    path: pathMap.projectSettings.path,
+  },
+  fileSettings: {
+    label: 'File Settings',
+    icon: <SettingsApplicationsIcon />,
+    path: pathMap.fileSettings.path,
   },
 };
 
@@ -46,12 +52,12 @@ export const Navigation: React.FC<Props> = () => {
           </ListItem>
         </Link>
         <Link
-          href={navTop.settings.path}
+          href={navTop.projectSettings.path}
           style={{ textDecoration: 'none', color: 'rgba(0, 0, 0, 0.87)' }}
         >
           <ListItem button>
-            <ListItemIcon>{navTop.settings.icon}</ListItemIcon>
-            <ListItemText primary={navTop.settings.label} />
+            <ListItemIcon>{navTop.projectSettings.icon}</ListItemIcon>
+            <ListItemText primary={navTop.projectSettings.label} />
           </ListItem>
         </Link>
         {/* <Link
