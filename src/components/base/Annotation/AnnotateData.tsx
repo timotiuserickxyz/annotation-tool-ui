@@ -177,9 +177,9 @@ export const AnnotateData: Component = ({ selectedProjectName, selectedProjectLa
       <br/>
       <div className={classes.bottomContainer}>
         <div className={classes.navigationContainer}>
-          <Button onClick={onClickPrev}>Prev</Button>
-          <Button onClick={onClickSave}>Save</Button>
-          <Button onClick={onClickNext}>Next</Button>
+          <Button variant="contained" onClick={onClickPrev}>Prev</Button>
+          <Button variant="contained" onClick={onClickSave}>Save</Button>
+          <Button variant="contained" onClick={onClickNext}>Next</Button>
         </div>
       </div>
     </div>

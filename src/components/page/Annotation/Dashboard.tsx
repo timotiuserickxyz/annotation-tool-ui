@@ -348,7 +348,7 @@ export const Dashboard: React.FC<Props> = () => {
           )} 
         </select>
         { selectedProjectName && rawFileList.length > 0 ? (
-          <Button className={classes.headerItem} onClick={handleDownload}>
+          <Button variant="contained" className={classes.headerItem} onClick={handleDownload}>
               Download
           </Button>
         ) : (

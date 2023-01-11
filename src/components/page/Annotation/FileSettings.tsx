@@ -78,11 +78,22 @@ export const FileSettings: React.FC<Props> = () => {
   const [newRawFolderName, setNewRawFolderName] = useState<string>('');
   const [newWavFolderName, setNewWavFolderName] = useState<string>('');
 
+  const [newRawFile, setNewRawFile] = useState<string>('');
+  const [newRawFileName, setNewRawFileName] = useState<string>('');
+  const [newWavFile, setNewWavFile] = useState<string>('');
+  const [newWavFileName, setNewWavFileName] = useState<string>('');
+
   const [openCreateRawFolderModal, setOpenCreateRawFolderModal] = useState<boolean>(false);
   const handleCloseCreateRawFolderModal = () => setOpenCreateRawFolderModal(false);
 
   const [openCreateWavFolderModal, setOpenCreateWavFolderModal] = useState<boolean>(false);
   const handleCloseCreateWavFolderModal = () => setOpenCreateWavFolderModal(false);
+
+  const [openUploadRawFileModal, setOpenUploadRawFileModal] = useState<boolean>(false);
+  const handleCloseUploadRawFileModal = () => setOpenUploadRawFileModal(false);
+
+  const [openUploadWavFileModal, setOpenUploadWavFileModal] = useState<boolean>(false);
+  const handleCloseUploadWavFileModal = () => setOpenUploadWavFileModal(false);
 
   const [openDeleteRawFolderModal, setOpenDeleteRawFolderModal] = useState<boolean>(false);
   const handleCloseDeleteRawFolderModal = () => setOpenDeleteRawFolderModal(false);
@@ -151,6 +162,38 @@ export const FileSettings: React.FC<Props> = () => {
     
   };
 
+  const prepareUploadRawFile = () => {
+    if (selectedRawFolderName == '')
+    {
+      alert('Source folder not chosen yet');
+      return;
+    }
+
+    setNewRawFile('');
+    setNewRawFileName('');
+    setOpenUploadRawFileModal(true);
+  };
+
+  const uploadRawFileAndRefresh = async() => {
+    
+  };
+
+  const prepareUploadWavFile = () => {
+    if (selectedWavFolderName == '')
+    {
+      alert('Wav folder not chosen yet');
+      return;
+    }
+
+    setNewWavFile('');
+    setNewWavFileName('');
+    setOpenUploadWavFileModal(true);
+  };
+
+  const uploadWavFileAndRefresh = async() => {
+    
+  };
+
   const prepareDeleteRawFolder = (folderName: string) => {
     setSelectedRawFolderName(folderName);
     setOpenDeleteRawFolderModal(true);
@@ -197,15 +240,27 @@ export const FileSettings: React.FC<Props> = () => {
     setNewWavFolderName(value);
   };
 
+  const changeNewRawFile = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    const value = event.target.value;console.log(value);
+    setNewRawFile(value);
+    setNewRawFileName(value.replace(/^.*[\\\/]/, ''));
+  };
+
+  const changeNewWavFile = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    const value = event.target.value;console.log(value);
+    setNewWavFile(value);
+    setNewWavFileName(value.replace(/^.*[\\\/]/, ''));
+  };
+
   return (
     <div className={classes.root}>
       <div className={classes.rawFileContainer}>
         <div className={classes.header}>
           <span className={classes.headerItem}>Source</span>
-          <Button className={classes.headerItem} onClick={prepareCreateRawFolder}>
+          <Button variant="contained" className={classes.headerItem} onClick={prepareCreateRawFolder}>
             Create Folder
           </Button>
-          <Button className={classes.headerItem}>
+          <Button variant="contained" className={classes.headerItem} onClick={prepareUploadRawFile}>
             Upload File
           </Button>
         </div>
@@ -229,10 +284,10 @@ export const FileSettings: React.FC<Props> = () => {
       <div className={classes.wavFileContainer}>
         <div className={classes.header}>
           <span className={classes.headerItem}>Wav</span>
-          <Button className={classes.headerItem} onClick={prepareCreateWavFolder}>
+          <Button variant="contained" className={classes.headerItem} onClick={prepareCreateWavFolder}>
             Create Folder
           </Button>
-          <Button className={classes.headerItem}>
+          <Button variant="contained" className={classes.headerItem} onClick={prepareUploadWavFile}>
             Upload File
           </Button>
         </div>
@@ -289,6 +344,40 @@ export const FileSettings: React.FC<Props> = () => {
         <DialogActions>
           <Button onClick={handleCloseCreateWavFolderModal}>Cancel</Button>
           <Button onClick={createWavFolderAndRefresh}>Submit</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={openUploadRawFileModal} onClose={handleCloseUploadRawFileModal}>
+        <DialogTitle>Upload New Source File</DialogTitle>
+        <DialogContent>
+          <Button variant="contained" component="label">
+            Select
+            <input hidden accept=".csv" multiple type="file" onChange={changeNewRawFile} />
+          </Button>
+          <span style={{marginLeft: '10px'}}>
+            {newRawFileName}
+          </span>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseUploadRawFileModal}>Cancel</Button>
+          <Button onClick={uploadRawFileAndRefresh}>Submit</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={openUploadWavFileModal} onClose={handleCloseUploadWavFileModal}>
+        <DialogTitle>Upload New Wav File</DialogTitle>
+        <DialogContent>
+          <Button variant="contained" component="label">
+            Select
+            <input hidden accept=".wav" multiple type="file" onChange={changeNewWavFile} />
+          </Button>
+          <span style={{marginLeft: '10px'}}>
+            {newWavFileName}
+          </span>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseUploadWavFileModal}>Cancel</Button>
+          <Button onClick={uploadWavFileAndRefresh}>Submit</Button>
         </DialogActions>
       </Dialog>
       

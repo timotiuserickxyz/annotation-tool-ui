@@ -377,7 +377,7 @@ export const ProjectSettings: React.FC<Props> = () => {
   return (
     <div className={classes.root}>
       <div className={classes.header}>
-        <Button className={classes.headerItem} onClick={prepareCreateProject}>
+        <Button variant="contained" className={classes.headerItem} onClick={prepareCreateProject}>
             Create New
         </Button>
       </div>

@@ -101,7 +101,7 @@ export const AnnotationProjectList: Component = ({ projects, onClickEditProject,
             </li>)
           )}
           <li>
-            <Button onClick={() => onClickCreateLabel(params.row.project_name)}>
+            <Button variant="contained" onClick={() => onClickCreateLabel(params.row.project_name)}>
               Create New
             </Button>
           </li>
@@ -113,7 +113,7 @@ export const AnnotationProjectList: Component = ({ projects, onClickEditProject,
       flex: 1,
       renderCell: (params: any = {}) => (
         <div>
-          <Button className={classes.customButton} onClick={() => onClickEditProject(
+          <Button  className={classes.customButton} onClick={() => onClickEditProject(
             params.row.project_name,
             params.row.source_path.raw_source_path.replace(/^.*[\\\/]/, ''),
             params.row.source_path.wav_source_path.replace(/^.*[\\\/]/, '')
