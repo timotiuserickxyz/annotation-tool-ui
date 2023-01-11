@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { DataGrid } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
-import { Button } from '@material-ui/core';
-import HighlightOff from '@material-ui/icons/HighlightOff';
+// import { Button } from '@material-ui/core';
+// import HighlightOff from '@material-ui/icons/HighlightOff';
 
 const useStyles = makeStyles({
   tableContainer: {
@@ -58,9 +58,9 @@ export const WavFileList: Component = ({ wavFileList, selectedWavFileName, onSel
       renderCell: (params: any = {}) => (
         <div>
           <span>{params.row.name}</span>
-          <Button className={classes.customButton} onClick={() => onDelete(params.row.name)}>
+          {/* <Button className={classes.customButton} onClick={() => onDelete(params.row.name)}>
             <HighlightOff />
-          </Button>
+          </Button> */}
         </div>
       ),
     },

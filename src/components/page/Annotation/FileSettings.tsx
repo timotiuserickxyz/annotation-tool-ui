@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
-// import { mutate } from 'swr';
+import { mutate } from 'swr';
 import { makeStyles } from '@material-ui/core/styles';
 
+import { getAPIUrl } from '../../../utils/path';
 import { getRawFolderList } from '../../../api/annotation/getRawFolderList';
 import { getWavFolderList } from '../../../api/annotation/getWavFolderList';
 import { getRawFileList } from '../../../api/annotation/getRawFileList';
 import { getWavFileList } from '../../../api/annotation/getWavFileList';
+import { createRawFolder } from '../../../api/annotation/createRawFolder';
+import { createWavFolder } from '../../../api/annotation/createWavFolder';
+import { uploadRawFile } from '../../../api/annotation/uploadRawFile';
+import { uploadWavFile } from '../../../api/annotation/uploadWavFile';
 
 import { RawFolderList } from '../../base/Annotation/RawFolderList';
 import { WavFolderList } from '../../base/Annotation/WavFolderList';
@@ -78,9 +83,9 @@ export const FileSettings: React.FC<Props> = () => {
   const [newRawFolderName, setNewRawFolderName] = useState<string>('');
   const [newWavFolderName, setNewWavFolderName] = useState<string>('');
 
-  //const [newRawFile, setNewRawFile] = useState<string>('');
+  const [newRawFile, setNewRawFile] = useState<File>();
   const [newRawFileName, setNewRawFileName] = useState<string>('');
-  //const [newWavFile, setNewWavFile] = useState<string>('');
+  const [newWavFile, setNewWavFile] = useState<File>();
   const [newWavFileName, setNewWavFileName] = useState<string>('');
 
   const [openCreateRawFolderModal, setOpenCreateRawFolderModal] = useState<boolean>(false);
@@ -126,7 +131,6 @@ export const FileSettings: React.FC<Props> = () => {
   const wavFileList = !!tempWavFileList && !!tempWavFileList.data ? tempWavFileList.data.files.map((t) => {
     return {...t};
   }) : [];
-//const wavFileList = rawFileList;
 
   const selectRawFolder = (folderName: string) => {
     setSelectedRawFolderName(folderName);
@@ -150,7 +154,26 @@ export const FileSettings: React.FC<Props> = () => {
   };
 
   const createRawFolderAndRefresh = async() => {
-    
+    let errorMessage = '';
+
+    const response = await createRawFolder(newRawFolderName);
+
+    if (response.error) {
+    errorMessage = 'InternalServerError';
+    }
+    else if (response.data && response.data.error) {
+    errorMessage = response.data.error.message;
+    }
+
+    if (errorMessage != '') {
+    alert(errorMessage);
+    return;
+    }
+        
+    // Refresh
+    await mutate(getAPIUrl('annotation', 'getRawFolderList'));
+
+    setOpenCreateRawFolderModal(false);
   };
 
   const prepareCreateWavFolder = () => {
@@ -159,7 +182,26 @@ export const FileSettings: React.FC<Props> = () => {
   };
 
   const createWavFolderAndRefresh = async() => {
-    
+    let errorMessage = '';
+
+    const response = await createWavFolder(newWavFolderName);
+
+    if (response.error) {
+    errorMessage = 'InternalServerError';
+    }
+    else if (response.data && response.data.error) {
+    errorMessage = response.data.error.message;
+    }
+
+    if (errorMessage != '') {
+    alert(errorMessage);
+    return;
+    }
+        
+    // Refresh
+    await mutate(getAPIUrl('annotation', 'getWavFolderList'));
+
+    setOpenCreateWavFolderModal(false);
   };
 
   const prepareUploadRawFile = () => {
@@ -169,13 +211,38 @@ export const FileSettings: React.FC<Props> = () => {
       return;
     }
 
-    //setNewRawFile('');
+    setNewRawFile(undefined);
     setNewRawFileName('');
     setOpenUploadRawFileModal(true);
   };
 
   const uploadRawFileAndRefresh = async() => {
-    
+    if (newRawFile == undefined || newRawFileName == '')
+    {
+      alert('Source file not chosen yet');
+      return;
+    }
+
+    let errorMessage = '';
+
+    const response = await uploadRawFile(selectedRawFolderName, newRawFile);
+
+    if (response.error) {
+      errorMessage = 'InternalServerError';
+    }
+    else if (response.data && response.data.error) {
+      errorMessage = response.data.error.message;
+    }
+
+    if (errorMessage != '') {
+      alert(errorMessage);
+      return;
+    }
+        
+    // Refresh
+    await mutate(getAPIUrl('annotation', 'getRawFileList', {folderName: selectedRawFolderName}));
+
+    setOpenUploadRawFileModal(false);
   };
 
   const prepareUploadWavFile = () => {
@@ -185,13 +252,38 @@ export const FileSettings: React.FC<Props> = () => {
       return;
     }
 
-    //setNewWavFile('');
+    setNewWavFile(undefined);
     setNewWavFileName('');
     setOpenUploadWavFileModal(true);
   };
 
   const uploadWavFileAndRefresh = async() => {
-    
+    if (newWavFile == undefined || newWavFileName == '')
+    {
+      alert('Wav file not chosen yet');
+      return;
+    }
+
+    let errorMessage = '';
+
+    const response = await uploadWavFile(selectedWavFolderName, newWavFile);
+
+    if (response.error) {
+      errorMessage = 'InternalServerError';
+    }
+    else if (response.data && response.data.error) {
+      errorMessage = response.data.error.message;
+    }
+
+    if (errorMessage != '') {
+      alert(errorMessage);
+      return;
+    }
+        
+    // Refresh
+    await mutate(getAPIUrl('annotation', 'getWavFileList', {folderName: selectedWavFolderName}));
+
+    setOpenUploadWavFileModal(false);
   };
 
   const prepareDeleteRawFolder = (folderName: string) => {
@@ -240,16 +332,24 @@ export const FileSettings: React.FC<Props> = () => {
     setNewWavFolderName(value);
   };
 
-  const changeNewRawFile = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    const value = event.target.value;console.log(value);
-    //setNewRawFile(value);
-    setNewRawFileName(value.replace(/^.*[\\\/]/, ''));
+  const changeNewRawFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const target = event.target;
+
+    if (target.files) {
+        setNewRawFile(target.files[0]);
+    }
+
+    setNewRawFileName(target.value.replace(/^.*[\\\/]/, ''));
   };
 
-  const changeNewWavFile = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    const value = event.target.value;console.log(value);
-    //setNewWavFile(value);
-    setNewWavFileName(value.replace(/^.*[\\\/]/, ''));
+  const changeNewWavFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const target = event.target;
+
+    if (target.files) {
+        setNewWavFile(target.files[0]);
+    }
+    
+    setNewWavFileName(target.value.replace(/^.*[\\\/]/, ''));
   };
 
   return (
@@ -352,7 +452,7 @@ export const FileSettings: React.FC<Props> = () => {
         <DialogContent>
           <Button variant="contained" component="label">
             Select
-            <input hidden accept=".csv" multiple type="file" onChange={changeNewRawFile} />
+            <input hidden accept=".csv" type="file" onChange={changeNewRawFile} />
           </Button>
           <span style={{marginLeft: '10px'}}>
             {newRawFileName}
@@ -369,7 +469,7 @@ export const FileSettings: React.FC<Props> = () => {
         <DialogContent>
           <Button variant="contained" component="label">
             Select
-            <input hidden accept=".wav" multiple type="file" onChange={changeNewWavFile} />
+            <input hidden accept=".wav" type="file" onChange={changeNewWavFile} />
           </Button>
           <span style={{marginLeft: '10px'}}>
             {newWavFileName}

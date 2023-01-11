@@ -4,6 +4,7 @@ interface RequestInitExtend extends RequestInit {
   params?: {
     [key: string]: any;
   };
+  ignoreContentType?: boolean;
 }
 
 // TODO 環境変数
@@ -45,7 +46,7 @@ export const post = async (
 ): Promise<Response<any>> => {
   const body = init?.body ?? JSON.stringify(init?.params);
   const headers: HeadersInit = {
-    ...{ 'Content-Type': 'application/json' },
+    ...(init?.ignoreContentType ? {} : { 'Content-Type': 'application/json' }),
     ...init?.headers,
   };
   const res = await fetch(`${API_URL}${path}`, {
