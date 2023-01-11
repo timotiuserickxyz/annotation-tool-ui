@@ -78,9 +78,9 @@ export const FileSettings: React.FC<Props> = () => {
   const [newRawFolderName, setNewRawFolderName] = useState<string>('');
   const [newWavFolderName, setNewWavFolderName] = useState<string>('');
 
-  const [newRawFile, setNewRawFile] = useState<string>('');
+  //const [newRawFile, setNewRawFile] = useState<string>('');
   const [newRawFileName, setNewRawFileName] = useState<string>('');
-  const [newWavFile, setNewWavFile] = useState<string>('');
+  //const [newWavFile, setNewWavFile] = useState<string>('');
   const [newWavFileName, setNewWavFileName] = useState<string>('');
 
   const [openCreateRawFolderModal, setOpenCreateRawFolderModal] = useState<boolean>(false);
@@ -169,7 +169,7 @@ export const FileSettings: React.FC<Props> = () => {
       return;
     }
 
-    setNewRawFile('');
+    //setNewRawFile('');
     setNewRawFileName('');
     setOpenUploadRawFileModal(true);
   };
@@ -185,7 +185,7 @@ export const FileSettings: React.FC<Props> = () => {
       return;
     }
 
-    setNewWavFile('');
+    //setNewWavFile('');
     setNewWavFileName('');
     setOpenUploadWavFileModal(true);
   };
@@ -242,13 +242,13 @@ export const FileSettings: React.FC<Props> = () => {
 
   const changeNewRawFile = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     const value = event.target.value;console.log(value);
-    setNewRawFile(value);
+    //setNewRawFile(value);
     setNewRawFileName(value.replace(/^.*[\\\/]/, ''));
   };
 
   const changeNewWavFile = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     const value = event.target.value;console.log(value);
-    setNewWavFile(value);
+    //setNewWavFile(value);
     setNewWavFileName(value.replace(/^.*[\\\/]/, ''));
   };
 
