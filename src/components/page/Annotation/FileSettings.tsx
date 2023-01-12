@@ -310,7 +310,7 @@ export const FileSettings: React.FC<Props> = () => {
   };
 
   const deleteRawFolderAndRefresh = async() => {
-    
+    console.log('Deleting raw folder');
   };
 
   const prepareDeleteWavFolder = (folderName: string) => {
@@ -319,7 +319,7 @@ export const FileSettings: React.FC<Props> = () => {
   };
 
   const deleteWavFolderAndRefresh = async() => {
-    
+    console.log('Deleting wav folder');
   };
 
   const prepareDeleteRawFile = (fileName: string) => {
@@ -328,7 +328,7 @@ export const FileSettings: React.FC<Props> = () => {
   };
 
   const deleteRawFileAndRefresh = async() => {
-    
+    console.log('Deleting raw file');
   };
 
   const prepareDeleteWavFile = (fileName: string) => {
@@ -337,7 +337,7 @@ export const FileSettings: React.FC<Props> = () => {
   };
 
   const deleteWavFileAndRefresh = async() => {
-    
+    console.log('Deleting wav file');
   };
 
   const changeNewRawFolderName = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
