@@ -17,6 +17,8 @@ const useStyles = makeStyles({
     marginTop: '20px',
     marginLeft: 'auto',
     marginRight: 'auto',
+    fontSize: '12px',
+    overflow: 'hidden',
   },
   audioPlayer: {
     width: '100%',
