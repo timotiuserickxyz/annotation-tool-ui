@@ -134,7 +134,6 @@ export const AnnotationProjectList: Component = ({ projects, onClickEditProject,
     <div className={classes.tableContainer}>
       <DataGrid
         className={classes.customTable}
-        getRowId={(row) => row.project_name}
         rows={rows}
         columns={columns}
         pageSize={rowPerPage}

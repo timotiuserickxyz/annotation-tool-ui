@@ -78,7 +78,7 @@ export const Dashboard: React.FC<Props> = () => {
   const classes = useStyles();
 
   const [selectedProjectName, setSelectedProjectName] = useState<string>('');
-  const [selectedRawFileName, setSelectedRawFileName] = useState<string>('');
+  const [selectedRawFileIndex, setSelectedRawFileIndex] = useState<number>(-1);
 
   const [selectedDataTableIndex, setSelectedDataTableIndex] = useState<number>(0);
   const [selectedRawFileData, setSelectedRawFileData] = useState<any>(null);
@@ -105,11 +105,11 @@ export const Dashboard: React.FC<Props> = () => {
   const rawFileFolderName = (!!rawFileFolderPath ? rawFileFolderPath.split('/').pop() : '') as string;
 
   const tempRawFileList = getRawFileList(rawFileFolderName);
-  const rawFileList = !!tempRawFileList && !!tempRawFileList.data ? tempRawFileList.data.files.map((t) => {
-    return {...t};
+  const rawFileList = !!tempRawFileList && !!tempRawFileList.data ? tempRawFileList.data.files.map((t, id) => {
+    return {id: id, ...t};
   }) : [];
 
-  const rawRawFileData = getRawFileDataList(rawFileFolderName, selectedRawFileName);
+  const rawRawFileData = getRawFileDataList(rawFileFolderName, selectedRawFileIndex >= 0 ? rawFileList[selectedRawFileIndex].name : '');
   const rawFileData = !!rawRawFileData && !!rawRawFileData.data && Array.isArray(rawRawFileData.data) ? rawRawFileData.data.map((t) => {
     return {...t};
   }) : [];
@@ -123,7 +123,7 @@ export const Dashboard: React.FC<Props> = () => {
 
   const selectProject = (e: string) => {
     setSelectedProjectName(e);
-    setSelectedRawFileName('');
+    setSelectedRawFileIndex(-1);
     setSelectedDataTableIndex(0);
     setSelectedAudio('');
     setCurrentSequence(0);
@@ -132,8 +132,8 @@ export const Dashboard: React.FC<Props> = () => {
     setSelectedComment('');
   };
 
-  const selectRawFile = (fileName: string) => {
-    setSelectedRawFileName(fileName);
+  const selectRawFile = (index: number) => {
+    setSelectedRawFileIndex(index);
     setSelectedDataTableIndex(0);
     setSelectedAudio('');
     setCurrentSequence(0);
@@ -152,7 +152,7 @@ export const Dashboard: React.FC<Props> = () => {
   useEffect(() => {
     if (isSaving == true
       && selectedProjectName != ''
-      && selectedRawFileName != ''
+      && selectedRawFileIndex != -1
       && selectedRawFileData
       && projectData && projectData.length > 0
     ) {
@@ -171,7 +171,7 @@ export const Dashboard: React.FC<Props> = () => {
     }
 
     const params = {
-      file_name: selectedRawFileName,
+      file_name: rawFileList[selectedRawFileIndex],
       channel: selectedRawFileData.Channel,
       sequence_number: selectedSequence,
       label: selectedLabel,
@@ -280,7 +280,7 @@ export const Dashboard: React.FC<Props> = () => {
 
     // Possibility of chunked by whole wav
     let existingProjectDataList: any[] = projectData.filter(
-      o => o.file_name === selectedRawFileName
+      o => o.file_name === rawFileList[selectedRawFileIndex].name
         && o.sequence_number === -1
     );
 
@@ -288,7 +288,7 @@ export const Dashboard: React.FC<Props> = () => {
     {
       // but is it really this channel?
       existingProjectDataList = projectData.filter(
-        o => o.file_name === selectedRawFileName
+        o => o.file_name === rawFileList[selectedRawFileIndex].name
           && o.sequence_number === -1
           && o.channel === channel
       );
@@ -305,7 +305,7 @@ export const Dashboard: React.FC<Props> = () => {
     {
       // Turns out to be chunked by talk unit
       existingProjectDataList = projectData.filter(
-        o => o.file_name === selectedRawFileName
+        o => o.file_name === rawFileList[selectedRawFileIndex].name
           && o.sequence_number === sequenceNumber
           && o.channel === channel
       );
@@ -360,7 +360,7 @@ export const Dashboard: React.FC<Props> = () => {
           <div className={classes.rawFileListContainer}>
             <DashboardRawFileList
               rawFileList={rawFileList}
-              selectedRawFileName={selectedRawFileName}
+              selectedRawFileIndex={selectedRawFileIndex}
               onSelect={selectRawFile}
             />
           </div>
@@ -371,7 +371,7 @@ export const Dashboard: React.FC<Props> = () => {
                   selectedProjectName={selectedProjectName}
                   selectedProjectLabelList={selectedProjectLabelList}
                   projectData={projectData.filter(
-                    o => o.file_name === selectedRawFileName
+                    o => o.file_name === rawFileList[selectedRawFileIndex].name
                   )}
                   selectedAudio={selectedAudio}
                   selectedAudioStartTime={selectedAudioStartTime}
@@ -392,7 +392,7 @@ export const Dashboard: React.FC<Props> = () => {
                 <AnnotationDataList
                   rawFileData={rawFileData}
                   projectData={projectData.filter(
-                    o => o.file_name === selectedRawFileName
+                    o => o.file_name === rawFileList[selectedRawFileIndex].name
                   )}
                   selectedDataTableIndex={selectedDataTableIndex}
                   onSelect={handleSelection}

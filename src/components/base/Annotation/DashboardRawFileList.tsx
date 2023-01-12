@@ -28,13 +28,13 @@ type Row = BaseRow & {
 
 type Props = {
   rawFileList: any[],
-  selectedRawFileName: string,
-  onSelect: (fileName: string) => void | Promise<void>,
+  selectedRawFileIndex: number,
+  onSelect: (fileIndex: number) => void | Promise<void>,
 };
 
 type Component = (props: Props) => React.ReactElement<Props>;
 
-export const DashboardRawFileList: Component = ({ rawFileList, selectedRawFileName, onSelect }) => {
+export const DashboardRawFileList: Component = ({ rawFileList, selectedRawFileIndex, onSelect }) => {
   const classes = useStyles();
 
   const rows: Row[] = !!rawFileList
@@ -53,15 +53,14 @@ export const DashboardRawFileList: Component = ({ rawFileList, selectedRawFileNa
     <div className={classes.tableContainer}>
       <DataGrid
         className={classes.customTable}
-        getRowId={(row) => row.name}
         rows={rows}
         columns={columns}
         pageSize={rowPerPage}
         disableColumnSelector={true}
-        selectionModel={[selectedRawFileName]}
+        selectionModel={[selectedRawFileIndex]}
         onSelectionModelChange={(newSelectionModel) => {
-          const fileName = newSelectionModel.selectionModel[0] as string;
-          onSelect(fileName);
+          const index = newSelectionModel.selectionModel[0] as number;
+          onSelect(index);
         }}
         rowsPerPageOptions={[100]}
         hideFooterRowCount={true}
