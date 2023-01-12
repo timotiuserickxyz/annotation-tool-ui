@@ -52,7 +52,7 @@ export default class CustomDocument extends NextDocument {
     return (
       <Html lang="ja-JP">
         <Head>
-          <title>AnnotationTool</title>
+          <title>Annotation Tool</title>
           <meta
             name="viewport"
             content="minimum-scale=1, initial-scale=1, width=device-width"

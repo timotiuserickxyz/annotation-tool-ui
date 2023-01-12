@@ -57,7 +57,7 @@ const useStyles = makeStyles({
 
 interface Props {}
 
-export const Settings: React.FC<Props> = () => {
+export const ProjectSettings: React.FC<Props> = () => {
   const classes = useStyles();
 
   const [newProjectName, setNewProjectName] = useState<string>('');
@@ -65,6 +65,7 @@ export const Settings: React.FC<Props> = () => {
   const [newWavFolderName, setNewWavFolderName] = useState<string>('');
 
   const [selectedProjectName, setSelectedProjectName] = useState<string>('');
+  const [selectedProjectLabel, setSelectedProjectLabel] = useState<string>('');
   const [newProjectLabel, setNewProjectLabel] = useState<string>('');
 
   const [openCreateProjectModal, setOpenCreateProjectModal] = useState<boolean>(false);
@@ -73,8 +74,14 @@ export const Settings: React.FC<Props> = () => {
   const [openEditProjectModal, setOpenEditProjectModal] = useState<boolean>(false);
   const handleCloseEditProjectModal = () => setOpenEditProjectModal(false);
 
-  const [openLabelModal, setOpenLabelModal] = useState<boolean>(false);
-  const handleCloseLabelModal = () => setOpenLabelModal(false);
+  const [openDeleteProjectModal, setOpenDeleteProjectModal] = useState<boolean>(false);
+  const handleCloseDeleteProjectModal = () => setOpenDeleteProjectModal(false);
+
+  const [openCreateLabelModal, setOpenCreateLabelModal] = useState<boolean>(false);
+  const handleCloseCreateLabelModal = () => setOpenCreateLabelModal(false);
+
+  const [openDeleteLabelModal, setOpenDeleteLabelModal] = useState<boolean>(false);
+  const handleCloseDeleteLabelModal = () => setOpenDeleteLabelModal(false);
 
   const tempProjectList = getProjectList();
   const projectList = !!tempProjectList.data ? tempProjectList.data.configs.map((t) => {
@@ -96,6 +103,7 @@ export const Settings: React.FC<Props> = () => {
     setNewRawFolderName('');
     setNewWavFolderName('');
     setSelectedProjectName('');
+    setSelectedProjectLabel('');
     setNewProjectLabel('');
   };
 
@@ -175,9 +183,9 @@ export const Settings: React.FC<Props> = () => {
     // Refresh
     await mutate(getAPIUrl('annotation', 'getProjectList'));
 
-    initializeAllInputs();
-
     setOpenCreateProjectModal(false);
+
+    initializeAllInputs();
   };
 
   const editProjectAndRefresh = async() => {
@@ -222,20 +230,21 @@ export const Settings: React.FC<Props> = () => {
     // Refresh
     await mutate(getAPIUrl('annotation', 'getProjectList'));
 
-    initializeAllInputs();
-
     setOpenEditProjectModal(false);
+
+    initializeAllInputs();
   };
 
-  const deleteProjectAndRefreshProject = async (targetProjectName: string) => {
-    if (confirm('Are you sure to delete project "' + targetProjectName + '"?') == false)
-    {
-      return;
-    }
+  const prepareDeleteProject = (targetProjectName: string) => {
+    initializeAllInputs();
+    setSelectedProjectName(targetProjectName);
+    setOpenDeleteProjectModal(true);
+  };
 
+  const deleteProjectAndRefresh = async () => {
     const params = {
       names: [
-        targetProjectName
+        selectedProjectName
       ]
     }
 
@@ -257,12 +266,16 @@ export const Settings: React.FC<Props> = () => {
         
     // Refresh
     await mutate(getAPIUrl('annotation', 'getProjectList'));
+
+    setOpenDeleteProjectModal(false);
+
+    initializeAllInputs();
   };
 
   const prepareCreateLabel = (targetProjectName: string) => {
     initializeAllInputs();
     setSelectedProjectName(targetProjectName);
-    setOpenLabelModal(true);
+    setOpenCreateLabelModal(true);
   };
 
   const createLabelAndRefresh = async() => {
@@ -300,22 +313,26 @@ export const Settings: React.FC<Props> = () => {
     // Refresh
     await mutate(getAPIUrl('annotation', 'getProjectList'));
 
-    setOpenLabelModal(false);
+    setOpenCreateLabelModal(false);
+
+    initializeAllInputs();
   };
 
-  const deleteLabelAndRefreshProject = async (targetProjectName: string, targetLabelName: string) => {
-    if (confirm('Are you sure to delete label "' + targetLabelName + '" from project "' + targetProjectName + '"?') == false)
-    {
-      return;
-    }
+  const prepareDeleteLabel = (targetProjectName: string, targetProjectLabel: string) => {
+    initializeAllInputs();
+    setSelectedProjectName(targetProjectName);
+    setSelectedProjectLabel(targetProjectLabel);
+    setOpenDeleteLabelModal(true);
+  };
 
+  const deleteLabelAndRefresh = async () => {
     const params = {
-      label_option: targetLabelName
+      label_option: selectedProjectLabel
     }
 
     let errorMessage = '';
 
-    const response = await deleteProjectLabel(targetProjectName, params);
+    const response = await deleteProjectLabel(selectedProjectName, params);
 
     if (response.error) {
       errorMessage = 'InternalServerError';
@@ -331,6 +348,10 @@ export const Settings: React.FC<Props> = () => {
         
     // Refresh
     await mutate(getAPIUrl('annotation', 'getProjectList'));
+
+    setOpenDeleteLabelModal(false);
+
+    initializeAllInputs();
   };
 
   const changeNewProjectName = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -356,7 +377,7 @@ export const Settings: React.FC<Props> = () => {
   return (
     <div className={classes.root}>
       <div className={classes.header}>
-        <Button className={classes.headerItem} onClick={prepareCreateProject}>
+        <Button variant="contained" className={classes.headerItem} onClick={prepareCreateProject}>
             Create New
         </Button>
       </div>
@@ -364,11 +385,12 @@ export const Settings: React.FC<Props> = () => {
         <AnnotationProjectList
             projects={projectList}
             onClickEditProject={prepareEditProject}
-            onClickDeleteProject={deleteProjectAndRefreshProject}
-            onClickDeleteLabel={deleteLabelAndRefreshProject}
+            onClickDeleteProject={prepareDeleteProject}
             onClickCreateLabel={prepareCreateLabel}
+            onClickDeleteLabel={prepareDeleteLabel}
         />
       </div>
+
       <Dialog open={openCreateProjectModal} onClose={handleCloseCreateProjectModal}>
         <DialogTitle>Create New Project</DialogTitle>
         <DialogContent>
@@ -462,8 +484,21 @@ export const Settings: React.FC<Props> = () => {
           <Button onClick={editProjectAndRefresh}>Submit</Button>
         </DialogActions>
       </Dialog>
+      
+      <Dialog open={openDeleteProjectModal} onClose={handleCloseEditProjectModal}>
+        <DialogTitle>Delete Project</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure to delete project "{selectedProjectName}"?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteProjectModal}>Cancel</Button>
+          <Button onClick={deleteProjectAndRefresh}>Submit</Button>
+        </DialogActions>
+      </Dialog>
 
-      <Dialog open={openLabelModal} onClose={handleCloseLabelModal}>
+      <Dialog open={openCreateLabelModal} onClose={handleCloseCreateLabelModal}>
         <DialogTitle>Create New Label</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -477,8 +512,21 @@ export const Settings: React.FC<Props> = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseLabelModal}>Cancel</Button>
+          <Button onClick={handleCloseCreateLabelModal}>Cancel</Button>
           <Button onClick={createLabelAndRefresh}>Submit</Button>
+        </DialogActions>
+      </Dialog>
+      
+      <Dialog open={openDeleteLabelModal} onClose={handleCloseDeleteLabelModal}>
+        <DialogTitle>Delete Label</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure to delete label "{selectedProjectLabel}" from project "{selectedProjectName}"?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteLabelModal}>Cancel</Button>
+          <Button onClick={deleteLabelAndRefresh}>Submit</Button>
         </DialogActions>
       </Dialog>
     </div>

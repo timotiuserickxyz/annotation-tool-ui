@@ -13,6 +13,9 @@ const useStyles = makeStyles({
     '&.MuiDataGrid-root .MuiDataGrid-cell:focus': {
       outline: 'none',
     },
+    '& .MuiDataGrid-row': {
+      cursor: 'pointer',
+    },
   }
 });
 
@@ -38,7 +41,6 @@ type Row = BaseRow & {
 };
 
 type Props = {
-  rawFileName: string,
   rawFileData: any[],
   projectData: any[],
   selectedDataTableIndex: number,
@@ -47,7 +49,7 @@ type Props = {
 
 type Component = (props: Props) => React.ReactElement<Props>;
 
-export const AnnotationDataList: Component = ({ rawFileName, rawFileData, projectData, selectedDataTableIndex, onSelect }) => {
+export const AnnotationDataList: Component = ({ rawFileData, projectData, selectedDataTableIndex, onSelect }) => {
   const classes = useStyles();
 
   const rows: Row[] = !!rawFileData
@@ -57,9 +59,9 @@ export const AnnotationDataList: Component = ({ rawFileName, rawFileData, projec
   : [];
 
   function getLabelFromProject(params: any) {
-    const filteredProjectData = projectData.filter(o =>
-      o.file_name === rawFileName
-      && o.sequence_number === params.row.Sequence_number
+    // Possibility of chunked by whole wav
+    let filteredProjectData: any[] = projectData.filter(o =>
+      o.sequence_number === -1
       && o.channel === params.row.Channel
     );
 
@@ -67,6 +69,20 @@ export const AnnotationDataList: Component = ({ rawFileName, rawFileData, projec
     {
       const existingProjectData = filteredProjectData.pop();
       return existingProjectData.label;
+    }
+    else
+    {
+      // Turns out to be chunked by talk unit
+      filteredProjectData = projectData.filter(o =>
+        o.sequence_number === params.row.Sequence_number
+        && o.channel === params.row.Channel
+      );
+
+      if (filteredProjectData.length > 0)
+      {
+        const existingProjectData = filteredProjectData.pop();
+        return existingProjectData.label;
+      }
     }
     
     return '';
@@ -124,7 +140,6 @@ export const AnnotationDataList: Component = ({ rawFileName, rawFileData, projec
         disableColumnSelector={true}
         selectionModel={[selectedDataTableIndex]}
         onSelectionModelChange={(newSelectionModel) => {
-          console.log('selectedDataTableIndex: ' + newSelectionModel.selectionModel[0]);
           const index = newSelectionModel.selectionModel[0] as number;
           onSelect(index);
         }}

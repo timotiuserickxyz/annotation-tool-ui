@@ -37,13 +37,10 @@ const useStyles = makeStyles({
   labelList: {
     padding: '10px',
   },
-  labelText: {
-    width: '100px',
-    display: 'inline-block',
-  },
   customButton: {
     minWidth: '40px !important',
     width: '40px',
+    marginLeft: '5px',
   },
 });
 
@@ -64,7 +61,7 @@ type Props = {
   onClickEditProject: (targetProjectName: string, targetProjectRawFolderName: string, targetProjectWavFolderName: string) => void | Promise<void>,
   onClickDeleteProject: (targetProjectName: string) => void | Promise<void>,
   onClickCreateLabel: (targetProjectName: string) => void | Promise<void>,
-  onClickDeleteLabel: (targetProjectName: string, targetLabelName: string) => void | Promise<void>,
+  onClickDeleteLabel: (targetProjectName: string, targetProjectLabel: string) => void | Promise<void>,
 };
 
 type Component = (props: Props) => React.ReactElement<Props>;
@@ -97,14 +94,14 @@ export const AnnotationProjectList: Component = ({ projects, onClickEditProject,
         <ul className={classes.labelList}>
           {params.row.label_option.label_option.map((label: string) => 
             (<li>
-              <span className={classes.labelText}>{label}</span>
+              <span>{label}</span>
               <Button className={classes.customButton} onClick={() => onClickDeleteLabel(params.row.project_name, label)}>
                 <HighlightOff />
               </Button>
             </li>)
           )}
           <li>
-            <Button onClick={() => onClickCreateLabel(params.row.project_name)}>
+            <Button variant="contained" onClick={() => onClickCreateLabel(params.row.project_name)}>
               Create New
             </Button>
           </li>
@@ -116,7 +113,7 @@ export const AnnotationProjectList: Component = ({ projects, onClickEditProject,
       flex: 1,
       renderCell: (params: any = {}) => (
         <div>
-          <Button className={classes.customButton} onClick={() => onClickEditProject(
+          <Button  className={classes.customButton} onClick={() => onClickEditProject(
             params.row.project_name,
             params.row.source_path.raw_source_path.replace(/^.*[\\\/]/, ''),
             params.row.source_path.wav_source_path.replace(/^.*[\\\/]/, '')

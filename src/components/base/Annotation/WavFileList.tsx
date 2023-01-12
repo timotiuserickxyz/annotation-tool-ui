@@ -35,26 +35,26 @@ type Row = BaseRow & {
 };
 
 type Props = {
-  rawFileList: any[],
-  selectedRawFileName: string,
+  wavFileList: any[],
+  selectedWavFileName: string,
   onSelect: (fileName: string) => void | Promise<void>,
   onDelete: (fileName: string) => void | Promise<void>,
 };
 
 type Component = (props: Props) => React.ReactElement<Props>;
 
-export const RawFileList: Component = ({ rawFileList, selectedRawFileName, onSelect, onDelete }) => {
+export const WavFileList: Component = ({ wavFileList, selectedWavFileName, onSelect, onDelete }) => {
   const classes = useStyles();
 
-  const rows: Row[] = !!rawFileList
-  ? rawFileList.map((t) => {
+  const rows: Row[] = !!wavFileList
+  ? wavFileList.map((t) => {
       return {...t};
     })
   : [];
 
   const columns = [
     { field: 'name',
-      headerName: 'Source File',
+      headerName: 'Wav File',
       flex: 1,
       renderCell: (params: any = {}) => (
         <div>
@@ -78,7 +78,7 @@ export const RawFileList: Component = ({ rawFileList, selectedRawFileName, onSel
         columns={columns}
         pageSize={rowPerPage}
         disableColumnSelector={true}
-        selectionModel={[selectedRawFileName]}
+        selectionModel={[selectedWavFileName]}
         onSelectionModelChange={(newSelectionModel) => {
           const fileName = newSelectionModel.selectionModel[0] as string;
           onSelect(fileName);

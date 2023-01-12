@@ -35,26 +35,26 @@ type Row = BaseRow & {
 };
 
 type Props = {
-  rawFileList: any[],
-  selectedRawFileName: string,
-  onSelect: (fileName: string) => void | Promise<void>,
-  onDelete: (fileName: string) => void | Promise<void>,
+  wavFolderList: any[],
+  selectedWavFolderName: string,
+  onSelect: (folderName: string) => void | Promise<void>,
+  onDelete: (folderName: string) => void | Promise<void>,
 };
 
 type Component = (props: Props) => React.ReactElement<Props>;
 
-export const RawFileList: Component = ({ rawFileList, selectedRawFileName, onSelect, onDelete }) => {
+export const WavFolderList: Component = ({ wavFolderList, selectedWavFolderName, onSelect, onDelete }) => {
   const classes = useStyles();
 
-  const rows: Row[] = !!rawFileList
-  ? rawFileList.map((t) => {
+  const rows: Row[] = !!wavFolderList
+  ? wavFolderList.map((t) => {
       return {...t};
     })
   : [];
 
   const columns = [
     { field: 'name',
-      headerName: 'Source File',
+      headerName: 'Wav Folder',
       flex: 1,
       renderCell: (params: any = {}) => (
         <div>
@@ -78,10 +78,10 @@ export const RawFileList: Component = ({ rawFileList, selectedRawFileName, onSel
         columns={columns}
         pageSize={rowPerPage}
         disableColumnSelector={true}
-        selectionModel={[selectedRawFileName]}
+        selectionModel={[selectedWavFolderName]}
         onSelectionModelChange={(newSelectionModel) => {
-          const fileName = newSelectionModel.selectionModel[0] as string;
-          onSelect(fileName);
+          const folderName = newSelectionModel.selectionModel[0] as string;
+          onSelect(folderName);
         }}
         rowsPerPageOptions={[100]}
         hideFooterRowCount={true}

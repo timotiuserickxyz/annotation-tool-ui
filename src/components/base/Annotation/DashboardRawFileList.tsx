@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { DataGrid } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
-import { Button } from '@material-ui/core';
-import HighlightOff from '@material-ui/icons/HighlightOff';
 
 const useStyles = makeStyles({
   tableContainer: {
@@ -16,13 +14,7 @@ const useStyles = makeStyles({
     '& .MuiDataGrid-row': {
       cursor: 'pointer',
     },
-  },
-  customButton: {
-    minWidth: '40px !important',
-    width: '40px',
-    marginLeft: '5px',
-    visibility: 'hidden',
-  },
+  }
 });
 
 export type BaseRow = {
@@ -38,12 +30,11 @@ type Props = {
   rawFileList: any[],
   selectedRawFileName: string,
   onSelect: (fileName: string) => void | Promise<void>,
-  onDelete: (fileName: string) => void | Promise<void>,
 };
 
 type Component = (props: Props) => React.ReactElement<Props>;
 
-export const RawFileList: Component = ({ rawFileList, selectedRawFileName, onSelect, onDelete }) => {
+export const DashboardRawFileList: Component = ({ rawFileList, selectedRawFileName, onSelect }) => {
   const classes = useStyles();
 
   const rows: Row[] = !!rawFileList
@@ -53,18 +44,7 @@ export const RawFileList: Component = ({ rawFileList, selectedRawFileName, onSel
   : [];
 
   const columns = [
-    { field: 'name',
-      headerName: 'Source File',
-      flex: 1,
-      renderCell: (params: any = {}) => (
-        <div>
-          <span>{params.row.name}</span>
-          <Button className={classes.customButton} onClick={() => onDelete(params.row.name)}>
-            <HighlightOff />
-          </Button>
-        </div>
-      ),
-    },
+    { field: 'name', headerName: 'Source File', flex: 1 },
   ];
 
   const rowPerPage: number = 100;
@@ -90,4 +70,3 @@ export const RawFileList: Component = ({ rawFileList, selectedRawFileName, onSel
     </div>
   )
 };
-  
