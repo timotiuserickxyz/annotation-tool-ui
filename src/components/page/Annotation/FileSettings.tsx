@@ -25,6 +25,7 @@ import {
     DialogContentText,
     DialogTitle,
   } from '@material-ui/core';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const useStyles = makeStyles({
   root: {
@@ -68,6 +69,12 @@ const useStyles = makeStyles({
     marginTop: '-15px',
     marginBottom: '20px',
   },
+  loading: {
+    width: '18px !important',
+    height: '18px !important',
+    marginLeft: '10px',
+    verticalAlign: 'middle',
+  },
 });
 
 interface Props {}
@@ -87,6 +94,9 @@ export const FileSettings: React.FC<Props> = () => {
   const [newRawFileName, setNewRawFileName] = useState<string>('');
   const [newWavFile, setNewWavFile] = useState<File>();
   const [newWavFileName, setNewWavFileName] = useState<string>('');
+  
+  const [uploadingRawFile, setUploadingRawFile] = useState(false);
+  const [uploadingWavFile, setUploadingWavFile] = useState(false);
 
   const [openCreateRawFolderModal, setOpenCreateRawFolderModal] = useState<boolean>(false);
   const handleCloseCreateRawFolderModal = () => setOpenCreateRawFolderModal(false);
@@ -223,6 +233,8 @@ export const FileSettings: React.FC<Props> = () => {
       return;
     }
 
+    setUploadingRawFile(true);
+
     let errorMessage = '';
 
     const response = await uploadRawFile(selectedRawFolderName, newRawFile);
@@ -235,6 +247,7 @@ export const FileSettings: React.FC<Props> = () => {
     }
 
     if (errorMessage != '') {
+      setUploadingRawFile(false);
       alert(errorMessage);
       return;
     }
@@ -242,6 +255,7 @@ export const FileSettings: React.FC<Props> = () => {
     // Refresh
     await mutate(getAPIUrl('annotation', 'getRawFileList', {folderName: selectedRawFolderName}));
 
+    setUploadingRawFile(false);
     setOpenUploadRawFileModal(false);
   };
 
@@ -264,6 +278,8 @@ export const FileSettings: React.FC<Props> = () => {
       return;
     }
 
+    setUploadingWavFile(true);
+
     let errorMessage = '';
 
     const response = await uploadWavFile(selectedWavFolderName, newWavFile);
@@ -276,6 +292,7 @@ export const FileSettings: React.FC<Props> = () => {
     }
 
     if (errorMessage != '') {
+      setUploadingWavFile(false);
       alert(errorMessage);
       return;
     }
@@ -283,6 +300,7 @@ export const FileSettings: React.FC<Props> = () => {
     // Refresh
     await mutate(getAPIUrl('annotation', 'getWavFileList', {folderName: selectedWavFolderName}));
 
+    setUploadingWavFile(false);
     setOpenUploadWavFileModal(false);
   };
 
@@ -457,6 +475,7 @@ export const FileSettings: React.FC<Props> = () => {
           <span style={{marginLeft: '10px'}}>
             {newRawFileName}
           </span>
+          { uploadingRawFile ? <CircularProgress className={classes.loading} /> : ''}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseUploadRawFileModal}>Cancel</Button>
@@ -474,6 +493,7 @@ export const FileSettings: React.FC<Props> = () => {
           <span style={{marginLeft: '10px'}}>
             {newWavFileName}
           </span>
+          { uploadingWavFile ? <CircularProgress className={classes.loading} /> : ''}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseUploadWavFileModal}>Cancel</Button>
