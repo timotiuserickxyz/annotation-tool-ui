@@ -171,7 +171,7 @@ export const Dashboard: React.FC<Props> = () => {
     }
 
     const params = {
-      file_name: rawFileList[selectedRawFileIndex],
+      file_name: rawFileList[selectedRawFileIndex].name,
       channel: selectedRawFileData.Channel,
       sequence_number: selectedSequence,
       label: selectedLabel,
