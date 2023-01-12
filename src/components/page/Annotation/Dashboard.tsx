@@ -110,7 +110,7 @@ export const Dashboard: React.FC<Props> = () => {
   }) : [];
 
   const rawRawFileData = getRawFileDataList(rawFileFolderName, selectedRawFileName);
-  const rawFileData = !!rawRawFileData && !!rawRawFileData.data ? rawRawFileData.data.map((t) => {
+  const rawFileData = !!rawRawFileData && !!rawRawFileData.data && Array.isArray(rawRawFileData.data) ? rawRawFileData.data.map((t) => {
     return {...t};
   }) : [];
 

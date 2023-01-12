@@ -105,10 +105,26 @@ export const FileSettings: React.FC<Props> = () => {
   const handleCloseCreateWavFolderModal = () => setOpenCreateWavFolderModal(false);
 
   const [openUploadRawFileModal, setOpenUploadRawFileModal] = useState<boolean>(false);
-  const handleCloseUploadRawFileModal = () => setOpenUploadRawFileModal(false);
+  const handleCloseUploadRawFileModal = () => {
+    if (uploadingRawFile)
+    {
+      alert('Uploading on progress');
+      return;
+    }
+
+    setOpenUploadRawFileModal(false);
+  }
 
   const [openUploadWavFileModal, setOpenUploadWavFileModal] = useState<boolean>(false);
-  const handleCloseUploadWavFileModal = () => setOpenUploadWavFileModal(false);
+  const handleCloseUploadWavFileModal = () => {
+    if (uploadingWavFile)
+    {
+      alert('Uploading on progress');
+      return;
+    }
+
+    setOpenUploadWavFileModal(false);
+  }
 
   const [openDeleteRawFolderModal, setOpenDeleteRawFolderModal] = useState<boolean>(false);
   const handleCloseDeleteRawFolderModal = () => setOpenDeleteRawFolderModal(false);
@@ -232,6 +248,12 @@ export const FileSettings: React.FC<Props> = () => {
       alert('Source file not chosen yet');
       return;
     }
+    
+    if (uploadingRawFile)
+    {
+      alert('Uploading on progress');
+      return;
+    }
 
     setUploadingRawFile(true);
 
@@ -275,6 +297,12 @@ export const FileSettings: React.FC<Props> = () => {
     if (newWavFile == undefined || newWavFileName == '')
     {
       alert('Wav file not chosen yet');
+      return;
+    }
+    
+    if (uploadingWavFile)
+    {
+      alert('Uploading on progress');
       return;
     }
 
