@@ -36,14 +36,14 @@ type Row = BaseRow & {
 
 type Props = {
   rawFileList: any[],
-  selectedRawFileName: string,
-  onSelect: (fileName: string) => void | Promise<void>,
-  onDelete: (fileName: string) => void | Promise<void>,
+  selectedRawFileIndex: number,
+  onSelect: (index: number) => void | Promise<void>,
+  onDelete: (index: number) => void | Promise<void>,
 };
 
 type Component = (props: Props) => React.ReactElement<Props>;
 
-export const RawFileList: Component = ({ rawFileList, selectedRawFileName, onSelect, onDelete }) => {
+export const RawFileList: Component = ({ rawFileList, selectedRawFileIndex, onSelect, onDelete }) => {
   const classes = useStyles();
 
   const rows: Row[] = !!rawFileList
@@ -59,7 +59,7 @@ export const RawFileList: Component = ({ rawFileList, selectedRawFileName, onSel
       renderCell: (params: any = {}) => (
         <div>
           <span>{params.row.name}</span>
-          <Button className={classes.customButton} onClick={() => onDelete(params.row.name)}>
+          <Button className={classes.customButton} onClick={() => onDelete(params.row.id)}>
             <HighlightOff />
           </Button>
         </div>
@@ -73,15 +73,14 @@ export const RawFileList: Component = ({ rawFileList, selectedRawFileName, onSel
     <div className={classes.tableContainer}>
       <DataGrid
         className={classes.customTable}
-        getRowId={(row) => row.name}
         rows={rows}
         columns={columns}
         pageSize={rowPerPage}
         disableColumnSelector={true}
-        selectionModel={[selectedRawFileName]}
+        selectionModel={[selectedRawFileIndex]}
         onSelectionModelChange={(newSelectionModel) => {
-          const fileName = newSelectionModel.selectionModel[0] as string;
-          onSelect(fileName);
+          const index = newSelectionModel.selectionModel[0] as number;
+          onSelect(index);
         }}
         rowsPerPageOptions={[100]}
         hideFooterRowCount={true}

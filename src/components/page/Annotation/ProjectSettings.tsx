@@ -84,8 +84,8 @@ export const ProjectSettings: React.FC<Props> = () => {
   const handleCloseDeleteLabelModal = () => setOpenDeleteLabelModal(false);
 
   const tempProjectList = getProjectList();
-  const projectList = !!tempProjectList.data ? tempProjectList.data.configs.map((t) => {
-    return {...t};
+  const projectList = !!tempProjectList.data ? tempProjectList.data.configs.map((t, id) => {
+    return {id: id, ...t};
   }) : [];
 
   const tempRawFolderList = getRawFolderList();

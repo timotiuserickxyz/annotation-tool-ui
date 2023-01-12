@@ -82,10 +82,10 @@ interface Props {}
 export const FileSettings: React.FC<Props> = () => {
   const classes = useStyles();
 
-  const [selectedRawFolderName, setSelectedRawFolderName] = useState<string>('');
-  const [selectedWavFolderName, setSelectedWavFolderName] = useState<string>('');
-  const [selectedRawFileName, setSelectedRawFileName] = useState<string>('');
-  const [selectedWavFileName, setSelectedWavFileName] = useState<string>('');
+  const [selectedRawFolderIndex, setSelectedRawFolderIndex] = useState<number>(-1);
+  const [selectedWavFolderIndex, setSelectedWavFolderIndex] = useState<number>(-1);
+  const [selectedRawFileIndex, setSelectedRawFileIndex] = useState<number>(-1);
+  const [selectedWavFileIndex, setSelectedWavFileIndex] = useState<number>(-1);
 
   const [newRawFolderName, setNewRawFolderName] = useState<string>('');
   const [newWavFolderName, setNewWavFolderName] = useState<string>('');
@@ -139,39 +139,39 @@ export const FileSettings: React.FC<Props> = () => {
   const handleCloseDeleteWavFileModal = () => setOpenDeleteWavFileModal(false);
 
   const tempRawFolderList = getRawFolderList();
-  const rawFolderList = !!tempRawFolderList.data ? tempRawFolderList.data.directories.map((t) => {
-    return {...t};
+  const rawFolderList = !!tempRawFolderList.data ? tempRawFolderList.data.directories.map((t, id) => {
+    return {id: id, ...t};
   }) : [];
 
   const tempWavFolderList = getWavFolderList();
-  const wavFolderList = !!tempWavFolderList.data ? tempWavFolderList.data.directories.map((t) => {
-    return {...t};
+  const wavFolderList = !!tempWavFolderList.data ? tempWavFolderList.data.directories.map((t, id) => {
+    return {id: id, ...t};
   }) : [];
 
-  const tempRawFileList = getRawFileList(selectedRawFolderName);
-  const rawFileList = !!tempRawFileList && !!tempRawFileList.data ? tempRawFileList.data.files.map((t) => {
-    return {...t};
+  const tempRawFileList = getRawFileList(selectedRawFolderIndex >= 0 ? rawFolderList[selectedRawFolderIndex].name : '');
+  const rawFileList = !!tempRawFileList && !!tempRawFileList.data ? tempRawFileList.data.files.map((t, id) => {
+    return {id: id, ...t};
   }) : [];
 
-  const tempWavFileList = getWavFileList(selectedWavFolderName);
-  const wavFileList = !!tempWavFileList && !!tempWavFileList.data ? tempWavFileList.data.files.map((t) => {
-    return {...t};
+  const tempWavFileList = getWavFileList(selectedWavFolderIndex >= 0 ? wavFolderList[selectedWavFolderIndex].name : '');
+  const wavFileList = !!tempWavFileList && !!tempWavFileList.data ? tempWavFileList.data.files.map((t, id) => {
+    return {id: id, ...t};
   }) : [];
 
-  const selectRawFolder = (folderName: string) => {
-    setSelectedRawFolderName(folderName);
+  const selectRawFolder = (index: number) => {
+    setSelectedRawFolderIndex(index);
   };
 
-  const selectWavFolder = (folderName: string) => {
-    setSelectedWavFolderName(folderName);
+  const selectWavFolder = (index: number) => {
+    setSelectedWavFolderIndex(index);
   };
 
-  const selectRawFile = (fileName: string) => {
-    setSelectedRawFileName(fileName);
+  const selectRawFile = (index: number) => {
+    setSelectedRawFileIndex(index);
   };
 
-  const selectWavFile = (fileName: string) => {
-    setSelectedWavFileName(fileName);
+  const selectWavFile = (index: number) => {
+    setSelectedWavFileIndex(index);
   };
 
   const prepareCreateRawFolder = () => {
@@ -231,7 +231,7 @@ export const FileSettings: React.FC<Props> = () => {
   };
 
   const prepareUploadRawFile = () => {
-    if (selectedRawFolderName == '')
+    if (selectedRawFolderIndex == -1)
     {
       alert('Source folder not chosen yet');
       return;
@@ -258,7 +258,7 @@ export const FileSettings: React.FC<Props> = () => {
     setUploadingRawFile(true);
 
     let errorMessage = '';
-
+    const selectedRawFolderName = rawFolderList[selectedRawFolderIndex].name;
     const response = await uploadRawFile(selectedRawFolderName, newRawFile);
 
     if (response.error) {
@@ -282,7 +282,7 @@ export const FileSettings: React.FC<Props> = () => {
   };
 
   const prepareUploadWavFile = () => {
-    if (selectedWavFolderName == '')
+    if (selectedWavFolderIndex == -1)
     {
       alert('Wav folder not chosen yet');
       return;
@@ -309,7 +309,7 @@ export const FileSettings: React.FC<Props> = () => {
     setUploadingWavFile(true);
 
     let errorMessage = '';
-
+    const selectedWavFolderName = wavFolderList[selectedWavFolderIndex].name;
     const response = await uploadWavFile(selectedWavFolderName, newWavFile);
 
     if (response.error) {
@@ -332,8 +332,8 @@ export const FileSettings: React.FC<Props> = () => {
     setOpenUploadWavFileModal(false);
   };
 
-  const prepareDeleteRawFolder = (folderName: string) => {
-    setSelectedRawFolderName(folderName);
+  const prepareDeleteRawFolder = (index: number) => {
+    setSelectedRawFolderIndex(index);
     setOpenDeleteRawFolderModal(true);
   };
 
@@ -341,8 +341,8 @@ export const FileSettings: React.FC<Props> = () => {
     console.log('Deleting raw folder');
   };
 
-  const prepareDeleteWavFolder = (folderName: string) => {
-    setSelectedWavFolderName(folderName);
+  const prepareDeleteWavFolder = (index: number) => {
+    setSelectedWavFolderIndex(index);
     setOpenDeleteWavFolderModal(true);
   };
 
@@ -350,8 +350,8 @@ export const FileSettings: React.FC<Props> = () => {
     console.log('Deleting wav folder');
   };
 
-  const prepareDeleteRawFile = (fileName: string) => {
-    setSelectedRawFileName(fileName);
+  const prepareDeleteRawFile = (index: number) => {
+    setSelectedRawFileIndex(index);
     setOpenDeleteRawFileModal(true);
   };
 
@@ -359,8 +359,8 @@ export const FileSettings: React.FC<Props> = () => {
     console.log('Deleting raw file');
   };
 
-  const prepareDeleteWavFile = (fileName: string) => {
-    setSelectedWavFileName(fileName);
+  const prepareDeleteWavFile = (index: number) => {
+    setSelectedWavFileIndex(index);
     setOpenDeleteWavFileModal(true);
   };
 
@@ -413,7 +413,7 @@ export const FileSettings: React.FC<Props> = () => {
         <div className={classes.content}>
           <RawFolderList
             rawFolderList={rawFolderList}
-            selectedRawFolderName={selectedRawFolderName}
+            selectedRawFolderIndex={selectedRawFolderIndex}
             onSelect={selectRawFolder}
             onDelete={prepareDeleteRawFolder}
           />
@@ -421,7 +421,7 @@ export const FileSettings: React.FC<Props> = () => {
         <div className={classes.content}>
           <RawFileList
             rawFileList={rawFileList}
-            selectedRawFileName={selectedRawFileName}
+            selectedRawFileIndex={selectedRawFileIndex}
             onSelect={selectRawFile}
             onDelete={prepareDeleteRawFile}
           />
@@ -440,7 +440,7 @@ export const FileSettings: React.FC<Props> = () => {
         <div className={classes.content}>
           <WavFolderList
             wavFolderList={wavFolderList}
-            selectedWavFolderName={selectedWavFolderName}
+            selectedWavFolderIndex={selectedWavFolderIndex}
             onSelect={selectWavFolder}
             onDelete={prepareDeleteWavFolder}
           />
@@ -448,7 +448,7 @@ export const FileSettings: React.FC<Props> = () => {
         <div className={classes.content}>
           <WavFileList
             wavFileList={wavFileList}
-            selectedWavFileName={selectedWavFileName}
+            selectedWavFileIndex={selectedWavFileIndex}
             onSelect={selectWavFile}
             onDelete={prepareDeleteWavFile}
           />
@@ -533,7 +533,7 @@ export const FileSettings: React.FC<Props> = () => {
         <DialogTitle>Delete Source Folder</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure to delete source folder "{selectedRawFolderName}"?
+            Are you sure to delete source folder "{rawFolderList[selectedRawFolderIndex]?.name}"?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -546,7 +546,7 @@ export const FileSettings: React.FC<Props> = () => {
         <DialogTitle>Delete Wav Folder</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure to delete wav folder "{selectedWavFolderName}"?
+            Are you sure to delete wav folder "{wavFolderList[selectedWavFolderIndex]?.name}"?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -559,7 +559,7 @@ export const FileSettings: React.FC<Props> = () => {
         <DialogTitle>Delete Source File</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure to delete source folder "{selectedRawFileName}"?
+            Are you sure to delete source folder "{rawFileList[selectedRawFileIndex]?.name}"?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -572,7 +572,7 @@ export const FileSettings: React.FC<Props> = () => {
         <DialogTitle>Delete Wav File</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure to delete wav file "{selectedWavFileName}"?
+            Are you sure to delete wav file "{wavFileList[selectedWavFileIndex]?.name}"?
           </DialogContentText>
         </DialogContent>
         <DialogActions>

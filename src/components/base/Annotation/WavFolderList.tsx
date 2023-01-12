@@ -36,14 +36,14 @@ type Row = BaseRow & {
 
 type Props = {
   wavFolderList: any[],
-  selectedWavFolderName: string,
-  onSelect: (folderName: string) => void | Promise<void>,
-  onDelete: (folderName: string) => void | Promise<void>,
+  selectedWavFolderIndex: number,
+  onSelect: (index: number) => void | Promise<void>,
+  onDelete: (index: number) => void | Promise<void>,
 };
 
 type Component = (props: Props) => React.ReactElement<Props>;
 
-export const WavFolderList: Component = ({ wavFolderList, selectedWavFolderName, onSelect, onDelete }) => {
+export const WavFolderList: Component = ({ wavFolderList, selectedWavFolderIndex, onSelect, onDelete }) => {
   const classes = useStyles();
 
   const rows: Row[] = !!wavFolderList
@@ -59,7 +59,7 @@ export const WavFolderList: Component = ({ wavFolderList, selectedWavFolderName,
       renderCell: (params: any = {}) => (
         <div>
           <span>{params.row.name}</span>
-          <Button className={classes.customButton} onClick={() => onDelete(params.row.name)}>
+          <Button className={classes.customButton} onClick={() => onDelete(params.row.id)}>
             <HighlightOff />
           </Button>
         </div>
@@ -73,15 +73,14 @@ export const WavFolderList: Component = ({ wavFolderList, selectedWavFolderName,
     <div className={classes.tableContainer}>
       <DataGrid
         className={classes.customTable}
-        getRowId={(row) => row.name}
         rows={rows}
         columns={columns}
         pageSize={rowPerPage}
         disableColumnSelector={true}
-        selectionModel={[selectedWavFolderName]}
+        selectionModel={[selectedWavFolderIndex]}
         onSelectionModelChange={(newSelectionModel) => {
-          const folderName = newSelectionModel.selectionModel[0] as string;
-          onSelect(folderName);
+          const index = newSelectionModel.selectionModel[0] as number;
+          onSelect(index);
         }}
         rowsPerPageOptions={[100]}
         hideFooterRowCount={true}
