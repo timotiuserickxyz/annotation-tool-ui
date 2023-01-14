@@ -229,6 +229,14 @@ export const Dashboard: React.FC<Props> = () => {
   const goToNextData = () => {
     if (selectedDataTableIndex < dataCount)
     {
+      if (selectedLabel == '')
+      {
+        alert('Label not chosen yet');
+        return;
+      }
+
+      saveAndRefreshData();
+
       const nextDataTableIndex = selectedDataTableIndex + 1;
       setSelectedDataTableIndex(nextDataTableIndex);
 
@@ -240,6 +248,14 @@ export const Dashboard: React.FC<Props> = () => {
   const goToPrevData = () => {
     if (selectedDataTableIndex > 1)
     {
+      if (selectedLabel == '')
+      {
+        alert('Label not chosen yet');
+        return;
+      }
+      
+      saveAndRefreshData();
+      
       const prevDataTableIndex = selectedDataTableIndex - 1;
       setSelectedDataTableIndex(prevDataTableIndex);
 
