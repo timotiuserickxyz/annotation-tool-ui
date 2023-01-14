@@ -172,7 +172,7 @@ export const Dashboard: React.FC<Props> = () => {
 
     const params = {
       file_name: rawFileList[selectedRawFileIndex].name,
-      channel: selectedRawFileData.Channel,
+      channel: selectedSequence === -1 ? 0 : selectedRawFileData.Channel,
       sequence_number: selectedSequence,
       label: selectedLabel,
       comment: selectedComment,
@@ -302,13 +302,6 @@ export const Dashboard: React.FC<Props> = () => {
 
     if (existingProjectDataList.length > 0)
     {
-      // but is it really this channel?
-      existingProjectDataList = projectData.filter(
-        o => o.file_name === rawFileList[selectedRawFileIndex].name
-          && o.sequence_number === -1
-          && o.channel === channel
-      );
-
       const existingProjectData = existingProjectDataList.pop();
 
       setSelectedProjectData(existingProjectData ? existingProjectData : null);
