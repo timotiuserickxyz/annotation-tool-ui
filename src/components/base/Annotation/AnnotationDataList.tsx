@@ -62,7 +62,6 @@ export const AnnotationDataList: Component = ({ rawFileData, projectData, select
     // Possibility of chunked by whole wav
     let filteredProjectData: any[] = projectData.filter(o =>
       o.sequence_number === -1
-      && o.channel === params.row.Channel
     );
 
     if (filteredProjectData.length > 0)

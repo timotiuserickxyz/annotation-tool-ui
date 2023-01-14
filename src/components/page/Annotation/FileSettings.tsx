@@ -90,9 +90,9 @@ export const FileSettings: React.FC<Props> = () => {
   const [newRawFolderName, setNewRawFolderName] = useState<string>('');
   const [newWavFolderName, setNewWavFolderName] = useState<string>('');
 
-  const [newRawFile, setNewRawFile] = useState<File>();
+  const [newRawFiles, setNewRawFiles] = useState<FileList>();
   const [newRawFileName, setNewRawFileName] = useState<string>('');
-  const [newWavFile, setNewWavFile] = useState<File>();
+  const [newWavFiles, setNewWavFiles] = useState<FileList>();
   const [newWavFileName, setNewWavFileName] = useState<string>('');
   
   const [uploadingRawFile, setUploadingRawFile] = useState(false);
@@ -237,13 +237,13 @@ export const FileSettings: React.FC<Props> = () => {
       return;
     }
 
-    setNewRawFile(undefined);
+    setNewRawFiles(undefined);
     setNewRawFileName('');
     setOpenUploadRawFileModal(true);
   };
 
   const uploadRawFileAndRefresh = async() => {
-    if (newRawFile == undefined || newRawFileName == '')
+    if (newRawFiles == undefined || newRawFileName == '')
     {
       alert('Source file not chosen yet');
       return;
@@ -259,7 +259,7 @@ export const FileSettings: React.FC<Props> = () => {
 
     let errorMessage = '';
     const selectedRawFolderName = rawFolderList[selectedRawFolderIndex].name;
-    const response = await uploadRawFile(selectedRawFolderName, newRawFile);
+    const response = await uploadRawFile(selectedRawFolderName, newRawFiles);
 
     if (response.error) {
       errorMessage = 'InternalServerError';
@@ -288,13 +288,13 @@ export const FileSettings: React.FC<Props> = () => {
       return;
     }
 
-    setNewWavFile(undefined);
+    setNewWavFiles(undefined);
     setNewWavFileName('');
     setOpenUploadWavFileModal(true);
   };
 
   const uploadWavFileAndRefresh = async() => {
-    if (newWavFile == undefined || newWavFileName == '')
+    if (newWavFiles == undefined || newWavFileName == '')
     {
       alert('Wav file not chosen yet');
       return;
@@ -310,7 +310,7 @@ export const FileSettings: React.FC<Props> = () => {
 
     let errorMessage = '';
     const selectedWavFolderName = wavFolderList[selectedWavFolderIndex].name;
-    const response = await uploadWavFile(selectedWavFolderName, newWavFile);
+    const response = await uploadWavFile(selectedWavFolderName, newWavFiles);
 
     if (response.error) {
       errorMessage = 'InternalServerError';
@@ -382,20 +382,34 @@ export const FileSettings: React.FC<Props> = () => {
     const target = event.target;
 
     if (target.files) {
-        setNewRawFile(target.files[0]);
+        setNewRawFiles(target.files);
     }
-
-    setNewRawFileName(target.value.replace(/^.*[\\\/]/, ''));
+    
+    if (target.files?.length == 1)
+    {
+      setNewRawFileName(target.value.replace(/^.*[\\\/]/, ''));
+    }
+    else if (target.files?.length != 1)
+    {
+      setNewRawFileName('' + target.files?.length.toString() + ' files selected');
+    }
   };
 
   const changeNewWavFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     const target = event.target;
 
     if (target.files) {
-        setNewWavFile(target.files[0]);
+        setNewWavFiles(target.files);
     }
     
-    setNewWavFileName(target.value.replace(/^.*[\\\/]/, ''));
+    if (target.files?.length == 1)
+    {
+      setNewWavFileName(target.value.replace(/^.*[\\\/]/, ''));
+    }
+    else if (target.files?.length != 1)
+    {
+      setNewWavFileName('' + target.files?.length.toString() + ' files selected');
+    }
   };
 
   return (
@@ -498,7 +512,7 @@ export const FileSettings: React.FC<Props> = () => {
         <DialogContent>
           <Button variant="contained" component="label">
             Select
-            <input hidden accept=".csv" type="file" onChange={changeNewRawFile} />
+            <input hidden accept=".csv" multiple type="file" onChange={changeNewRawFile} />
           </Button>
           <span style={{marginLeft: '10px'}}>
             {newRawFileName}
@@ -516,7 +530,7 @@ export const FileSettings: React.FC<Props> = () => {
         <DialogContent>
           <Button variant="contained" component="label">
             Select
-            <input hidden accept=".wav" type="file" onChange={changeNewWavFile} />
+            <input hidden accept=".wav" multiple type="file" onChange={changeNewWavFile} />
           </Button>
           <span style={{marginLeft: '10px'}}>
             {newWavFileName}
