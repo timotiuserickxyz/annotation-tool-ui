@@ -23,6 +23,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Snackbar,
 } from '@material-ui/core';
 
 const useStyles = makeStyles({
@@ -83,6 +84,11 @@ export const ProjectSettings: React.FC<Props> = () => {
   const [openDeleteLabelModal, setOpenDeleteLabelModal] = useState<boolean>(false);
   const handleCloseDeleteLabelModal = () => setOpenDeleteLabelModal(false);
 
+  const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+  const handleCloseSnackbar = () => setOpenSnackbar(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string>('');
+
+
   const tempProjectList = getProjectList();
   const projectList = !!tempProjectList.data ? tempProjectList.data.configs.map((t, id) => {
     return {id: id, ...t};
@@ -123,17 +129,20 @@ export const ProjectSettings: React.FC<Props> = () => {
   const createProjectAndRefresh = async() => {
     if (newProjectName == '')
     {
-      alert('Project name is empty');
+      setSnackbarMessage('Project name is empty');
+      setOpenSnackbar(true);
       return;
     }
     else if (newRawFolderName == '')
     {
-      alert('Source folder not chosen yet');
+      setSnackbarMessage('Csv folder not chosen yet');
+      setOpenSnackbar(true);
       return;
     }
     else if (newWavFolderName == '')
     {
-      alert('Wav folder not chosen yet');
+      setSnackbarMessage('Wav folder not chosen yet');
+      setOpenSnackbar(true);
       return;
     }
 
@@ -154,7 +163,8 @@ export const ProjectSettings: React.FC<Props> = () => {
     }
 
     if (createProjectErrorMessage != '') {
-      alert(createProjectErrorMessage);
+      setSnackbarMessage(createProjectErrorMessage);
+      setOpenSnackbar(true);
       return;
     }
 
@@ -176,7 +186,8 @@ export const ProjectSettings: React.FC<Props> = () => {
     }
 
     if (editProjectErrorMessage != '') {
-      alert(editProjectErrorMessage);
+      setSnackbarMessage(editProjectErrorMessage);
+      setOpenSnackbar(true);
       return;
     }
 
@@ -184,6 +195,8 @@ export const ProjectSettings: React.FC<Props> = () => {
     await mutate(getAPIUrl('annotation', 'getProjectList'));
 
     setOpenCreateProjectModal(false);
+    setSnackbarMessage('Create new project successful');
+    setOpenSnackbar(true);
 
     initializeAllInputs();
   };
@@ -191,17 +204,20 @@ export const ProjectSettings: React.FC<Props> = () => {
   const editProjectAndRefresh = async() => {
     if (selectedProjectName == '')
     {
-      alert('Project not selected yet');
+      setSnackbarMessage('Project not selected yet');
+      setOpenSnackbar(true);
       return;
     }
     else if (newRawFolderName == '')
     {
-      alert('Source folder not chosen yet');
+      setSnackbarMessage('Project not selected yet');
+      setOpenSnackbar(true);
       return;
     }
     else if (newWavFolderName == '')
     {
-      alert('Wav folder not chosen yet');
+      setSnackbarMessage('Project not selected yet');
+      setOpenSnackbar(true);
       return;
     }
 
@@ -223,7 +239,8 @@ export const ProjectSettings: React.FC<Props> = () => {
     }
 
     if (editProjectErrorMessage != '') {
-      alert(editProjectErrorMessage);
+      setSnackbarMessage(editProjectErrorMessage);
+      setOpenSnackbar(true);
       return;
     }
 
@@ -231,6 +248,8 @@ export const ProjectSettings: React.FC<Props> = () => {
     await mutate(getAPIUrl('annotation', 'getProjectList'));
 
     setOpenEditProjectModal(false);
+    setSnackbarMessage('Edit project successful');
+    setOpenSnackbar(true);
 
     initializeAllInputs();
   };
@@ -260,7 +279,8 @@ export const ProjectSettings: React.FC<Props> = () => {
     }
 
     if (errorMessage != '') {
-      alert(errorMessage);
+      setSnackbarMessage(errorMessage);
+      setOpenSnackbar(true);
       return;
     }
         
@@ -268,6 +288,8 @@ export const ProjectSettings: React.FC<Props> = () => {
     await mutate(getAPIUrl('annotation', 'getProjectList'));
 
     setOpenDeleteProjectModal(false);
+    setSnackbarMessage('Delete project successful');
+    setOpenSnackbar(true);
 
     initializeAllInputs();
   };
@@ -281,12 +303,14 @@ export const ProjectSettings: React.FC<Props> = () => {
   const createLabelAndRefresh = async() => {
     if (selectedProjectName == '')
     {
-      alert('Selected project is empty');
+      setSnackbarMessage('Selected project is empty');
+      setOpenSnackbar(true);
       return;
     }
     else if (newProjectLabel == '')
     {
-      alert('New label is empty');
+      setSnackbarMessage('New label is empty');
+      setOpenSnackbar(true);
       return;
     }
 
@@ -306,7 +330,8 @@ export const ProjectSettings: React.FC<Props> = () => {
     }
 
     if (errorMessage != '') {
-      alert(errorMessage);
+      setSnackbarMessage(errorMessage);
+      setOpenSnackbar(true);
       return;
     }
         
@@ -314,6 +339,8 @@ export const ProjectSettings: React.FC<Props> = () => {
     await mutate(getAPIUrl('annotation', 'getProjectList'));
 
     setOpenCreateLabelModal(false);
+    setSnackbarMessage('Create new label successful');
+    setOpenSnackbar(true);
 
     initializeAllInputs();
   };
@@ -342,7 +369,8 @@ export const ProjectSettings: React.FC<Props> = () => {
     }
 
     if (errorMessage != '') {
-      alert(errorMessage);
+      setSnackbarMessage(errorMessage);
+      setOpenSnackbar(true);
       return;
     }
         
@@ -350,6 +378,8 @@ export const ProjectSettings: React.FC<Props> = () => {
     await mutate(getAPIUrl('annotation', 'getProjectList'));
 
     setOpenDeleteLabelModal(false);
+    setSnackbarMessage('Delete label successful');
+    setOpenSnackbar(true);
 
     initializeAllInputs();
   };
@@ -405,7 +435,7 @@ export const ProjectSettings: React.FC<Props> = () => {
           />
           <br/>
           <DialogContentText>
-            Source Folder
+            Csv Folder
           </DialogContentText>
           <Select
             className={classes.customForm}
@@ -452,7 +482,7 @@ export const ProjectSettings: React.FC<Props> = () => {
           />
           <br/>
           <DialogContentText>
-            Source Folder
+            Csv Folder
           </DialogContentText>
           <Select
             className={classes.customForm}
@@ -529,6 +559,14 @@ export const ProjectSettings: React.FC<Props> = () => {
           <Button onClick={deleteLabelAndRefresh}>Submit</Button>
         </DialogActions>
       </Dialog>
+      
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        message={snackbarMessage}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      />
     </div>
   );
 };

@@ -54,7 +54,7 @@ export const RawFileList: Component = ({ rawFileList, selectedRawFileIndex, onSe
 
   const columns = [
     { field: 'name',
-      headerName: 'Source File',
+      headerName: 'Csv File',
       flex: 1,
       renderCell: (params: any = {}) => (
         <div>

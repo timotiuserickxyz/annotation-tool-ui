@@ -24,6 +24,7 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
+    Snackbar,
   } from '@material-ui/core';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
@@ -108,7 +109,8 @@ export const FileSettings: React.FC<Props> = () => {
   const handleCloseUploadRawFileModal = () => {
     if (uploadingRawFile)
     {
-      alert('Uploading on progress');
+      setSnackbarMessage('Uploading on progress');
+      setOpenSnackbar(true);
       return;
     }
 
@@ -119,7 +121,8 @@ export const FileSettings: React.FC<Props> = () => {
   const handleCloseUploadWavFileModal = () => {
     if (uploadingWavFile)
     {
-      alert('Uploading on progress');
+      setSnackbarMessage('Uploading on progress');
+      setOpenSnackbar(true);
       return;
     }
 
@@ -137,6 +140,10 @@ export const FileSettings: React.FC<Props> = () => {
 
   const [openDeleteWavFileModal, setOpenDeleteWavFileModal] = useState<boolean>(false);
   const handleCloseDeleteWavFileModal = () => setOpenDeleteWavFileModal(false);
+
+  const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+  const handleCloseSnackbar = () => setOpenSnackbar(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string>('');
 
   const tempRawFolderList = getRawFolderList();
   const rawFolderList = !!tempRawFolderList.data ? tempRawFolderList.data.directories.map((t, id) => {
@@ -180,26 +187,36 @@ export const FileSettings: React.FC<Props> = () => {
   };
 
   const createRawFolderAndRefresh = async() => {
+    if (newRawFolderName == '')
+    {
+      setSnackbarMessage('Csv folder name is empty');
+      setOpenSnackbar(true);
+      return;
+    }
+
     let errorMessage = '';
 
     const response = await createRawFolder(newRawFolderName);
 
     if (response.error) {
-    errorMessage = 'InternalServerError';
+      errorMessage = 'InternalServerError';
     }
     else if (response.data && response.data.error) {
-    errorMessage = response.data.error.message;
+      errorMessage = response.data.error.message;
     }
 
     if (errorMessage != '') {
-    alert(errorMessage);
-    return;
+      setSnackbarMessage(errorMessage);
+      setOpenSnackbar(true);
+      return;
     }
         
     // Refresh
     await mutate(getAPIUrl('annotation', 'getRawFolderList'));
 
     setOpenCreateRawFolderModal(false);
+    setSnackbarMessage('Create csv folder successful');
+    setOpenSnackbar(true);
   };
 
   const prepareCreateWavFolder = () => {
@@ -208,20 +225,28 @@ export const FileSettings: React.FC<Props> = () => {
   };
 
   const createWavFolderAndRefresh = async() => {
+    if (newRawFolderName == '')
+    {
+      setSnackbarMessage('Wav folder name is empty');
+      setOpenSnackbar(true);
+      return;
+    }
+
     let errorMessage = '';
 
     const response = await createWavFolder(newWavFolderName);
 
     if (response.error) {
-    errorMessage = 'InternalServerError';
+      errorMessage = 'InternalServerError';
     }
     else if (response.data && response.data.error) {
-    errorMessage = response.data.error.message;
+      errorMessage = response.data.error.message;
     }
 
     if (errorMessage != '') {
-    alert(errorMessage);
-    return;
+      setSnackbarMessage(errorMessage);
+      setOpenSnackbar(true);
+      return;
     }
         
     // Refresh
@@ -233,7 +258,8 @@ export const FileSettings: React.FC<Props> = () => {
   const prepareUploadRawFile = () => {
     if (selectedRawFolderIndex == -1)
     {
-      alert('Source folder not chosen yet');
+      setSnackbarMessage('Csv folder not chosen yet');
+      setOpenSnackbar(true);
       return;
     }
 
@@ -245,13 +271,15 @@ export const FileSettings: React.FC<Props> = () => {
   const uploadRawFileAndRefresh = async() => {
     if (newRawFiles == undefined || newRawFileName == '')
     {
-      alert('Source file not chosen yet');
+      setSnackbarMessage('Csv file not chosen yet');
+      setOpenSnackbar(true);
       return;
     }
     
     if (uploadingRawFile)
     {
-      alert('Uploading on progress');
+      setSnackbarMessage('Uploading on progress');
+      setOpenSnackbar(true);
       return;
     }
 
@@ -270,7 +298,8 @@ export const FileSettings: React.FC<Props> = () => {
 
     if (errorMessage != '') {
       setUploadingRawFile(false);
-      alert(errorMessage);
+      setSnackbarMessage(errorMessage);
+      setOpenSnackbar(true);
       return;
     }
         
@@ -279,12 +308,15 @@ export const FileSettings: React.FC<Props> = () => {
 
     setUploadingRawFile(false);
     setOpenUploadRawFileModal(false);
+    setSnackbarMessage('Upload csv file successful');
+    setOpenSnackbar(true);
   };
 
   const prepareUploadWavFile = () => {
     if (selectedWavFolderIndex == -1)
     {
-      alert('Wav folder not chosen yet');
+      setSnackbarMessage('Wav folder not chosen yet');
+      setOpenSnackbar(true);
       return;
     }
 
@@ -296,13 +328,15 @@ export const FileSettings: React.FC<Props> = () => {
   const uploadWavFileAndRefresh = async() => {
     if (newWavFiles == undefined || newWavFileName == '')
     {
-      alert('Wav file not chosen yet');
+      setSnackbarMessage('Wav file not chosen yet');
+      setOpenSnackbar(true);
       return;
     }
     
     if (uploadingWavFile)
     {
-      alert('Uploading on progress');
+      setSnackbarMessage('Uploading on progress');
+      setOpenSnackbar(true);
       return;
     }
 
@@ -321,7 +355,8 @@ export const FileSettings: React.FC<Props> = () => {
 
     if (errorMessage != '') {
       setUploadingWavFile(false);
-      alert(errorMessage);
+      setSnackbarMessage(errorMessage);
+      setOpenSnackbar(true);
       return;
     }
         
@@ -330,6 +365,8 @@ export const FileSettings: React.FC<Props> = () => {
 
     setUploadingWavFile(false);
     setOpenUploadWavFileModal(false);
+    setSnackbarMessage('Upload wav file successful');
+    setOpenSnackbar(true);
   };
 
   const prepareDeleteRawFolder = (index: number) => {
@@ -416,7 +453,7 @@ export const FileSettings: React.FC<Props> = () => {
     <div className={classes.root}>
       <div className={classes.rawFileContainer}>
         <div className={classes.header}>
-          <span className={classes.headerItem}>Source</span>
+          <span className={classes.headerItem}>Csv</span>
           <Button variant="contained" className={classes.headerItem} onClick={prepareCreateRawFolder}>
             Create Folder
           </Button>
@@ -470,7 +507,7 @@ export const FileSettings: React.FC<Props> = () => {
       </div>
 
       <Dialog open={openCreateRawFolderModal} onClose={handleCloseCreateRawFolderModal}>
-        <DialogTitle>Create New Source Folder</DialogTitle>
+        <DialogTitle>Create New Csv Folder</DialogTitle>
         <DialogContent>
           <DialogContentText>
             
@@ -508,7 +545,7 @@ export const FileSettings: React.FC<Props> = () => {
       </Dialog>
 
       <Dialog open={openUploadRawFileModal} onClose={handleCloseUploadRawFileModal}>
-        <DialogTitle>Upload New Source File</DialogTitle>
+        <DialogTitle>Upload New Csv File</DialogTitle>
         <DialogContent>
           <Button variant="contained" component="label">
             Select
@@ -544,10 +581,10 @@ export const FileSettings: React.FC<Props> = () => {
       </Dialog>
       
       <Dialog open={openDeleteRawFolderModal} onClose={handleCloseDeleteRawFolderModal}>
-        <DialogTitle>Delete Source Folder</DialogTitle>
+        <DialogTitle>Delete Csv Folder</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure to delete source folder "{rawFolderList[selectedRawFolderIndex]?.name}"?
+            Are you sure to delete csv folder "{rawFolderList[selectedRawFolderIndex]?.name}"?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -570,10 +607,10 @@ export const FileSettings: React.FC<Props> = () => {
       </Dialog>
       
       <Dialog open={openDeleteRawFileModal} onClose={handleCloseDeleteRawFileModal}>
-        <DialogTitle>Delete Source File</DialogTitle>
+        <DialogTitle>Delete Csv File</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure to delete source folder "{rawFileList[selectedRawFileIndex]?.name}"?
+            Are you sure to delete csv file "{rawFileList[selectedRawFileIndex]?.name}"?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -594,6 +631,14 @@ export const FileSettings: React.FC<Props> = () => {
           <Button onClick={deleteWavFileAndRefresh}>Submit</Button>
         </DialogActions>
       </Dialog>
+      
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        message={snackbarMessage}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      />
     </div>
   );
 };

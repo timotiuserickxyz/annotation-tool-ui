@@ -44,7 +44,7 @@ export const DashboardRawFileList: Component = ({ rawFileList, selectedRawFileIn
   : [];
 
   const columns = [
-    { field: 'name', headerName: 'Source File', flex: 1 },
+    { field: 'name', headerName: 'Csv File', flex: 1 },
   ];
 
   const rowPerPage: number = 100;
