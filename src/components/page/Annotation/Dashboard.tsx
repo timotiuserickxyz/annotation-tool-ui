@@ -17,7 +17,8 @@ import { AnnotateData } from '../../base/Annotation/AnnotateData';
 import { AnnotationDataList } from '../../base/Annotation/AnnotationDataList';
 
 import {
-  Button
+  Button,
+  Snackbar,
 } from '@material-ui/core';
 
 const useStyles = makeStyles({
@@ -76,6 +77,10 @@ interface Props {}
 
 export const Dashboard: React.FC<Props> = () => {
   const classes = useStyles();
+
+  const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+  const handleCloseSnackbar = () => setOpenSnackbar(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string>('');
 
   const [selectedProjectName, setSelectedProjectName] = useState<string>('');
   const [selectedRawFileIndex, setSelectedRawFileIndex] = useState<number>(-1);
@@ -166,7 +171,8 @@ export const Dashboard: React.FC<Props> = () => {
   const saveAndRefreshData = async() => {
     if (selectedLabel == '')
     {
-      alert('Label not chosen yet');
+      setSnackbarMessage('Label not chosen yet');
+      setOpenSnackbar(true);
       return;
     }
 
@@ -200,13 +206,17 @@ export const Dashboard: React.FC<Props> = () => {
     }
 
     if (errorMessage != '') {
-      alert(errorMessage);
+      setSnackbarMessage(errorMessage);
+      setOpenSnackbar(true);
       return;
     }
     
     // Refresh
     // mutate(getAPIUrl('annotation', 'getProjectDetail', {projectName: selectedProjectName}));
     await mutate(getAPIUrl('annotation', 'getProjectDataList', {projectName: selectedProjectName}));
+
+    setSnackbarMessage('Saving successful');
+    setOpenSnackbar(true);
 
     setIsSaving(true);
   };
@@ -231,7 +241,8 @@ export const Dashboard: React.FC<Props> = () => {
     {
       if (selectedLabel == '')
       {
-        alert('Label not chosen yet');
+        setSnackbarMessage('Label not chosen yet');
+        setOpenSnackbar(true);
         return;
       }
 
@@ -250,7 +261,8 @@ export const Dashboard: React.FC<Props> = () => {
     {
       if (selectedLabel == '')
       {
-        alert('Label not chosen yet');
+        setSnackbarMessage('Label not chosen yet');
+        setOpenSnackbar(true);
         return;
       }
       
@@ -415,6 +427,14 @@ export const Dashboard: React.FC<Props> = () => {
       ) : (
         <div></div>
       )}
+      
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        message={snackbarMessage}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      />
     </div>
   );
 };

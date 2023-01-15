@@ -78,7 +78,7 @@ export const AnnotationProjectList: Component = ({ projects, onClickEditProject,
   const columns = [
     { field: 'project_name', headerName: 'Project Name', flex: 1 },
     { field: 'raw',
-      headerName: 'Source Folder',
+      headerName: 'Csv Folder',
       flex: 1,
       valueGetter: (params: any) => params.row.source_path.raw_source_path.replace(/^.*[\\\/]/, '')
     },

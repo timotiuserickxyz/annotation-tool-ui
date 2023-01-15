@@ -54,7 +54,7 @@ export const RawFolderList: Component = ({ rawFolderList, selectedRawFolderIndex
 
   const columns = [
     { field: 'name',
-      headerName: 'Source Folder',
+      headerName: 'Csv Folder',
       flex: 1,
       renderCell: (params: any = {}) => (
         <div>
