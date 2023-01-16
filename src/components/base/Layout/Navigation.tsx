@@ -1,7 +1,7 @@
 import React from 'react';
 import HomeOutlinedIcon from '@material-ui/icons/HomeOutlined';
 import SettingsIcon from '@material-ui/icons/Settings';
-import SettingsApplicationsIcon from '@material-ui/icons/SettingsApplications';
+import FolderIcon from '@material-ui/icons/Folder';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -26,15 +26,15 @@ const navTop = {
     icon: <HomeOutlinedIcon />,
     path: pathMap.dashboard.path,
   },
+  dataSource: {
+    label: 'Data Source',
+    icon: <FolderIcon />,
+    path: pathMap.dataSource.path,
+  },
   projectSettings: {
     label: 'Project Settings',
     icon: <SettingsIcon />,
     path: pathMap.projectSettings.path,
-  },
-  fileSettings: {
-    label: 'File Settings',
-    icon: <SettingsApplicationsIcon />,
-    path: pathMap.fileSettings.path,
   },
 };
 
@@ -52,21 +52,21 @@ export const Navigation: React.FC<Props> = () => {
           </ListItem>
         </Link>
         <Link
+          href={navTop.dataSource.path}
+          style={{ textDecoration: 'none', color: 'rgba(0, 0, 0, 0.87)' }}
+        >
+          <ListItem button>
+            <ListItemIcon>{navTop.dataSource.icon}</ListItemIcon>
+            <ListItemText primary={navTop.dataSource.label} />
+          </ListItem>
+        </Link>
+        <Link
           href={navTop.projectSettings.path}
           style={{ textDecoration: 'none', color: 'rgba(0, 0, 0, 0.87)' }}
         >
           <ListItem button>
             <ListItemIcon>{navTop.projectSettings.icon}</ListItemIcon>
             <ListItemText primary={navTop.projectSettings.label} />
-          </ListItem>
-        </Link>
-        <Link
-          href={navTop.fileSettings.path}
-          style={{ textDecoration: 'none', color: 'rgba(0, 0, 0, 0.87)' }}
-        >
-          <ListItem button>
-            <ListItemIcon>{navTop.fileSettings.icon}</ListItemIcon>
-            <ListItemText primary={navTop.fileSettings.label} />
           </ListItem>
         </Link>
         {/* <Link

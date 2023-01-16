@@ -80,7 +80,7 @@ const useStyles = makeStyles({
 
 interface Props {}
 
-export const FileSettings: React.FC<Props> = () => {
+export const DataSource: React.FC<Props> = () => {
   const classes = useStyles();
 
   const [selectedRawFolderIndex, setSelectedRawFolderIndex] = useState<number>(-1);
@@ -453,7 +453,7 @@ export const FileSettings: React.FC<Props> = () => {
     <div className={classes.root}>
       <div className={classes.rawFileContainer}>
         <div className={classes.header}>
-          <span className={classes.headerItem}>Csv</span>
+          <span className={classes.headerItem}>Csv Source</span>
           <Button variant="contained" className={classes.headerItem} onClick={prepareCreateRawFolder}>
             Create Folder
           </Button>
@@ -480,7 +480,7 @@ export const FileSettings: React.FC<Props> = () => {
       </div>
       <div className={classes.wavFileContainer}>
         <div className={classes.header}>
-          <span className={classes.headerItem}>Wav</span>
+          <span className={classes.headerItem}>Wav Source</span>
           <Button variant="contained" className={classes.headerItem} onClick={prepareCreateWavFolder}>
             Create Folder
           </Button>
