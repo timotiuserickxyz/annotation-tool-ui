@@ -267,15 +267,9 @@ export const ProjectSettings: React.FC<Props> = () => {
   };
 
   const deleteProjectAndRefresh = async () => {
-    const params = {
-      names: [
-        selectedProjectName
-      ]
-    }
-
     let errorMessage = '';
 
-    const response = await deleteProject(params);
+    const response = await deleteProject(selectedProjectName);
 
     if (response.error) {
       errorMessage = 'InternalServerError';

@@ -10,7 +10,7 @@ export const pathMap = {
     getProjectDetail: '/annotation-project/id/:projectName',
     postProject: '/annotation-project/new',
     putProject: '/annotation-project/config/update/:projectName',
-    deleteProject: '/annotation-project/delete',
+    deleteProject: '/annotation-project/delete/:projectName',
     postProjectLabel: '/annotation-project/label/new',
     deleteProjectLabel: '/annotation-project/label/delete/:projectName/:labelName',
     getWavFolderList: '/wav-data/list',
