@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { DataGrid } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
-import { Button } from '@material-ui/core';
-import HighlightOff from '@material-ui/icons/HighlightOff';
+import { IconButton } from '@material-ui/core';
+import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 
 const useStyles = makeStyles({
   tableContainer: {
@@ -14,12 +14,20 @@ const useStyles = makeStyles({
       outline: 'none',
     },
     '& .MuiDataGrid-row': {
+      width: '100%',
+      display: 'block',
       cursor: 'pointer',
+    },
+    '& .MuiDataGrid-cell': {
+      overflow: 'visible',
+    },
+    '& .MuiDataGrid-renderingZone': {
+      overflowX: 'scroll',
+      overflowY: 'hidden',
     },
   },
   customButton: {
-    minWidth: '40px !important',
-    width: '40px',
+    padding: '5px',
     marginLeft: '5px',
     visibility: 'hidden',
   },
@@ -53,15 +61,16 @@ export const WavFolderList: Component = ({ wavFolderList, selectedWavFolderIndex
   : [];
 
   const columns = [
-    { field: 'name',
+    {
+      field: 'name',
       headerName: 'Wav Folder',
       flex: 1,
       renderCell: (params: any = {}) => (
         <div>
           <span>{params.row.name}</span>
-          <Button className={classes.customButton} onClick={() => onDelete(params.row.id)}>
-            <HighlightOff />
-          </Button>
+          <IconButton className={classes.customButton} onClick={() => onDelete(params.row.id)}>
+            <HighlightOffIcon />
+          </IconButton>
         </div>
       ),
     },

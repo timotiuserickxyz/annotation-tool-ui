@@ -4,7 +4,7 @@ import { API_URL } from '../core';
 export function downloadProjectData(param: string) {
   fetch(API_URL + getAPIUrl('annotation', 'downloadProjectData', {projectName: param}))
   .then(response => response.text()).then(text => {
-    if (text.indexOf('"status": "error"'))
+    if (text.indexOf('"status": "error"') >= 0)
     {
       if (text.indexOf('"code": 500') >= 0) {
         alert('Project does not have any annotation yet');

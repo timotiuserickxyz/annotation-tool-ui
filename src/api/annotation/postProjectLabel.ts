@@ -15,8 +15,8 @@ type Project = {
   source_path: SourcePath;
 } & ResponseStatus;
 
-export async function postProjectLabel(param1: string, params: any): Promise<Response<Project>> {
-  const { data, error } = await post(getAPIUrl('annotation', 'postProjectLabel', {projectName: param1}), {
+export async function postProjectLabel(params: any): Promise<Response<Project>> {
+  const { data, error } = await post(getAPIUrl('annotation', 'postProjectLabel'), {
     params
   });
   

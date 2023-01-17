@@ -2,17 +2,17 @@ import { post } from '../core';
 import { Response, ResponseStatus } from '../types/base';
 import { getAPIUrl } from '../../utils/path';
 
-interface SourcePath {
-  raw_source_path: string;
-  wav_source_path: string;
-}
 interface LabelOption {
-  label_option: string[];
+  label_type: string[];
+  label_name: string[];
 }
 type Project = {
   project_name: string;
-  label_option: LabelOption;
-  source_path: SourcePath;
+  raw_source_path: string;
+  wav_source_path: string;
+  chunking_type: string;
+  description: string;
+  label_option: LabelOption[];
 } & ResponseStatus;
 
 export async function postProject(params: any): Promise<Response<Project>> {

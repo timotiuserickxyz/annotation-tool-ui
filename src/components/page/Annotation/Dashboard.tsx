@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { mutate } from 'swr';
 import { makeStyles } from '@material-ui/core/styles';
+import HighlightOff from '@material-ui/icons/HighlightOff';
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 
 import { getAPIUrl } from '../../../utils/path';
 import { getProjectList } from '../../../api/annotation/getProjectList';
@@ -18,6 +20,12 @@ import { AnnotationDataList } from '../../base/Annotation/AnnotationDataList';
 
 import {
   Button,
+  IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Snackbar,
 } from '@material-ui/core';
 
@@ -36,7 +44,7 @@ const useStyles = makeStyles({
   },
   customDropdown: {
     float: 'left',
-    marginRight: '30px',
+    marginRight: '10px',
     textAlign: 'center',
     paddingLeft: '10px',
     paddingRight: '10px',
@@ -82,6 +90,7 @@ export const Dashboard: React.FC<Props> = () => {
   const handleCloseSnackbar = () => setOpenSnackbar(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>('');
 
+  const [showExplanation, setShowExplanation] = useState<boolean>(true);
   const [selectedProjectName, setSelectedProjectName] = useState<string>('');
   const [selectedRawFileIndex, setSelectedRawFileIndex] = useState<number>(-1);
 
@@ -92,21 +101,27 @@ export const Dashboard: React.FC<Props> = () => {
   const [selectedAudioEndTime, setSelectedAudioEndTime] = useState<number>(0);
   const [selectedProjectData, setSelectedProjectData] = useState<any>(null);
   
-  const [currentSequence, setCurrentSequence] = useState<number>(0);
-  const [selectedSequence, setSelectedSequence] = useState<number>(0);
   const [selectedLabel, setSelectedLabel] = useState<string>('');
   const [selectedComment, setSelectedComment] = useState<string>('');
 
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
+  const [openDeleteProjectDataModal, setOpenDeleteProjectDataModal] = useState<boolean>(false);
+  const handleCloseDeleteProjectDataModal = () => setOpenDeleteProjectDataModal(false);
+
+  const [openClearProjectDataModal, setOpenClearProjectDataModal] = useState<boolean>(false);
+  const handleCloseClearProjectDataModal = () => setOpenClearProjectDataModal(false);
+
   const tempProjectList = getProjectList();
-  const projectList = !!tempProjectList.data ? tempProjectList.data.configs.map((t) => {
+  const projectList = !!tempProjectList.data ? tempProjectList.data.projects.map((t) => {
     return {...t};
   }) : [];
 
   const tempProjectDetail = getProjectDetail(selectedProjectName);
-  const selectedProjectLabelList = !!tempProjectDetail && !!tempProjectDetail.data ? tempProjectDetail.data.label_option.label_option : [];
-  const rawFileFolderPath = !!tempProjectDetail && !!tempProjectDetail.data ? tempProjectDetail.data.source_path.raw_source_path : '';
+  const selectedProjectDescription = !!tempProjectDetail && !!tempProjectDetail.data ? tempProjectDetail.data.description : [];
+  const selectedProjectChunkingType = !!tempProjectDetail && !!tempProjectDetail.data ? tempProjectDetail.data.chunking_type : [];
+  const selectedProjectLabelList = !!tempProjectDetail && !!tempProjectDetail.data ? tempProjectDetail.data.label_option : [];
+  const rawFileFolderPath = !!tempProjectDetail && !!tempProjectDetail.data ? tempProjectDetail.data.raw_source_path : '';
   const rawFileFolderName = (!!rawFileFolderPath ? rawFileFolderPath.split('/').pop() : '') as string;
 
   const tempRawFileList = getRawFileList(rawFileFolderName);
@@ -127,25 +142,35 @@ export const Dashboard: React.FC<Props> = () => {
   const dataCount = rawFileData.length;
 
   const selectProject = (e: string) => {
+    setShowExplanation(true);
     setSelectedProjectName(e);
     setSelectedRawFileIndex(-1);
     setSelectedDataTableIndex(0);
     setSelectedAudio('');
-    setCurrentSequence(0);
-    setSelectedSequence(0);
     setSelectedLabel('');
     setSelectedComment('');
   };
 
   const selectRawFile = (index: number) => {
+    if (index != -1)
+    {
+      setShowExplanation(false);
+    }
+    
     setSelectedRawFileIndex(index);
     setSelectedDataTableIndex(0);
     setSelectedAudio('');
-    setCurrentSequence(0);
-    setSelectedSequence(0);
     setSelectedLabel('');
     setSelectedComment('');
   };
+
+  const handleShowExplanation = () => {
+    setShowExplanation(true);
+  }
+
+  const handleHideExplanation = () => {
+    setShowExplanation(false);
+  }
 
   useEffect(() => {
     if (selectedDataTableIndex == 0 && dataCount > 0) {
@@ -178,8 +203,8 @@ export const Dashboard: React.FC<Props> = () => {
 
     const params = {
       file_name: rawFileList[selectedRawFileIndex].name,
-      channel: selectedSequence === -1 ? 0 : selectedRawFileData.Channel,
-      sequence_number: selectedSequence,
+      channel: selectedProjectChunkingType == 'Talk Unit' ? selectedRawFileData.Channel : 0,
+      sequence_number: selectedProjectChunkingType == 'Talk Unit' ? selectedRawFileData.Sequence_number : -1,
       label: selectedLabel,
       comment: selectedComment,
     }
@@ -219,11 +244,6 @@ export const Dashboard: React.FC<Props> = () => {
     setOpenSnackbar(true);
 
     setIsSaving(true);
-  };
-
-  const handleChangeSequence = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Number.parseInt((event.target as HTMLInputElement).value);console.log('sequence: ' + value);
-    setSelectedSequence(value);
   };
 
   const handleChangeLabel = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -306,26 +326,31 @@ export const Dashboard: React.FC<Props> = () => {
     const sequenceNumber = selectedRawFileData.Sequence_number;
     const channel = selectedRawFileData.Channel;
 
-    // Possibility of chunked by whole wav
-    let existingProjectDataList: any[] = projectData.filter(
-      o => o.file_name === rawFileList[selectedRawFileIndex].name
-        && o.sequence_number === -1
-    );
-
-    if (existingProjectDataList.length > 0)
+    if (selectedProjectChunkingType == 'Whole Wav')
     {
-      const existingProjectData = existingProjectDataList.pop();
-
-      setSelectedProjectData(existingProjectData ? existingProjectData : null);
-      setCurrentSequence(sequenceNumber);
-      setSelectedSequence(-1);
-      setSelectedLabel(existingProjectData ? existingProjectData.label : '');
-      setSelectedComment(existingProjectData ? existingProjectData.comment : '');
+      const existingProjectDataList: any[] = projectData.filter(
+        o => o.file_name === rawFileList[selectedRawFileIndex].name
+          && o.sequence_number === -1
+      );
+  
+      if (existingProjectDataList.length > 0)
+      {
+        const existingProjectData = existingProjectDataList.pop();
+  
+        setSelectedProjectData(existingProjectData ? existingProjectData : null);
+        setSelectedLabel(existingProjectData ? existingProjectData.label : '');
+        setSelectedComment(existingProjectData ? existingProjectData.comment : '');
+      }
+      else
+      {
+        setSelectedProjectData(null);
+        setSelectedLabel('');
+        setSelectedComment('');
+      }
     }
-    else
+    else if (selectedProjectChunkingType == 'Talk Unit')
     {
-      // Turns out to be chunked by talk unit
-      existingProjectDataList = projectData.filter(
+      const existingProjectDataList = projectData.filter(
         o => o.file_name === rawFileList[selectedRawFileIndex].name
           && o.sequence_number === sequenceNumber
           && o.channel === channel
@@ -336,21 +361,161 @@ export const Dashboard: React.FC<Props> = () => {
         const existingProjectData = existingProjectDataList.pop();
 
         setSelectedProjectData(existingProjectData);
-        setCurrentSequence(sequenceNumber);
-        setSelectedSequence(existingProjectData ? existingProjectData.sequence_number : sequenceNumber);
         setSelectedLabel(existingProjectData ? existingProjectData.label : '');
         setSelectedComment(existingProjectData ? existingProjectData.comment : '');
       }
       else
       {
         setSelectedProjectData(null);
-        setCurrentSequence(sequenceNumber);
-        setSelectedSequence(sequenceNumber);
         setSelectedLabel('');
         setSelectedComment('');
       }
     }
+    else
+    {
+      setSelectedProjectData(null);
+      setSelectedLabel('');
+      setSelectedComment('');
+    }
+
+    // Possibility of chunked by whole wav
+    // let existingProjectDataList: any[] = projectData.filter(
+    //   o => o.file_name === rawFileList[selectedRawFileIndex].name
+    //     && o.sequence_number === -1
+    // );
+
+    // if (existingProjectDataList.length > 0)
+    // {
+    //   const existingProjectData = existingProjectDataList.pop();
+
+    //   setSelectedProjectData(existingProjectData ? existingProjectData : null);
+    //   setCurrentSequence(sequenceNumber);
+    //   setSelectedSequence(-1);
+    //   setSelectedLabel(existingProjectData ? existingProjectData.label : '');
+    //   setSelectedComment(existingProjectData ? existingProjectData.comment : '');
+    // }
+    // else
+    // {
+    //   // Turns out to be chunked by talk unit
+    //   existingProjectDataList = projectData.filter(
+    //     o => o.file_name === rawFileList[selectedRawFileIndex].name
+    //       && o.sequence_number === sequenceNumber
+    //       && o.channel === channel
+    //   );
+
+    //   if (existingProjectDataList.length > 0)
+    //   {
+    //     const existingProjectData = existingProjectDataList.pop();
+
+    //     setSelectedProjectData(existingProjectData);
+    //     setCurrentSequence(sequenceNumber);
+    //     setSelectedSequence(existingProjectData ? existingProjectData.sequence_number : sequenceNumber);
+    //     setSelectedLabel(existingProjectData ? existingProjectData.label : '');
+    //     setSelectedComment(existingProjectData ? existingProjectData.comment : '');
+    //   }
+    //   else
+    //   {
+    //     setSelectedProjectData(null);
+    //     setCurrentSequence(sequenceNumber);
+    //     setSelectedSequence(sequenceNumber);
+    //     setSelectedLabel('');
+    //     setSelectedComment('');
+    //   }
+    // }
   }
+
+  const prepareDeleteProjectData = () => {
+    if (selectedProjectData == null)
+    {
+      setSnackbarMessage('Row not annotated yet');
+      setOpenSnackbar(true);
+      return;
+    }
+
+    setOpenDeleteProjectDataModal(true);
+  };
+
+  const deleteProjectDataAndRefresh = async () => {
+    setOpenDeleteProjectDataModal(false);
+    setSnackbarMessage('Deleting project data');
+    setOpenSnackbar(true);
+    return;
+
+    // const params = {
+    //   names: [
+    //     selectedProjectName
+    //   ]
+    // }
+
+    // let errorMessage = '';
+
+    // const response = await postProjectData(selectedProjectName, params);
+
+    // if (response.error) {
+    //   errorMessage = 'InternalServerError';
+    // }
+    // else if (response.data && response.data.error) {
+    //   errorMessage = response.data.error.message;
+    // }
+
+    // if (errorMessage != '') {
+    //   setSnackbarMessage(errorMessage);
+    //   setOpenSnackbar(true);
+    //   return;
+    // }
+    
+    // // Refresh
+    // await mutate(getAPIUrl('annotation', 'getProjectDataList', {projectName: selectedProjectName}));
+
+    // setOpenDeleteProjectDataModal(false);
+    // setSnackbarMessage('Delete project data successful');
+    // setOpenSnackbar(true);
+
+    // setIsSaving(true);
+  };
+
+  const prepareClearProjectData = () => {
+    setOpenClearProjectDataModal(true);
+  };
+
+  const clearProjectDataAndRefresh = async () => {
+    setOpenClearProjectDataModal(false);
+    setSnackbarMessage('Clearing project data');
+    setOpenSnackbar(true);
+    return;
+
+    // const params = {
+    //   names: [
+    //     selectedProjectName
+    //   ]
+    // }
+
+    // let errorMessage = '';
+
+    // const response = await postProjectData(selectedProjectName, params);
+
+    // if (response.error) {
+    //   errorMessage = 'InternalServerError';
+    // }
+    // else if (response.data && response.data.error) {
+    //   errorMessage = response.data.error.message;
+    // }
+
+    // if (errorMessage != '') {
+    //   setSnackbarMessage(errorMessage);
+    //   setOpenSnackbar(true);
+    //   return;
+    // }
+    
+    // // Refresh
+    // await mutate(getAPIUrl('annotation', 'getProjectDataList', {projectName: selectedProjectName}));
+
+    // setOpenClearProjectDataModal(false);
+    // setSnackbarMessage('Delete project data successful');
+    // setOpenSnackbar(true);
+
+    // setIsSaving(true);
+  };
 
   const handleDownload = () => {
     downloadProjectData(selectedProjectName);
@@ -369,9 +534,14 @@ export const Dashboard: React.FC<Props> = () => {
           )} 
         </select>
         { selectedProjectName && rawFileList.length > 0 ? (
-          <Button variant="contained" className={classes.headerItem} onClick={handleDownload}>
-              Download
-          </Button>
+          <div>
+            <IconButton onClick={handleShowExplanation} className={classes.headerItem} aria-label="Explanation" style={{padding: '5px', color: 'gray', marginLeft: '-5px'}}>
+              <ErrorOutlineIcon />
+            </IconButton>
+            <Button variant="contained" className={classes.headerItem} onClick={handleDownload}>
+                Download
+            </Button>
+          </div>
         ) : (
           <span>Please select a project for your annotation work</span>
         )}
@@ -383,50 +553,87 @@ export const Dashboard: React.FC<Props> = () => {
               rawFileList={rawFileList}
               selectedRawFileIndex={selectedRawFileIndex}
               onSelect={selectRawFile}
+              onShowExplanation={handleShowExplanation}
             />
           </div>
-          { rawFileData && rawFileData.length > 0 ? (
+          { showExplanation == true ? (
             <div className={classes.subcontent}>
-              <div className={classes.annotateDataContainer}>
-                <AnnotateData
-                  selectedProjectName={selectedProjectName}
-                  selectedProjectLabelList={selectedProjectLabelList}
-                  projectData={projectData.filter(
-                    o => o.file_name === rawFileList[selectedRawFileIndex].name
-                  )}
-                  selectedAudio={selectedAudio}
-                  selectedAudioStartTime={selectedAudioStartTime}
-                  selectedAudioEndTime={selectedAudioEndTime}
-                  currentSequence={currentSequence}
-                  selectedSequence={selectedSequence}
-                  selectedLabel={selectedLabel}
-                  selectedComment={selectedComment}
-                  handleChangeSequence={handleChangeSequence}
-                  handleChangeLabel={handleChangeLabel}
-                  handleChangeComment={handleChangeComment}
-                  onClickSave={saveAndRefreshData}
-                  onClickPrev={goToPrevData}
-                  onClickNext={goToNextData}
-                />
-              </div>
-              <div className={classes.annotationDataListContainer}>
-                <AnnotationDataList
-                  rawFileData={rawFileData}
-                  projectData={projectData.filter(
-                    o => o.file_name === rawFileList[selectedRawFileIndex].name
-                  )}
-                  selectedDataTableIndex={selectedDataTableIndex}
-                  onSelect={handleSelection}
-                />
+              <IconButton onClick={handleHideExplanation} aria-label="Close" style={{padding: '5px', color: 'gray', float: 'right'}}>
+                <HighlightOff />
+              </IconButton>
+              <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center'}}>
+                <span style={{width: '100%', textAlign: 'center', whiteSpace: 'pre-line'}}>
+                  {selectedProjectDescription}
+                </span>
               </div>
             </div>
           ) : (
-            <div></div>
+            [ rawFileData && rawFileData.length > 0 ? (
+              <div className={classes.subcontent}>
+                <div className={classes.annotateDataContainer}>
+                  <AnnotateData
+                    selectedProjectName={selectedProjectName}
+                    selectedProjectLabelList={selectedProjectLabelList}
+                    isWholeWav={selectedProjectChunkingType === 'Whole Wav'}
+                    selectedAudio={selectedAudio}
+                    selectedAudioStartTime={selectedAudioStartTime}
+                    selectedAudioEndTime={selectedAudioEndTime}
+                    selectedLabel={selectedLabel}
+                    selectedComment={selectedComment}
+                    handleChangeLabel={handleChangeLabel}
+                    handleChangeComment={handleChangeComment}
+                    onClickSave={saveAndRefreshData}
+                    onClickPrev={goToPrevData}
+                    onClickNext={goToNextData}
+                    onClickDelete={prepareDeleteProjectData}
+                    onClickClear={prepareClearProjectData}
+                  />
+                </div>
+                <div className={classes.annotationDataListContainer}>
+                  <AnnotationDataList
+                    rawFileData={rawFileData}
+                    projectData={projectData.filter(
+                      o => o.file_name === rawFileList[selectedRawFileIndex].name
+                    )}
+                    selectedDataTableIndex={selectedDataTableIndex}
+                    onSelect={handleSelection}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div></div>
+            )]
           )}
         </div>
       ) : (
         <div></div>
       )}
+      
+      <Dialog open={openDeleteProjectDataModal} onClose={handleCloseDeleteProjectDataModal}>
+        <DialogTitle>Delete Data</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure to delete this annotation?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteProjectDataModal}>Cancel</Button>
+          <Button onClick={deleteProjectDataAndRefresh}>Submit</Button>
+        </DialogActions>
+      </Dialog>
+      
+      <Dialog open={openClearProjectDataModal} onClose={handleCloseClearProjectDataModal}>
+        <DialogTitle>Clear Data</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure to clear all annotation from project "{selectedProjectName}"?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseClearProjectDataModal}>Cancel</Button>
+          <Button onClick={clearProjectDataAndRefresh}>Submit</Button>
+        </DialogActions>
+      </Dialog>
       
       <Snackbar
         open={openSnackbar}

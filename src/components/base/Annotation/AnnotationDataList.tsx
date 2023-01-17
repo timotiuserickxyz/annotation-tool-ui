@@ -101,7 +101,8 @@ export const AnnotationDataList: Component = ({ rawFileData, projectData, select
     { field: 'LineId', headerName: 'No', width: 75 },
     { field: 'Channel', headerName: 'Ch', width: 75 },
     { field: 'Sequence_number', headerName: 'Seq', width: 80 },
-    { field: 'FileName',
+    {
+      field: 'FileName',
       headerName: 'File',
       renderCell: (params: any) =>  (
         <Tooltip title={params.row.FileName.replace(/^.*[\\\/]/, '')} >
@@ -111,7 +112,8 @@ export const AnnotationDataList: Component = ({ rawFileData, projectData, select
     },
     { field: 'Starting_time_of_the_talk', headerName: 'Start' },
     { field: 'End_time_of_the_talk', headerName: 'End' },
-    { field: 'Label',
+    {
+      field: 'Label',
       headerName: 'Label',
       valueGetter: getLabelFromProject,
     },
