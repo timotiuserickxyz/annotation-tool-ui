@@ -6,6 +6,8 @@ type ProjectInfo = {
   project_name: string;
   raw_source_path: string;
   wav_source_path: string;
+  chunking_type: string;
+  description: string;
 } & ResponseStatus;
 
 export async function putProject(param: string, params: any): Promise<Response<ProjectInfo>> {

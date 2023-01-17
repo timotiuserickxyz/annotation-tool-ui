@@ -15,9 +15,15 @@ import { deleteProjectLabel } from '../../../api/annotation/deleteProjectLabel';
 import { AnnotationProjectList } from '../../base/Annotation/AnnotationProjectList';
 import {
   Button,
-  TextField,
+  Checkbox,
   Select,
   MenuItem,
+  TextField,
+  Radio,
+  FormLabel,
+  RadioGroup,
+  FormControl,
+  FormControlLabel,
   Dialog,
   DialogActions,
   DialogContent,
@@ -54,6 +60,16 @@ const useStyles = makeStyles({
     border: 'solid 1px lightGray',
     borderRadius: '5px',
   },
+  explanationTextArea: {
+    width: '100%',
+    maxWidth: '400px',
+    height: '100px',
+    display: 'flex',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    padding: '10px',
+    textAlign: 'center',
+  },
 });
 
 interface Props {}
@@ -64,10 +80,14 @@ export const ProjectSettings: React.FC<Props> = () => {
   const [newProjectName, setNewProjectName] = useState<string>('');
   const [newRawFolderName, setNewRawFolderName] = useState<string>('');
   const [newWavFolderName, setNewWavFolderName] = useState<string>('');
+  const [newChunkingType, setNewChunkingType] = useState<string>('Talk Unit');
+  const [newDescription, setNewDescription] = useState<string>('');
 
   const [selectedProjectName, setSelectedProjectName] = useState<string>('');
   const [selectedProjectLabel, setSelectedProjectLabel] = useState<string>('');
+
   const [newProjectLabel, setNewProjectLabel] = useState<string>('');
+  const [ignoreNewProjectLabel, setIgnoreNewProjectLabel] = useState<boolean>(false);
 
   const [openCreateProjectModal, setOpenCreateProjectModal] = useState<boolean>(false);
   const handleCloseCreateProjectModal = () => setOpenCreateProjectModal(false);
@@ -90,7 +110,7 @@ export const ProjectSettings: React.FC<Props> = () => {
 
 
   const tempProjectList = getProjectList();
-  const projectList = !!tempProjectList.data ? tempProjectList.data.configs.map((t, id) => {
+  const projectList = !!tempProjectList.data ? tempProjectList.data.projects.map((t, id) => {
     return {id: id, ...t};
   }) : [];
 
@@ -108,9 +128,12 @@ export const ProjectSettings: React.FC<Props> = () => {
     setNewProjectName('');
     setNewRawFolderName('');
     setNewWavFolderName('');
+    setNewChunkingType('Talk Unit');
+    setNewDescription('');
     setSelectedProjectName('');
     setSelectedProjectLabel('');
     setNewProjectLabel('');
+    setIgnoreNewProjectLabel(false);
   };
 
   const prepareCreateProject = () => {
@@ -118,11 +141,13 @@ export const ProjectSettings: React.FC<Props> = () => {
     setOpenCreateProjectModal(true);
   };
 
-  const prepareEditProject = (targetProjectName: string, targetProjectRawFolderName: string, targetProjectWavFolderName: string) => {
+  const prepareEditProject = (targetProjectName: string, targetProjectRawFolderName: string, targetProjectWavFolderName: string, targetProjectChunkingType: string, targetProjectDescription: string) => {
     initializeAllInputs();
+    setSelectedProjectName(targetProjectName);
     setNewRawFolderName(targetProjectRawFolderName);
     setNewWavFolderName(targetProjectWavFolderName);
-    setSelectedProjectName(targetProjectName);
+    setNewChunkingType(targetProjectChunkingType);
+    setNewDescription(targetProjectDescription);
     setOpenEditProjectModal(true);
   };
 
@@ -146,14 +171,17 @@ export const ProjectSettings: React.FC<Props> = () => {
       return;
     }
 
-    // Create new project
-    const params1 = {
+    const params = {
       project_name: newProjectName,
+      raw_source: newRawFolderName,
+      wav_source: newWavFolderName,
+      chunking_type: newChunkingType,
+      description: newDescription
     }
 
     let createProjectErrorMessage = '';
 
-    const createProjectResponse = await postProject(params1);
+    const createProjectResponse = await postProject(params);
 
     if (createProjectResponse.error) {
       createProjectErrorMessage = 'InternalServerError';
@@ -164,29 +192,6 @@ export const ProjectSettings: React.FC<Props> = () => {
 
     if (createProjectErrorMessage != '') {
       setSnackbarMessage(createProjectErrorMessage);
-      setOpenSnackbar(true);
-      return;
-    }
-
-    // Edit the project
-    const params2 = {
-      raw_source: newRawFolderName,
-      wav_source: newWavFolderName,
-    }
-
-    let editProjectErrorMessage = '';
-
-    const editProjectResponse = await putProject(newProjectName, params2);
-
-    if (editProjectResponse.error) {
-      editProjectErrorMessage = 'InternalServerError';
-    }
-    else if (editProjectResponse.data && editProjectResponse.data.error) {
-      editProjectErrorMessage = editProjectResponse.data.error.message;
-    }
-
-    if (editProjectErrorMessage != '') {
-      setSnackbarMessage(editProjectErrorMessage);
       setOpenSnackbar(true);
       return;
     }
@@ -210,21 +215,22 @@ export const ProjectSettings: React.FC<Props> = () => {
     }
     else if (newRawFolderName == '')
     {
-      setSnackbarMessage('Project not selected yet');
+      setSnackbarMessage('Csv folder not chosen yet');
       setOpenSnackbar(true);
       return;
     }
     else if (newWavFolderName == '')
     {
-      setSnackbarMessage('Project not selected yet');
+      setSnackbarMessage('Wav folder not chosen yet');
       setOpenSnackbar(true);
       return;
     }
 
-    // Edit the project
     const params = {
       raw_source: newRawFolderName,
       wav_source: newWavFolderName,
+      chunking_type: newChunkingType,
+      description: newDescription
     }
 
     let editProjectErrorMessage = '';
@@ -315,12 +321,14 @@ export const ProjectSettings: React.FC<Props> = () => {
     }
 
     const params = {
-      label_option: newProjectLabel,
+      project_name: selectedProjectName,
+      label_type: ignoreNewProjectLabel === true ? 'garbage' : 'active',
+      label_name: newProjectLabel,
     }
 
     let errorMessage = '';
 
-    const response = await postProjectLabel(selectedProjectName, params);
+    const response = await postProjectLabel(params);
 
     if (response.error) {
       errorMessage = 'InternalServerError';
@@ -353,13 +361,9 @@ export const ProjectSettings: React.FC<Props> = () => {
   };
 
   const deleteLabelAndRefresh = async () => {
-    const params = {
-      label_option: selectedProjectLabel
-    }
-
     let errorMessage = '';
 
-    const response = await deleteProjectLabel(selectedProjectName, params);
+    const response = await deleteProjectLabel(selectedProjectName, selectedProjectLabel);
 
     if (response.error) {
       errorMessage = 'InternalServerError';
@@ -399,9 +403,24 @@ export const ProjectSettings: React.FC<Props> = () => {
     setNewWavFolderName(value);
   };
 
+  const changeNewChunkingType = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setNewChunkingType(value);
+  };
+
+  const changeNewDescription = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    const value = event.target.value;
+    setNewDescription(value);
+  };
+
   const changeNewProjectLabel = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     const value = event.target.value;
     setNewProjectLabel(value);
+  };
+
+  const changeNewProjectLabelType = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.checked;
+    setIgnoreNewProjectLabel(value);
   };
 
   return (
@@ -461,6 +480,36 @@ export const ProjectSettings: React.FC<Props> = () => {
               (<MenuItem value={f.name}>{f.name}</MenuItem>)
             )} 
           </Select>
+          <br/>
+          <FormControl>
+            <FormLabel id="chunking-type-radio-buttons-group">Chunking Type</FormLabel>
+            <RadioGroup
+              aria-labelledby="chunking-type-radio-buttons-group"
+              name="chunking-type-radio-buttons-group"
+              value={newChunkingType}
+              onChange={changeNewChunkingType}
+            >
+              <FormControlLabel
+                control={<Radio />}
+                value="Talk Unit"
+                label="Talk Unit"
+              />
+              <FormControlLabel
+                control={<Radio />}
+                value="Whole Wav"
+                label="Whole Wav"
+              />
+            </RadioGroup>
+          </FormControl>
+          <br/>
+          <DialogContentText>
+            Explanation
+          </DialogContentText>
+          <textarea className={classes.explanationTextArea}
+            placeholder="Explanation"
+            value={newDescription}
+            onChange={changeNewDescription}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseCreateProjectModal}>Cancel</Button>
@@ -508,6 +557,36 @@ export const ProjectSettings: React.FC<Props> = () => {
               (<MenuItem value={f.name}>{f.name}</MenuItem>)
             )} 
           </Select>
+          <br/>
+          <FormControl>
+            <FormLabel id="chunking-type-radio-buttons-group">Chunking Type</FormLabel>
+            <RadioGroup
+              aria-labelledby="chunking-type-radio-buttons-group"
+              name="chunking-type-radio-buttons-group"
+              value={newChunkingType}
+              onChange={changeNewChunkingType}
+            >
+              <FormControlLabel
+                control={<Radio />}
+                value="Talk Unit"
+                label="Talk Unit"
+              />
+              <FormControlLabel
+                control={<Radio />}
+                value="Whole Wav"
+                label="Whole Wav"
+              />
+            </RadioGroup>
+          </FormControl>
+          <br/>
+          <DialogContentText>
+            Explanation
+          </DialogContentText>
+          <textarea className={classes.explanationTextArea}
+            placeholder="Explanation"
+            value={newDescription}
+            onChange={changeNewDescription}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseEditProjectModal}>Cancel</Button>
@@ -515,7 +594,7 @@ export const ProjectSettings: React.FC<Props> = () => {
         </DialogActions>
       </Dialog>
       
-      <Dialog open={openDeleteProjectModal} onClose={handleCloseEditProjectModal}>
+      <Dialog open={openDeleteProjectModal} onClose={handleCloseDeleteProjectModal}>
         <DialogTitle>Delete Project</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -532,13 +611,18 @@ export const ProjectSettings: React.FC<Props> = () => {
         <DialogTitle>Create New Label</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            
+            Label Name
           </DialogContentText>
           <TextField
             className={classes.customForm}
             autoFocus={true}
             value={newProjectLabel}
             onChange={changeNewProjectLabel}
+          />
+          <br/>
+          <FormControlLabel
+            control={<Checkbox checked={ignoreNewProjectLabel} onChange={changeNewProjectLabelType} />}
+            label="Garbage?"
           />
         </DialogContent>
         <DialogActions>

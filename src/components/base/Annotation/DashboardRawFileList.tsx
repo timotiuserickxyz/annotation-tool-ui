@@ -14,7 +14,7 @@ const useStyles = makeStyles({
     '& .MuiDataGrid-row': {
       cursor: 'pointer',
     },
-  }
+  },
 });
 
 export type BaseRow = {
@@ -30,11 +30,12 @@ type Props = {
   rawFileList: any[],
   selectedRawFileIndex: number,
   onSelect: (fileIndex: number) => void | Promise<void>,
+  onShowExplanation: () => void | Promise<void>,
 };
 
 type Component = (props: Props) => React.ReactElement<Props>;
 
-export const DashboardRawFileList: Component = ({ rawFileList, selectedRawFileIndex, onSelect }) => {
+export const DashboardRawFileList: Component = ({ rawFileList, selectedRawFileIndex, onSelect, onShowExplanation }) => {
   const classes = useStyles();
 
   const rows: Row[] = !!rawFileList
@@ -44,7 +45,11 @@ export const DashboardRawFileList: Component = ({ rawFileList, selectedRawFileIn
   : [];
 
   const columns = [
-    { field: 'name', headerName: 'Csv File', flex: 1 },
+    {
+      field: 'name',
+      headerName: 'Csv File',
+      flex: 1,
+    },
   ];
 
   const rowPerPage: number = 100;

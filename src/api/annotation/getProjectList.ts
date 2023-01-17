@@ -3,20 +3,20 @@ import { fetcher } from '../core';
 import { Response, ResponseError, ResponseStatus } from '../types/base';
 import { getAPIUrl } from '../../utils/path';
 
-interface SourcePath {
-  raw_source_path: string;
-  wav_source_path: string;
-}
 interface LabelOption {
-  label_option: string[];
+  label_type: string;
+  label_name: string;
 }
 interface Project {
   project_name: string;
-  label_option: LabelOption;
-  source_path: SourcePath;
+  raw_source_path: string;
+  wav_source_path: string;
+  chunking_type: string;
+  description: string;
+  label_option: LabelOption[];
 }
 type ProjectList = {
-  configs: Project[];
+  projects: Project[];
 } & ResponseStatus;
 
 export function getProjectList(): Response<ProjectList> {
