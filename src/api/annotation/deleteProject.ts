@@ -6,10 +6,8 @@ type Result = {
   status: string;
 } & ResponseStatus;
 
-export async function deleteProject(params: any): Promise<Response<Result>> {
-  const { data, error } = await remove(getAPIUrl('annotation', 'deleteProject'), {
-    params
-  });
+export async function deleteProject(param: string): Promise<Response<Result>> {
+  const { data, error } = await remove(getAPIUrl('annotation', 'deleteProject', {projectName: param}));
   
   return {
     data: data ?? null,
