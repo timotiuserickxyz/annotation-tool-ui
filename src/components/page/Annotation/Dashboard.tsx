@@ -373,7 +373,7 @@ export const Dashboard: React.FC<Props> = () => {
               Download
           </Button>
         ) : (
-          <div></div>
+          <span>Please select a project for your annotation work</span>
         )}
       </div>
       { selectedProjectName && rawFileList.length > 0 ? (
