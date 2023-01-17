@@ -12,6 +12,7 @@ import { getRawFileDataList } from '../../../api/annotation/getRawFileDataList';
 import { getProjectDataList } from '../../../api/annotation/getProjectDataList';
 import { postProjectData } from '../../../api/annotation/postProjectData';
 import { putProjectData } from '../../../api/annotation/putProjectData';
+import { deleteProjectData } from '../../../api/annotation/deleteProjectData';
 import { downloadProjectData } from '../../../api/annotation/downloadProjectData';
 
 import { DashboardRawFileList } from '../../base/Annotation/DashboardRawFileList';
@@ -377,51 +378,6 @@ export const Dashboard: React.FC<Props> = () => {
       setSelectedLabel('');
       setSelectedComment('');
     }
-
-    // Possibility of chunked by whole wav
-    // let existingProjectDataList: any[] = projectData.filter(
-    //   o => o.file_name === rawFileList[selectedRawFileIndex].name
-    //     && o.sequence_number === -1
-    // );
-
-    // if (existingProjectDataList.length > 0)
-    // {
-    //   const existingProjectData = existingProjectDataList.pop();
-
-    //   setSelectedProjectData(existingProjectData ? existingProjectData : null);
-    //   setCurrentSequence(sequenceNumber);
-    //   setSelectedSequence(-1);
-    //   setSelectedLabel(existingProjectData ? existingProjectData.label : '');
-    //   setSelectedComment(existingProjectData ? existingProjectData.comment : '');
-    // }
-    // else
-    // {
-    //   // Turns out to be chunked by talk unit
-    //   existingProjectDataList = projectData.filter(
-    //     o => o.file_name === rawFileList[selectedRawFileIndex].name
-    //       && o.sequence_number === sequenceNumber
-    //       && o.channel === channel
-    //   );
-
-    //   if (existingProjectDataList.length > 0)
-    //   {
-    //     const existingProjectData = existingProjectDataList.pop();
-
-    //     setSelectedProjectData(existingProjectData);
-    //     setCurrentSequence(sequenceNumber);
-    //     setSelectedSequence(existingProjectData ? existingProjectData.sequence_number : sequenceNumber);
-    //     setSelectedLabel(existingProjectData ? existingProjectData.label : '');
-    //     setSelectedComment(existingProjectData ? existingProjectData.comment : '');
-    //   }
-    //   else
-    //   {
-    //     setSelectedProjectData(null);
-    //     setCurrentSequence(sequenceNumber);
-    //     setSelectedSequence(sequenceNumber);
-    //     setSelectedLabel('');
-    //     setSelectedComment('');
-    //   }
-    // }
   }
 
   const prepareDeleteProjectData = () => {
@@ -436,42 +392,35 @@ export const Dashboard: React.FC<Props> = () => {
   };
 
   const deleteProjectDataAndRefresh = async () => {
-    setOpenDeleteProjectDataModal(false);
-    setSnackbarMessage('Deleting project data');
-    setOpenSnackbar(true);
-    return;
+    const params = {
+      record_id: selectedProjectData.record_id
+    }
 
-    // const params = {
-    //   names: [
-    //     selectedProjectName
-    //   ]
-    // }
+    let errorMessage = '';
 
-    // let errorMessage = '';
+    const response = await deleteProjectData(selectedProjectName, params);
 
-    // const response = await postProjectData(selectedProjectName, params);
+    if (response.error) {
+      errorMessage = 'InternalServerError';
+    }
+    else if (response.data && response.data.error) {
+      errorMessage = response.data.error.message;
+    }
 
-    // if (response.error) {
-    //   errorMessage = 'InternalServerError';
-    // }
-    // else if (response.data && response.data.error) {
-    //   errorMessage = response.data.error.message;
-    // }
-
-    // if (errorMessage != '') {
-    //   setSnackbarMessage(errorMessage);
-    //   setOpenSnackbar(true);
-    //   return;
-    // }
+    if (errorMessage != '') {
+      setSnackbarMessage(errorMessage);
+      setOpenSnackbar(true);
+      return;
+    }
     
-    // // Refresh
-    // await mutate(getAPIUrl('annotation', 'getProjectDataList', {projectName: selectedProjectName}));
+    // Refresh
+    await mutate(getAPIUrl('annotation', 'getProjectDataList', {projectName: selectedProjectName}));
 
-    // setOpenDeleteProjectDataModal(false);
-    // setSnackbarMessage('Delete project data successful');
-    // setOpenSnackbar(true);
+    setOpenDeleteProjectDataModal(false);
+    setSnackbarMessage('Delete project data successful');
+    setOpenSnackbar(true);
 
-    // setIsSaving(true);
+    setIsSaving(true);
   };
 
   const prepareClearProjectData = () => {
@@ -479,42 +428,35 @@ export const Dashboard: React.FC<Props> = () => {
   };
 
   const clearProjectDataAndRefresh = async () => {
-    setOpenClearProjectDataModal(false);
-    setSnackbarMessage('Clearing project data');
-    setOpenSnackbar(true);
-    return;
+    const params = {
+      file_name: rawFileList[selectedRawFileIndex].name
+    }
 
-    // const params = {
-    //   names: [
-    //     selectedProjectName
-    //   ]
-    // }
+    let errorMessage = '';
 
-    // let errorMessage = '';
+    const response = await deleteProjectData(selectedProjectName, params);
 
-    // const response = await postProjectData(selectedProjectName, params);
+    if (response.error) {
+      errorMessage = 'InternalServerError';
+    }
+    else if (response.data && response.data.error) {
+      errorMessage = response.data.error.message;
+    }
 
-    // if (response.error) {
-    //   errorMessage = 'InternalServerError';
-    // }
-    // else if (response.data && response.data.error) {
-    //   errorMessage = response.data.error.message;
-    // }
-
-    // if (errorMessage != '') {
-    //   setSnackbarMessage(errorMessage);
-    //   setOpenSnackbar(true);
-    //   return;
-    // }
+    if (errorMessage != '') {
+      setSnackbarMessage(errorMessage);
+      setOpenSnackbar(true);
+      return;
+    }
     
-    // // Refresh
-    // await mutate(getAPIUrl('annotation', 'getProjectDataList', {projectName: selectedProjectName}));
+    // Refresh
+    await mutate(getAPIUrl('annotation', 'getProjectDataList', {projectName: selectedProjectName}));
 
-    // setOpenClearProjectDataModal(false);
-    // setSnackbarMessage('Delete project data successful');
-    // setOpenSnackbar(true);
+    setOpenClearProjectDataModal(false);
+    setSnackbarMessage('Delete project data successful');
+    setOpenSnackbar(true);
 
-    // setIsSaving(true);
+    setIsSaving(true);
   };
 
   const handleDownload = () => {
