@@ -495,7 +495,6 @@ export const Dashboard: React.FC<Props> = () => {
               rawFileList={rawFileList}
               selectedRawFileIndex={selectedRawFileIndex}
               onSelect={selectRawFile}
-              onShowExplanation={handleShowExplanation}
             />
           </div>
           { showExplanation == true ? (

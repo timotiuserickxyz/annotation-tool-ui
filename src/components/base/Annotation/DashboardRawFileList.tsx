@@ -29,13 +29,12 @@ type Row = BaseRow & {
 type Props = {
   rawFileList: any[],
   selectedRawFileIndex: number,
-  onSelect: (fileIndex: number) => void | Promise<void>,
-  onShowExplanation: () => void | Promise<void>,
+  onSelect: (fileIndex: number) => void | Promise<void>
 };
 
 type Component = (props: Props) => React.ReactElement<Props>;
 
-export const DashboardRawFileList: Component = ({ rawFileList, selectedRawFileIndex, onSelect, onShowExplanation }) => {
+export const DashboardRawFileList: Component = ({ rawFileList, selectedRawFileIndex, onSelect }) => {
   const classes = useStyles();
 
   const rows: Row[] = !!rawFileList
