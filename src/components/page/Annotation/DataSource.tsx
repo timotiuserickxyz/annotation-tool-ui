@@ -227,7 +227,7 @@ export const DataSource: React.FC<Props> = () => {
   const createWavFolderAndRefresh = async() => {
     if (newRawFolderName == '')
     {
-      setSnackbarMessage('Wav folder name is empty');
+      setSnackbarMessage('Audio folder name is empty');
       setOpenSnackbar(true);
       return;
     }
@@ -315,7 +315,7 @@ export const DataSource: React.FC<Props> = () => {
   const prepareUploadWavFile = () => {
     if (selectedWavFolderIndex == -1)
     {
-      setSnackbarMessage('Wav folder not chosen yet');
+      setSnackbarMessage('Audio folder not chosen yet');
       setOpenSnackbar(true);
       return;
     }
@@ -328,7 +328,7 @@ export const DataSource: React.FC<Props> = () => {
   const uploadWavFileAndRefresh = async() => {
     if (newWavFiles == undefined || newWavFileName == '')
     {
-      setSnackbarMessage('Wav file not chosen yet');
+      setSnackbarMessage('Audio file not chosen yet');
       setOpenSnackbar(true);
       return;
     }
@@ -365,7 +365,7 @@ export const DataSource: React.FC<Props> = () => {
 
     setUploadingWavFile(false);
     setOpenUploadWavFileModal(false);
-    setSnackbarMessage('Upload wav file successful');
+    setSnackbarMessage('Upload audio file successful');
     setOpenSnackbar(true);
   };
 
@@ -384,7 +384,7 @@ export const DataSource: React.FC<Props> = () => {
   };
 
   const deleteWavFolderAndRefresh = async() => {
-    console.log('Deleting wav folder');
+    console.log('Deleting audio folder');
   };
 
   const prepareDeleteRawFile = (index: number) => {
@@ -402,7 +402,7 @@ export const DataSource: React.FC<Props> = () => {
   };
 
   const deleteWavFileAndRefresh = async() => {
-    console.log('Deleting wav file');
+    console.log('Deleting audio file');
   };
 
   const changeNewRawFolderName = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -480,7 +480,7 @@ export const DataSource: React.FC<Props> = () => {
       </div>
       <div className={classes.wavFileContainer}>
         <div className={classes.header}>
-          <span className={classes.headerItem}>Wav Source</span>
+          <span className={classes.headerItem}>Audio Source</span>
           <Button variant="contained" className={classes.headerItem} onClick={prepareCreateWavFolder}>
             Create Folder
           </Button>
@@ -526,7 +526,7 @@ export const DataSource: React.FC<Props> = () => {
       </Dialog>
 
       <Dialog open={openCreateWavFolderModal} onClose={handleCloseCreateWavFolderModal}>
-        <DialogTitle>Create New Wav Folder</DialogTitle>
+        <DialogTitle>Create New Audio Folder</DialogTitle>
         <DialogContent>
           <DialogContentText>
             
@@ -563,7 +563,7 @@ export const DataSource: React.FC<Props> = () => {
       </Dialog>
 
       <Dialog open={openUploadWavFileModal} onClose={handleCloseUploadWavFileModal}>
-        <DialogTitle>Upload New Wav File</DialogTitle>
+        <DialogTitle>Upload New Audio File</DialogTitle>
         <DialogContent>
           <Button variant="contained" component="label">
             Select
@@ -594,10 +594,10 @@ export const DataSource: React.FC<Props> = () => {
       </Dialog>
       
       <Dialog open={openDeleteWavFolderModal} onClose={handleCloseDeleteWavFolderModal}>
-        <DialogTitle>Delete Wav Folder</DialogTitle>
+        <DialogTitle>Delete Audio Folder</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure to delete wav folder "{wavFolderList[selectedWavFolderIndex]?.name}"?
+            Are you sure to delete audio folder "{wavFolderList[selectedWavFolderIndex]?.name}"?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -620,10 +620,10 @@ export const DataSource: React.FC<Props> = () => {
       </Dialog>
       
       <Dialog open={openDeleteWavFileModal} onClose={handleCloseDeleteWavFileModal}>
-        <DialogTitle>Delete Wav File</DialogTitle>
+        <DialogTitle>Delete Audio File</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure to delete wav file "{wavFileList[selectedWavFileIndex]?.name}"?
+            Are you sure to delete audio file "{wavFileList[selectedWavFileIndex]?.name}"?
           </DialogContentText>
         </DialogContent>
         <DialogActions>

@@ -20,8 +20,6 @@ const useStyles = makeStyles({
     },
     '& .MuiDataGrid-cell': {
       overflow: 'visible',
-    },
-    '& .MuiDataGrid-renderingZone': {
       overflowX: 'auto',
       overflowY: 'hidden',
     },
