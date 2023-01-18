@@ -72,6 +72,15 @@ const useStyles = makeStyles({
     float: 'left',
     padding: '20px',
   },
+  explanationContainer: {
+    position: 'relative',
+    top: '0',
+    left: '15%',
+    width: '85%',
+    height: '100%',
+    zIndex: 100,
+    backgroundColor: 'white',
+  },
   annotateDataContainer: {
     width: '35%',
     float: 'left',
@@ -490,53 +499,56 @@ export const Dashboard: React.FC<Props> = () => {
               onSelect={selectRawFile}
             />
           </div>
-          { showExplanation == true ? (
+
+          { rawFileData && rawFileData.length > 0 ? (
             <div className={classes.subcontent}>
-              <IconButton onClick={handleHideExplanation} aria-label="Close" style={{padding: '5px', color: 'gray', float: 'right'}}>
-                <HighlightOff />
-              </IconButton>
-              <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center'}}>
-                <span style={{width: '100%', textAlign: 'center', whiteSpace: 'pre-line'}}>
-                  {selectedProjectDescription}
-                </span>
+              <div className={classes.annotateDataContainer}>
+                <AnnotateData
+                  selectedProjectName={selectedProjectName}
+                  selectedProjectLabelList={selectedProjectLabelList}
+                  isWholeWav={selectedProjectChunkingType === 'Whole Wav'}
+                  selectedAudio={selectedAudio}
+                  selectedAudioStartTime={selectedAudioStartTime}
+                  selectedAudioEndTime={selectedAudioEndTime}
+                  selectedLabel={selectedLabel}
+                  selectedComment={selectedComment}
+                  handleChangeLabel={handleChangeLabel}
+                  handleChangeComment={handleChangeComment}
+                  onClickSave={saveAndRefreshData}
+                  onClickPrev={goToPrevData}
+                  onClickNext={goToNextData}
+                  onClickDelete={prepareDeleteProjectData}
+                  onClickClear={prepareClearProjectData}
+                />
+              </div>
+              <div className={classes.annotationDataListContainer}>
+                <AnnotationDataList
+                  rawFileData={rawFileData}
+                  projectData={projectData.filter(
+                    o => o.file_name === rawFileList[selectedRawFileIndex].name
+                  )}
+                  selectedDataTableIndex={selectedDataTableIndex}
+                  onSelect={handleSelection}
+                />
               </div>
             </div>
           ) : (
-            [ rawFileData && rawFileData.length > 0 ? (
-              <div className={classes.subcontent}>
-                <div className={classes.annotateDataContainer}>
-                  <AnnotateData
-                    selectedProjectName={selectedProjectName}
-                    selectedProjectLabelList={selectedProjectLabelList}
-                    isWholeWav={selectedProjectChunkingType === 'Whole Wav'}
-                    selectedAudio={selectedAudio}
-                    selectedAudioStartTime={selectedAudioStartTime}
-                    selectedAudioEndTime={selectedAudioEndTime}
-                    selectedLabel={selectedLabel}
-                    selectedComment={selectedComment}
-                    handleChangeLabel={handleChangeLabel}
-                    handleChangeComment={handleChangeComment}
-                    onClickSave={saveAndRefreshData}
-                    onClickPrev={goToPrevData}
-                    onClickNext={goToNextData}
-                    onClickDelete={prepareDeleteProjectData}
-                    onClickClear={prepareClearProjectData}
-                  />
-                </div>
-                <div className={classes.annotationDataListContainer}>
-                  <AnnotationDataList
-                    rawFileData={rawFileData}
-                    projectData={projectData.filter(
-                      o => o.file_name === rawFileList[selectedRawFileIndex].name
-                    )}
-                    selectedDataTableIndex={selectedDataTableIndex}
-                    onSelect={handleSelection}
-                  />
-                </div>
+            <div></div>
+          )}
+
+          { showExplanation == true ? (
+            <div className={classes.explanationContainer}>
+              <div style={{position: 'absolute', width: '100%', height: '100%', display: 'flex', alignItems: 'center'}}>
+                <span style={{width: '100%', marginTop: '-100px', textAlign: 'center', whiteSpace: 'pre-line'}}>
+                  {selectedProjectDescription}
+                </span>
               </div>
-            ) : (
-              <div></div>
-            )]
+              <IconButton onClick={handleHideExplanation} aria-label="Close" style={{position: 'absolute', top: '10px', right: '10px', padding: '5px', color: 'gray'}}>
+                <HighlightOff />
+              </IconButton>
+            </div>
+          ) : (
+            <div></div>
           )}
         </div>
       ) : (

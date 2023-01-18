@@ -2,7 +2,6 @@ import * as React from 'react';
 import { DataGrid } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
 import { Tooltip } from '@material-ui/core';
-// import { Radio } from '@material-ui/core';
 
 const useStyles = makeStyles({
   tableContainer: {
@@ -88,16 +87,6 @@ export const AnnotationDataList: Component = ({ rawFileData, projectData, select
   }
 
   const columns = [
-    // { field: '',
-    //   headerName: '',
-    //   flex: 0.5,
-    //   renderCell: (params: any = {}) => (
-    //     <Radio
-    //       checked={selectedDataTableIndex === params.id}
-    //       value={params.id}
-    //     />
-    //   ),
-    // },
     { field: 'LineId', headerName: 'No', width: 75 },
     { field: 'Channel', headerName: 'Ch', width: 75 },
     { field: 'Sequence_number', headerName: 'Seq', width: 80 },
@@ -106,7 +95,7 @@ export const AnnotationDataList: Component = ({ rawFileData, projectData, select
       headerName: 'File',
       renderCell: (params: any) =>  (
         <Tooltip title={params.row.FileName.replace(/^.*[\\\/]/, '')} >
-         <span className="table-cell-trucate">{params.row.FileName.replace(/^.*[\\\/]/, '')}</span>
+          <span>{params.row.FileName.replace(/^.*[\\\/]/, '')}</span>
         </Tooltip>
       ),
     },

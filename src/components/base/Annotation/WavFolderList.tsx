@@ -20,8 +20,6 @@ const useStyles = makeStyles({
     },
     '& .MuiDataGrid-cell': {
       overflow: 'visible',
-    },
-    '& .MuiDataGrid-renderingZone': {
       overflowX: 'auto',
       overflowY: 'hidden',
     },
@@ -63,7 +61,7 @@ export const WavFolderList: Component = ({ wavFolderList, selectedWavFolderIndex
   const columns = [
     {
       field: 'name',
-      headerName: 'Wav Folder',
+      headerName: 'Audio Folder',
       flex: 1,
       renderCell: (params: any = {}) => (
         <div>
