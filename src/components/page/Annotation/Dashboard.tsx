@@ -15,6 +15,7 @@ import { putProjectData } from '../../../api/annotation/putProjectData';
 import { deleteProjectData } from '../../../api/annotation/deleteProjectData';
 import { clearProjectData } from '../../../api/annotation/clearProjectData';
 import { downloadProjectData } from '../../../api/annotation/downloadProjectData';
+import { exportProjectData } from '../../../api/annotation/exportProjectData';
 
 import { DashboardRawFileList } from '../../base/Annotation/DashboardRawFileList';
 import { AnnotateData } from '../../base/Annotation/AnnotateData';
@@ -461,6 +462,28 @@ export const Dashboard: React.FC<Props> = () => {
     setIsSaving(true);
   };
 
+  const handleExport = async () => {
+    let errorMessage = '';
+
+    const response = await exportProjectData(selectedProjectName);
+
+    if (response.error) {
+      errorMessage = 'InternalServerError';
+    }
+    else if (response.data && response.data.error) {
+      errorMessage = response.data.error.message;
+    }
+
+    if (errorMessage != '') {
+      setSnackbarMessage(errorMessage);
+      setOpenSnackbar(true);
+      return;
+    }
+
+    setSnackbarMessage('Export project data successful');
+    setOpenSnackbar(true);
+  };
+
   const handleDownload = () => {
     downloadProjectData(selectedProjectName);
   };
@@ -484,6 +507,9 @@ export const Dashboard: React.FC<Props> = () => {
             </IconButton>
             <Button variant="contained" className={classes.headerItem} onClick={handleDownload}>
                 Download
+            </Button>
+            <Button variant="contained" className={classes.headerItem} onClick={handleExport}>
+                Export to AutoML
             </Button>
           </div>
         ) : (
