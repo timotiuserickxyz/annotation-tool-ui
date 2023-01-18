@@ -13,6 +13,7 @@ import { getProjectDataList } from '../../../api/annotation/getProjectDataList';
 import { postProjectData } from '../../../api/annotation/postProjectData';
 import { putProjectData } from '../../../api/annotation/putProjectData';
 import { deleteProjectData } from '../../../api/annotation/deleteProjectData';
+import { clearProjectData } from '../../../api/annotation/clearProjectData';
 import { downloadProjectData } from '../../../api/annotation/downloadProjectData';
 
 import { DashboardRawFileList } from '../../base/Annotation/DashboardRawFileList';
@@ -392,13 +393,9 @@ export const Dashboard: React.FC<Props> = () => {
   };
 
   const deleteProjectDataAndRefresh = async () => {
-    const params = {
-      record_id: selectedProjectData.record_id
-    }
-
     let errorMessage = '';
 
-    const response = await deleteProjectData(selectedProjectName, params);
+    const response = await deleteProjectData(selectedProjectName, selectedProjectData.record_id);
 
     if (response.error) {
       errorMessage = 'InternalServerError';
@@ -428,13 +425,9 @@ export const Dashboard: React.FC<Props> = () => {
   };
 
   const clearProjectDataAndRefresh = async () => {
-    const params = {
-      file_name: rawFileList[selectedRawFileIndex].name
-    }
-
     let errorMessage = '';
 
-    const response = await deleteProjectData(selectedProjectName, params);
+    const response = await clearProjectData(selectedProjectName, rawFileList[selectedRawFileIndex].name);
 
     if (response.error) {
       errorMessage = 'InternalServerError';

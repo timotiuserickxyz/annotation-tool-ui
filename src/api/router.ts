@@ -22,6 +22,7 @@ export const pathMap = {
     postProjectData: '/annotation-project/data/new/:projectName',
     putProjectData: '/annotation-project/data/update/:projectName/:recordId',
     deleteProjectData: '/annotation-project/data/delete/:projectName',
+    clearProjectData: '/annotation-project/data/delete/:projectName',
     downloadProjectData: '/annotation-project/data/download/:projectName',
     createRawFolder: '/annotation-project/data/new/csv_folder/:folderName',
     createWavFolder: '/annotation-project/data/new/wav_folder/:folderName',
