@@ -1,6 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import {
+  IconButton,
+} from '@material-ui/core';
 import PauseIcon from '@material-ui/icons/Pause';
+import RefreshIcon from '@material-ui/icons/Refresh';
 import { makeStyles } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
@@ -49,6 +53,14 @@ const useStyles = makeStyles({
     marginLeft: '3px',
     width: '18px !important',
     height: '18px !important',
+  },
+  customButton: {
+    float: 'left',
+    marginTop: '15px',
+    marginLeft: '3px',
+    width: '18px !important',
+    height: '18px !important',
+    padding: '0px',
   },
 });
 
@@ -106,96 +118,6 @@ export default function Waveform({filePath, fileName, startTime, endTime, isWhol
   // Do not switch the order
   // Waveform creator should be put lastly
   useEffect(() => {
-    const create = async () => {
-      setPlay(false);
-
-      const WaveSurfer = (await import('wavesurfer.js')).default;
-      const RegionsPlugin = (await import('wavesurfer.js/dist/plugin/wavesurfer.regions')).default;
-
-      wavesurfer.current = WaveSurfer.create({
-        container: waveformRef.current,
-        waveColor: "Black",
-        progressColor: "Black",
-        cursorColor: "Black",
-        fillParent: true,
-        responsive: true,
-        barRadius: 0,
-        height: 50,
-        // If true, normalize by the maximum peak instead of 1.0.
-        //normalize: true,
-        // Use the PeakCache to improve rendering speed of large waveforms.
-        partialRender: true,
-        plugins: [
-          RegionsPlugin.create({
-            regionsMinLength: 2,
-            regions: []
-          })
-        ]
-      });
-
-      setLoading(true);
-
-      wavesurfer.current.load(filePath);
-
-      wavesurfer.current.on("ready", function() {
-        // https://wavesurfer-js.org/docs/methods.html
-        // wavesurfer.current.play();
-        // setPlay(true);
-
-        // make sure object still available when file loaded
-        if (wavesurfer.current) {
-          wavesurfer.current.setVolume(volume);
-          wavesurfer.current.zoom(zoom);
-          setLoading(false);
-
-          if (wavesurfer.current && !isWholeWav) {
-            wavesurfer.current.clearRegions();
-            wavesurfer.current.addRegion({
-              start: startTime,
-              end: endTime,
-              loop: true,
-              drag: false,
-              resize: false,
-              color: 'hsla(0, 100%, 50%, 0.3)',
-            });
-      
-            if (playing)
-            {
-              wavesurfer.current.play(startTime, endTime);
-            }
-            else
-            {
-              wavesurfer.current.play(startTime, endTime);
-              wavesurfer.current.playPause();
-            }
-          }
-        }
-      });
-
-      wavesurfer.current.on("error", function(e) {
-        if (e == 'Error: HTTP error status: 404')
-        {
-          alert(filePath + ' not found');
-        }
-        else
-        {
-          alert('Error loading ' + filePath);
-        }
-
-        setLoading(false);
-      });
-
-      wavesurfer.current.on('region-click', function(region, e) {
-        e.stopPropagation();
-        region.wavesurfer.play(region.start, region.end);
-        setPlay(true);
-      });
-
-      wavesurfer.current.on("finish", function() {
-        setPlay(false);
-      });
-    };
-
     if (wavesurfer.current) {
       wavesurfer.current.destroy();
     }
@@ -203,6 +125,96 @@ export default function Waveform({filePath, fileName, startTime, endTime, isWhol
     create();
     
   }, [filePath]);
+
+  const create = async () => {
+    setPlay(false);
+
+    const WaveSurfer = (await import('wavesurfer.js')).default;
+    const RegionsPlugin = (await import('wavesurfer.js/dist/plugin/wavesurfer.regions')).default;
+
+    wavesurfer.current = WaveSurfer.create({
+      container: waveformRef.current,
+      waveColor: "Black",
+      progressColor: "Black",
+      cursorColor: "Black",
+      fillParent: true,
+      responsive: true,
+      barRadius: 0,
+      height: 50,
+      // If true, normalize by the maximum peak instead of 1.0.
+      //normalize: true,
+      // Use the PeakCache to improve rendering speed of large waveforms.
+      partialRender: true,
+      plugins: [
+        RegionsPlugin.create({
+          regionsMinLength: 2,
+          regions: []
+        })
+      ]
+    });
+
+    setLoading(true);
+
+    wavesurfer.current.load(filePath);
+
+    wavesurfer.current.on("ready", function() {
+      // https://wavesurfer-js.org/docs/methods.html
+      // wavesurfer.current.play();
+      // setPlay(true);
+
+      // make sure object still available when file loaded
+      if (wavesurfer.current) {
+        wavesurfer.current.setVolume(volume);
+        wavesurfer.current.zoom(zoom);
+        setLoading(false);
+
+        if (wavesurfer.current && !isWholeWav) {
+          wavesurfer.current.clearRegions();
+          wavesurfer.current.addRegion({
+            start: startTime,
+            end: endTime,
+            loop: true,
+            drag: false,
+            resize: false,
+            color: 'hsla(0, 100%, 50%, 0.3)',
+          });
+    
+          if (playing)
+          {
+            wavesurfer.current.play(startTime, endTime);
+          }
+          else
+          {
+            wavesurfer.current.play(startTime, endTime);
+            wavesurfer.current.playPause();
+          }
+        }
+      }
+    });
+
+    wavesurfer.current.on("error", function(e) {
+      if (e == 'Error: HTTP error status: 404')
+      {
+        alert(filePath + ' not found. Please check if the file exist and try again.');
+      }
+      else
+      {
+        alert('Error loading ' + filePath + '. Please check if the file exist and try again.');
+      }
+
+      setLoading(false);
+    });
+
+    wavesurfer.current.on('region-click', function(region, e) {
+      e.stopPropagation();
+      region.wavesurfer.play(region.start, region.end);
+      setPlay(true);
+    });
+
+    wavesurfer.current.on("finish", function() {
+      setPlay(false);
+    });
+  };
 
   const handlePlayPause = () => {
     if (loading) return;
@@ -242,7 +254,16 @@ export default function Waveform({filePath, fileName, startTime, endTime, isWhol
         <div className={classes.waveForm}>
           <div id="waveform" ref={waveformRef} />
         </div>
-        { loading ? <CircularProgress className={classes.loading} /> : ''}
+        { loading ? <CircularProgress className={classes.loading} /> : (
+          <IconButton className={classes.customButton} onClick={() => {
+            if (wavesurfer.current) {
+              wavesurfer.current.destroy();
+            }
+            create();
+          }}>
+            <RefreshIcon />
+          </IconButton>
+        )}
         <div style={{marginTop: '-20px'}}>
           <input
             type="range"
