@@ -62,8 +62,10 @@ const useStyles = makeStyles({
   },
   explanationTextArea: {
     width: '100%',
-    maxWidth: '400px',
+    minWidth: '180px',
+    maxWidth: '420px',
     height: '100px',
+    minHeight: '150px',
     display: 'flex',
     marginLeft: 'auto',
     marginRight: 'auto',

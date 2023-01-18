@@ -22,7 +22,7 @@ const useStyles = makeStyles({
       overflow: 'visible',
     },
     '& .MuiDataGrid-renderingZone': {
-      overflowX: 'scroll',
+      overflowX: 'auto',
       overflowY: 'hidden',
     },
   },
