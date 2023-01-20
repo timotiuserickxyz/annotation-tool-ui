@@ -102,9 +102,9 @@ export const Dashboard: React.FC<Props> = () => {
   const handleCloseSnackbar = () => setOpenSnackbar(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>('');
 
-  const tempProjectName = localStorage.getItem('selected_project_name');
-  const tempRawFileIndex = localStorage.getItem('selected_file_index');
-  const tempDataTableIndex = localStorage.getItem('selected_data_table_index');
+  const tempProjectName = typeof window !== 'undefined' ? localStorage.getItem('selected_project_name') : '';
+  const tempRawFileIndex = typeof window !== 'undefined' ? localStorage.getItem('selected_file_index') : '';
+  const tempDataTableIndex = typeof window !== 'undefined' ? localStorage.getItem('selected_data_table_index') : '';
 
   const [showExplanation, setShowExplanation] = useState<boolean>(true);
   const [selectedProjectName, setSelectedProjectName] = useState<string>(tempProjectName ? tempProjectName : '');
@@ -144,7 +144,7 @@ export const Dashboard: React.FC<Props> = () => {
     return {id: id, ...t};
   }) : [];
 
-  const rawRawFileData = getRawFileDataList(rawFileFolderName, selectedRawFileIndex >= 0 ? rawFileList[selectedRawFileIndex].name : '');
+  const rawRawFileData = getRawFileDataList(rawFileFolderName, (selectedRawFileIndex >= 0 && rawFileList[selectedRawFileIndex]) ? rawFileList[selectedRawFileIndex].name : '');
   const rawFileData = !!rawRawFileData && !!rawRawFileData.data && Array.isArray(rawRawFileData.data) ? rawRawFileData.data.map((t) => {
     return {...t};
   }) : [];
@@ -511,7 +511,8 @@ export const Dashboard: React.FC<Props> = () => {
             (<option key={p.project_name} value={p.project_name}>{p.project_name}</option>)
           )} 
         </select>
-        { selectedProjectName && rawFileList.length > 0 ? (
+        
+        { projectList.length > 0 && selectedProjectName != '' && rawFileList.length > 0 ? (
           <div>
             <IconButton onClick={handleShowExplanation} className={classes.headerItem} aria-label="Explanation" style={{padding: '5px', color: 'gray', marginLeft: '-5px'}}>
               <ErrorOutlineIcon />
@@ -524,7 +525,16 @@ export const Dashboard: React.FC<Props> = () => {
             </Button>
           </div>
         ) : (
-          <span>Please select a project for your annotation work</span>
+          [ projectList.length > 0 && selectedProjectName != '' && rawFileList.length <= 0 ? (
+            <span>Selected project does not have any file</span>
+          ) : (
+            [ projectList.length > 0 && selectedProjectName == '' ? (
+                <span>Please select a project for your annotation work</span>
+              ) : (
+                <span>Project not found</span>
+              )
+            ]
+          )]
         )}
       </div>
       { selectedProjectName && rawFileList.length > 0 ? (
