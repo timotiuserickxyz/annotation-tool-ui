@@ -1,7 +1,7 @@
 version: '3'
 services:
   ui:
-    image: annotation-tool-ui:0.0.8
+    image: annotation-tool-ui:0.0.9
     build:
       context: .
       dockerfile: Dockerfile
