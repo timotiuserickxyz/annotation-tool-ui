@@ -1,78 +1,124 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from 'react';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import {
-  IconButton,
-} from '@material-ui/core';
 import PauseIcon from '@material-ui/icons/Pause';
 import RefreshIcon from '@material-ui/icons/Refresh';
-import { makeStyles } from '@material-ui/core/styles';
+import MicIcon from '@material-ui/icons/Mic';
+import MicOffIcon from '@material-ui/icons/MicOff';
+import { jssPreset, makeStyles } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 const useStyles = makeStyles({
   audioPlayerContainer: {
     width: '80%',
-    height: '100px',
+    marginTop: '20px',
     marginLeft: 'auto',
     marginRight: 'auto',
   },
   titleContainer: {
-    width: '100%',
+    width: 'calc(100% - 21px)',
     height: '20px',
-    marginTop: '20px',
+    float: 'left',
     marginLeft: 'auto',
     marginRight: 'auto',
     fontSize: '12px',
     overflow: 'hidden',
+    border: 'solid 0.5px Black',
+    paddingLeft: '5px',
+  },
+  refreshButton: {
+    width: '21px !important',
+    height: '20px !important',
+    float: 'left',
+    padding: '0px',
+    cursor: 'pointer',
+  },
+  loadingIcon: {
+    width: '18px !important',
+    height: '18px !important',
   },
   audioPlayer: {
     width: '100%',
-    height: '80px',
-    marginTop: '20px',
     marginLeft: 'auto',
     marginRight: 'auto',
   },
   playBtn: {
-    backgroundColor: "Black",
+    backgroundColor: 'Black',
     width:'30px',
-    height: '50px',
     float: 'left',
     paddingTop: '5px',
     paddingLeft: '1px',
     paddingRight: '1px',
     cursor: 'pointer',
   },
-  waveForm: {
+  waveFormContainer: {
     width: 'calc(100% - 51px)',
+    float: 'left',
+  },
+  waveForm: {
+    width: '100%',
     height: '50px',
-    float: 'left',
     border: 'solid 1px Black',
-  },
-  loading: {
     float: 'left',
-    marginTop: '15px',
-    marginLeft: '3px',
+  },
+  muteIcon: {
     width: '18px !important',
     height: '18px !important',
   },
-  customButton: {
+  muteButton: {
     float: 'left',
-    marginTop: '15px',
-    marginLeft: '3px',
-    width: '18px !important',
-    height: '18px !important',
+    width: '21px !important',
+    height: '50px !important',
     padding: '0px',
+    cursor: 'pointer',
   },
 });
 
-export default function Waveform({filePath, fileName, startTime, endTime, isWholeWav}) {
+export default function Waveform({title, selectedAudioPath, startTime, endTime, isWholeWav, onError}) {
   const classes = useStyles();
 
-  const waveformRef = useRef(null);
-  const wavesurfer = useRef(null);
   const [loading, setLoading] = useState(false);
   const [playing, setPlay] = useState(false);
   const [volume, setVolume] = useState(0.5);
   const [zoom, setZoom] = useState(2);
+  const [isFirstChannelMuted, muteFirstChannel] = useState(false);
+  const [isSecondChannelMuted, muteSecondChannel] = useState(false);
+
+  let audioPathList = [
+    selectedAudioPath
+  ];
+
+  if (selectedAudioPath.indexOf('_channel1.wav') >= 0)
+  {
+    audioPathList = [
+      selectedAudioPath,
+      selectedAudioPath.replace('_channel1.wav', '_channel2.wav'),
+    ]
+  }
+  else if (selectedAudioPath.indexOf('_channel2.wav') >= 0)
+  {
+    audioPathList = [
+      selectedAudioPath.replace('_channel2.wav', '_channel1.wav'),
+      selectedAudioPath,
+    ]
+  }
+  else if (selectedAudioPath.indexOf('_L.wav') >= 0)
+  {
+    audioPathList = [
+      selectedAudioPath,
+      selectedAudioPath.replace('_L.wav', '_R.wav'),
+    ]
+  }
+  else if (selectedAudioPath.indexOf('_R.wav') >= 0)
+  {
+    audioPathList = [
+      selectedAudioPath.replace('_R.wav', '_L.wav'),
+      selectedAudioPath,
+    ]
+  }
+
+  const audioCount = audioPathList.length;
+  const wavesurfer = useRef(Array(audioCount));
+  let loadedCount = 0;
 
   // Do not switch the order
   // Destructor should be put first
@@ -80,8 +126,11 @@ export default function Waveform({filePath, fileName, startTime, endTime, isWhol
     return () => {
       // componentwillunmount in functional component.
       // Anything in here is fired on component unmount.
-      if (wavesurfer.current) {
-        wavesurfer.current.destroy();
+      for (var i = 0; i < audioCount; i++) {
+        let tempWaveForm = wavesurfer.current[i];
+        if (tempWaveForm) {
+          tempWaveForm.destroy();
+        }
       }
     }
   }, []);
@@ -89,28 +138,32 @@ export default function Waveform({filePath, fileName, startTime, endTime, isWhol
   // Do not switch the order
   // Region creator should be put before audio player creator
   useEffect(() => {
-    if (wavesurfer.current && isWholeWav) {
-      wavesurfer.current.clearRegions();
-    }
-    else if (wavesurfer.current && !isWholeWav) {
-      wavesurfer.current.clearRegions();
-      wavesurfer.current.addRegion({
-        start: startTime,
-        end: endTime,
-        loop: true,
-        drag: false,
-        resize: false,
-        color: 'hsla(0, 100%, 50%, 0.3)',
-      });
-
-      if (playing)
-      {
-        wavesurfer.current.play(startTime, endTime);
+    for (var i = 0; i < audioCount; i++) {
+      let tempWaveForm = wavesurfer.current[i];
+      
+      if (tempWaveForm && isWholeWav) {
+        tempWaveForm.clearRegions();
       }
-      else
-      {
-        wavesurfer.current.play(startTime, endTime);
-        wavesurfer.current.playPause();
+      else if (tempWaveForm && !isWholeWav) {
+        tempWaveForm.clearRegions();
+        tempWaveForm.addRegion({
+          start: startTime,
+          end: endTime,
+          loop: true,
+          drag: false,
+          resize: false,
+          color: 'hsla(0, 100%, 50%, 0.3)',
+        });
+  
+        if (playing)
+        {
+          tempWaveForm.play(startTime, endTime);
+        }
+        else
+        {
+          tempWaveForm.play(startTime, endTime);
+          tempWaveForm.playPause();
+        }
       }
     }
   }, [startTime, endTime, isWholeWav]);
@@ -118,13 +171,8 @@ export default function Waveform({filePath, fileName, startTime, endTime, isWhol
   // Do not switch the order
   // Waveform creator should be put lastly
   useEffect(() => {
-    if (wavesurfer.current) {
-      wavesurfer.current.destroy();
-    }
-
     create();
-    
-  }, [filePath]);
+  }, [title]);
 
   const create = async () => {
     setPlay(false);
@@ -132,94 +180,126 @@ export default function Waveform({filePath, fileName, startTime, endTime, isWhol
     const WaveSurfer = (await import('wavesurfer.js')).default;
     const RegionsPlugin = (await import('wavesurfer.js/dist/plugin/wavesurfer.regions')).default;
 
-    wavesurfer.current = WaveSurfer.create({
-      container: waveformRef.current,
-      waveColor: "Black",
-      progressColor: "Black",
-      cursorColor: "Black",
-      fillParent: true,
-      responsive: true,
-      barRadius: 0,
-      height: 50,
-      // If true, normalize by the maximum peak instead of 1.0.
-      //normalize: true,
-      // Use the PeakCache to improve rendering speed of large waveforms.
-      partialRender: true,
-      plugins: [
-        RegionsPlugin.create({
-          regionsMinLength: 2,
-          regions: []
-        })
-      ]
-    });
-
     setLoading(true);
+    loadedCount = 0;
 
-    wavesurfer.current.load(filePath);
+    for (var i = 0; i < audioCount; i++) {
+      let tempWaveForm = wavesurfer.current[i];
+      if (tempWaveForm) {
+        tempWaveForm.destroy();
+      }
 
-    wavesurfer.current.on("ready", function() {
-      // https://wavesurfer-js.org/docs/methods.html
-      // wavesurfer.current.play();
-      // setPlay(true);
+      let newWaveForm = WaveSurfer.create({
+        container: '#waveform' + i,
+        waveColor: 'Black',
+        progressColor: 'Black',
+        cursorColor: 'Black',
+        fillParent: true,
+        responsive: true,
+        barRadius: 0,
+        height: 50,
+        partialRender: true,
+        plugins: [
+          RegionsPlugin.create({
+            regionsMinLength: 2,
+            regions: []
+          })
+        ],
+      });
 
-      // make sure object still available when file loaded
-      if (wavesurfer.current) {
-        wavesurfer.current.setVolume(volume);
-        wavesurfer.current.zoom(zoom);
-        setLoading(false);
+      const filePath = audioPathList[i];
+      newWaveForm.load(filePath);
 
-        if (wavesurfer.current && !isWholeWav) {
-          wavesurfer.current.clearRegions();
-          wavesurfer.current.addRegion({
-            start: startTime,
-            end: endTime,
-            loop: true,
-            drag: false,
-            resize: false,
-            color: 'hsla(0, 100%, 50%, 0.3)',
-          });
-    
-          if (playing)
-          {
-            wavesurfer.current.play(startTime, endTime);
+      newWaveForm.on('ready', function()
+      {
+        if (newWaveForm) {
+          newWaveForm.setVolume(volume);
+          newWaveForm.zoom(zoom);
+
+          if (!isWholeWav) {
+            newWaveForm.clearRegions();
+            newWaveForm.addRegion({
+              start: startTime,
+              end: endTime,
+              loop: true,
+              drag: false,
+              resize: false,
+              color: 'hsla(0, 100%, 50%, 0.3)',
+            });
+      
+            if (playing)
+            {
+              newWaveForm.play(startTime, endTime);
+            }
+            else
+            {
+              newWaveForm.play(startTime, endTime);
+              newWaveForm.playPause();
+            }
           }
-          else
-          {
-            wavesurfer.current.play(startTime, endTime);
-            wavesurfer.current.playPause();
+
+          loadedCount += 1;
+          if (loadedCount >= audioCount) {
+            setLoading(false);
           }
         }
-      }
-    });
+      });
 
-    wavesurfer.current.on("error", function(e) {
-      if (e == 'Error: HTTP error status: 404')
-      {
-        alert(filePath + ' not found. Please check if the file exist and try again.');
-      }
-      else
-      {
-        alert('Error loading ' + filePath + '. Please check if the file exist and try again.');
-      }
+      newWaveForm.on('error', function(e) {
+        onError('Error when loading ' + filePath + '. Please check if the file exist and try again.');
+        console.log('Error when loading ' + filePath + ': ' + e);
 
-      setLoading(false);
-    });
+        loadedCount += 1;
+        if (loadedCount >= audioCount) {
+          setLoading(false);
+        }
+      });
 
-    wavesurfer.current.on('region-click', function(region, e) {
-      e.stopPropagation();
-      region.wavesurfer.play(region.start, region.end);
-      setPlay(true);
-    });
+      newWaveForm.on('region-click', function(region, e) {
+        e.stopPropagation();
 
-    wavesurfer.current.on("finish", function() {
-      setPlay(false);
-    });
+        for (var i = 0; i < audioCount; i++) {
+          let tempWaveForm = wavesurfer.current[i];
+
+          if (tempWaveForm) {
+            tempWaveForm.play(region.start, region.end);
+          }
+        }
+
+        setPlay(true);
+      });
+
+      newWaveForm.on('seek', function(position) {
+        const currTime = position * newWaveForm.getDuration();
+
+        for (var i = 0; i < audioCount; i++) {
+          let tempWaveForm = wavesurfer.current[i];
+
+          if (tempWaveForm && !isWholeWav)
+          {
+            tempWaveForm.play(currTime);
+          }
+        }
+      });
+
+      newWaveForm.on('finish', function() {
+        setPlay(false);
+      });
+
+      wavesurfer.current[i] = newWaveForm;
+    }
   };
 
   const handlePlayPause = () => {
     if (loading) return;
     setPlay(!playing);
-    wavesurfer.current.playPause();
+
+    for (var i = 0; i < audioCount; i++) {
+      let tempWaveForm = wavesurfer.current[i];
+      if (tempWaveForm) {
+        tempWaveForm.playPause();
+      }
+    }
   };
 
   const onVolumeChange = e => {
@@ -228,7 +308,15 @@ export default function Waveform({filePath, fileName, startTime, endTime, isWhol
 
     if (newVolume) {
       setVolume(newVolume);
-      wavesurfer.current.setVolume(newVolume || 1);
+      muteFirstChannel(false);
+      muteSecondChannel(false);
+
+      for (var i = 0; i < audioCount; i++) {
+        let tempWaveForm = wavesurfer.current[i];
+        if (tempWaveForm) {
+          tempWaveForm.setVolume(newVolume || 1);
+        }
+      }
     }
   };
 
@@ -237,62 +325,93 @@ export default function Waveform({filePath, fileName, startTime, endTime, isWhol
     const newZoom =+ target.value;
 
     setZoom(newZoom);
-    wavesurfer.current.zoom(newZoom);
+
+    for (var i = 0; i < audioCount; i++) {
+      let tempWaveForm = wavesurfer.current[i];
+      if (tempWaveForm) {
+        tempWaveForm.zoom(newZoom);
+      }
+    }
   };
 
   return (
-    <div className={classes.audioPlayerContainer}>
+    <div className={classes.audioPlayerContainer} style={{height: (audioCount * 50) + 50 + 'px'}}>
       <div className={classes.titleContainer}>
-          {fileName}
+          {title}
       </div>
-      <div className={classes.audioPlayer}>
+      <button className={classes.refreshButton}
+        disabled={ loading ? 'disabled' : '' }
+        onClick={() => {
+          create();
+        }}
+      >
+        { loading ? <CircularProgress className={classes.loadingIcon} /> : <RefreshIcon className={classes.loadingIcon} /> }
+      </button>
+      <div className={classes.audioPlayer} style={{height: (audioCount * 50) + 30 + 'px'}}>
         <button
           className={classes.playBtn}
+          style={{height: (audioCount * 50) + 'px'}}
           onClick={handlePlayPause}>
-          {!playing ? <PlayArrowIcon style={{fill: "White"}} /> : <PauseIcon style={{fill: "White"}} />}
+          {!playing ? <PlayArrowIcon style={{fill: 'White'}} /> : <PauseIcon style={{fill: 'White'}} />}
         </button>
-        <div className={classes.waveForm}>
-          <div id="waveform" ref={waveformRef} />
+        <div className={classes.waveFormContainer} style={{height: (audioCount * 50) + 'px'}}>
+          <div className={classes.waveForm}>
+            <div id="waveform0" />
+          </div>
+          <div className={classes.waveForm} style={{display: audioCount <= 1 ? 'none' : ''}}>
+            <div id="waveform1" />
+          </div>
         </div>
-        { loading ? <CircularProgress className={classes.loading} /> : (
-          <IconButton className={classes.customButton} onClick={() => {
-            if (wavesurfer.current) {
-              wavesurfer.current.destroy();
-            }
-            create();
-          }}>
-            <RefreshIcon />
-          </IconButton>
-        )}
-        <div style={{marginTop: '-20px'}}>
-          <input
-            type="range"
-            id="volume"
-            name="volume"
-            // waveSurfer recognize value of `0` same as `1`
-            //  so we need to set some zero-ish value for silence
-            min="0.01"
-            max="1"
-            step=".025"
-            onChange={onVolumeChange}
-            defaultValue={volume}
-            style={{width: '40%'}}
-          />
-          <label htmlFor="volume">Volume</label>
-        </div>
-        <div style={{marginTop: '-5px'}}>
-          <input
-            type="range"
-            id="zoom"
-            name="zoom"
-            min="0"
-            max="10"
-            step="1"
-            onChange={onZoomChange}
-            defaultValue={zoom}
-            style={{width: '40%'}}
-          />
-          <label htmlFor="zoom">Zoom</label>
+        <button className={classes.muteButton}
+          disabled={ loading ? 'disabled' : '' }
+          onClick={() => {
+            wavesurfer.current[0].setMute(!isFirstChannelMuted);
+            muteFirstChannel(!isFirstChannelMuted);
+          }}
+        >
+          { isFirstChannelMuted ? <MicOffIcon className={classes.muteIcon} /> : <MicIcon className={classes.muteIcon} /> }
+        </button>
+        <button className={classes.muteButton}
+          style={{display: audioCount <= 1 ? 'none' : ''}}
+          disabled={ loading ? 'disabled' : '' }
+          onClick={() => {
+            wavesurfer.current[1].setMute(!isSecondChannelMuted);
+            muteSecondChannel(!isSecondChannelMuted);
+          }}
+        >
+          { isSecondChannelMuted ? <MicOffIcon className={classes.muteIcon} /> : <MicIcon className={classes.muteIcon} /> }
+        </button>
+        <div style={{width: '100%', minHeight: '50px', height: 'auto', float: 'left'}}>
+          <div>
+            <input
+              type="range"
+              id="volume"
+              name="volume"
+              // waveSurfer recognize value of `0` same as `1`
+              //  so we need to set some zero-ish value for silence
+              min="0.01"
+              max="1"
+              step=".025"
+              onChange={onVolumeChange}
+              defaultValue={volume}
+              style={{width: '50%'}}
+            />
+            <label htmlFor="volume" style={{fontSize: '13px'}}>Volume</label>
+          </div>
+          <div>
+            <input
+              type="range"
+              id="zoom"
+              name="zoom"
+              min="0"
+              max="10"
+              step="1"
+              onChange={onZoomChange}
+              defaultValue={zoom}
+              style={{width: '50%'}}
+            />
+            <label htmlFor="zoom" style={{fontSize: '13px'}}>Zoom</label>
+          </div>
         </div>
       </div>
     </div>

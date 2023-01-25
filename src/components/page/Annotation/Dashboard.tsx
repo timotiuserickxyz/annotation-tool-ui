@@ -498,6 +498,11 @@ export const Dashboard: React.FC<Props> = () => {
     downloadProjectData(selectedProjectName);
   };
 
+  const showErrorMessage = (message: string) => {
+    setSnackbarMessage(message);
+    setOpenSnackbar(true);
+  }
+
   return (
     <div className={classes.root}>
       <div className={classes.header}>
@@ -566,6 +571,7 @@ export const Dashboard: React.FC<Props> = () => {
                   onClickNext={goToNextData}
                   onClickDelete={prepareDeleteProjectData}
                   onClickClear={prepareClearProjectData}
+                  onError={showErrorMessage}
                 />
               </div>
               <div className={classes.annotationDataListContainer}>
