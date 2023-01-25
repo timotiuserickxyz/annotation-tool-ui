@@ -88,13 +88,15 @@ type Props = {
   onClickNext: () => void | Promise<void>,
   onClickDelete: () => void | Promise<void>,
   onClickClear: () => void | Promise<void>,
+  onError: (message:string) => void | Promise<void>,
 };
 
 type Component = (props: Props) => React.ReactElement<Props>;
 
-export const AnnotateData: Component = ({ selectedProjectName, selectedProjectLabelList, isWholeWav, selectedAudio, selectedAudioStartTime, selectedAudioEndTime, selectedLabel, handleChangeLabel, selectedComment, handleChangeComment, onClickSave, onClickPrev, onClickNext, onClickDelete, onClickClear }) => {
+export const AnnotateData: Component = ({ selectedProjectName, selectedProjectLabelList, isWholeWav, selectedAudio, selectedAudioStartTime, selectedAudioEndTime, selectedLabel, handleChangeLabel, selectedComment, handleChangeComment, onClickSave, onClickPrev, onClickNext, onClickDelete, onClickClear, onError }) => {
   const classes = useStyles();
 
+  const title = selectedAudio.replace('_channel1.wav', '').replace('_channel2.wav', '').replace('_L.wav', '').replace('_R.wav', '');
   const selectedAudioPath = API_URL + '/annotation-project/source/wav/' + selectedProjectName + '/' + selectedAudio;
 
   return (
@@ -102,11 +104,12 @@ export const AnnotateData: Component = ({ selectedProjectName, selectedProjectLa
       <div className={classes.container}>
         {
           selectedAudio != '' ? (<AudioPlayer
-            filePath={selectedAudioPath}
-            fileName={selectedAudio}
+            title={title}
+            selectedAudioPath={selectedAudioPath}
             startTime={selectedAudioStartTime}
             endTime={selectedAudioEndTime}
             isWholeWav={isWholeWav}
+            onError={onError}
           />) : ''
         }
       </div>

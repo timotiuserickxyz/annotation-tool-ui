@@ -102,11 +102,14 @@ export const Dashboard: React.FC<Props> = () => {
   const handleCloseSnackbar = () => setOpenSnackbar(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>('');
 
-  const [showExplanation, setShowExplanation] = useState<boolean>(true);
-  const [selectedProjectName, setSelectedProjectName] = useState<string>('');
-  const [selectedRawFileIndex, setSelectedRawFileIndex] = useState<number>(-1);
+  const tempProjectName = typeof window !== 'undefined' ? localStorage.getItem('selected_project_name') : '';
+  const tempRawFileIndex = typeof window !== 'undefined' ? localStorage.getItem('selected_file_index') : '';
+  const tempDataTableIndex = typeof window !== 'undefined' ? localStorage.getItem('selected_data_table_index') : '';
 
-  const [selectedDataTableIndex, setSelectedDataTableIndex] = useState<number>(0);
+  const [showExplanation, setShowExplanation] = useState<boolean>(true);
+  const [selectedProjectName, setSelectedProjectName] = useState<string>(tempProjectName ? tempProjectName : '');
+  const [selectedRawFileIndex, setSelectedRawFileIndex] = useState<number>(tempRawFileIndex ? parseInt(tempRawFileIndex) : -1);
+  const [selectedDataTableIndex, setSelectedDataTableIndex] = useState<number>(tempDataTableIndex ? parseInt(tempDataTableIndex) : 0);
   const [selectedRawFileData, setSelectedRawFileData] = useState<any>(null);
   const [selectedAudio, setSelectedAudio] = useState<string>('');
   const [selectedAudioStartTime, setSelectedAudioStartTime] = useState<number>(0);
@@ -141,7 +144,7 @@ export const Dashboard: React.FC<Props> = () => {
     return {id: id, ...t};
   }) : [];
 
-  const rawRawFileData = getRawFileDataList(rawFileFolderName, selectedRawFileIndex >= 0 ? rawFileList[selectedRawFileIndex].name : '');
+  const rawRawFileData = getRawFileDataList(rawFileFolderName, (selectedRawFileIndex >= 0 && rawFileList[selectedRawFileIndex]) ? rawFileList[selectedRawFileIndex].name : '');
   const rawFileData = !!rawRawFileData && !!rawRawFileData.data && Array.isArray(rawRawFileData.data) ? rawRawFileData.data.map((t) => {
     return {...t};
   }) : [];
@@ -161,6 +164,8 @@ export const Dashboard: React.FC<Props> = () => {
     setSelectedAudio('');
     setSelectedLabel('');
     setSelectedComment('');
+
+    localStorage.setItem('selected_project_name', e);
   };
 
   const selectRawFile = (index: number) => {
@@ -174,6 +179,8 @@ export const Dashboard: React.FC<Props> = () => {
     setSelectedAudio('');
     setSelectedLabel('');
     setSelectedComment('');
+
+    localStorage.setItem('selected_file_index', index.toString());
   };
 
   const handleShowExplanation = () => {
@@ -282,6 +289,7 @@ export const Dashboard: React.FC<Props> = () => {
 
       const nextDataTableIndex = selectedDataTableIndex + 1;
       setSelectedDataTableIndex(nextDataTableIndex);
+      localStorage.setItem('selected_data_table_index', nextDataTableIndex.toString());
 
       const dataIndex = nextDataTableIndex - 1;
       refreshSelection(dataIndex);
@@ -302,6 +310,7 @@ export const Dashboard: React.FC<Props> = () => {
       
       const prevDataTableIndex = selectedDataTableIndex - 1;
       setSelectedDataTableIndex(prevDataTableIndex);
+      localStorage.setItem('selected_data_table_index', prevDataTableIndex.toString());
 
       const dataIndex = prevDataTableIndex - 1;
       refreshSelection(dataIndex);
@@ -312,6 +321,7 @@ export const Dashboard: React.FC<Props> = () => {
     if (dataTableIndex >= 1 && dataTableIndex <= dataCount)
     {
       setSelectedDataTableIndex(dataTableIndex);
+      localStorage.setItem('selected_data_table_index', dataTableIndex.toString());
 
       const dataIndex = dataTableIndex - 1;
       refreshSelection(dataIndex);
@@ -424,7 +434,7 @@ export const Dashboard: React.FC<Props> = () => {
     await mutate(getAPIUrl('annotation', 'getProjectDataList', {projectName: selectedProjectName}));
 
     setOpenDeleteProjectDataModal(false);
-    setSnackbarMessage('Delete project data successful');
+    setSnackbarMessage('Delete annotation successful');
     setOpenSnackbar(true);
 
     setIsSaving(true);
@@ -456,7 +466,7 @@ export const Dashboard: React.FC<Props> = () => {
     await mutate(getAPIUrl('annotation', 'getProjectDataList', {projectName: selectedProjectName}));
 
     setOpenClearProjectDataModal(false);
-    setSnackbarMessage('Delete project data successful');
+    setSnackbarMessage('Clear all annotation successful');
     setOpenSnackbar(true);
 
     setIsSaving(true);
@@ -488,19 +498,26 @@ export const Dashboard: React.FC<Props> = () => {
     downloadProjectData(selectedProjectName);
   };
 
+  const showErrorMessage = (message: string) => {
+    setSnackbarMessage(message);
+    setOpenSnackbar(true);
+  }
+
   return (
     <div className={classes.root}>
       <div className={classes.header}>
         <h2 className={classes.headerItem}>Project:</h2>
         <select className={classes.customDropdown}
-            onChange={(e) => selectProject(e.target.value)}
-          >
+          value={selectedProjectName}
+          onChange={(e) => selectProject(e.target.value)}
+        >
           <option></option>
           {projectList && projectList.map(p => 
             (<option key={p.project_name} value={p.project_name}>{p.project_name}</option>)
           )} 
         </select>
-        { selectedProjectName && rawFileList.length > 0 ? (
+        
+        { projectList.length > 0 && selectedProjectName != '' && rawFileList.length > 0 ? (
           <div>
             <IconButton onClick={handleShowExplanation} className={classes.headerItem} aria-label="Explanation" style={{padding: '5px', color: 'gray', marginLeft: '-5px'}}>
               <ErrorOutlineIcon />
@@ -513,7 +530,16 @@ export const Dashboard: React.FC<Props> = () => {
             </Button>
           </div>
         ) : (
-          <span>Please select a project for your annotation work</span>
+          [ projectList.length > 0 && selectedProjectName != '' && rawFileList.length <= 0 ? (
+            <span>Selected project does not have any file</span>
+          ) : (
+            [ projectList.length > 0 && selectedProjectName == '' ? (
+                <span>Please select a project for your annotation work</span>
+              ) : (
+                <span>Project not found</span>
+              )
+            ]
+          )]
         )}
       </div>
       { selectedProjectName && rawFileList.length > 0 ? (
@@ -545,6 +571,7 @@ export const Dashboard: React.FC<Props> = () => {
                   onClickNext={goToNextData}
                   onClickDelete={prepareDeleteProjectData}
                   onClickClear={prepareClearProjectData}
+                  onError={showErrorMessage}
                 />
               </div>
               <div className={classes.annotationDataListContainer}>
