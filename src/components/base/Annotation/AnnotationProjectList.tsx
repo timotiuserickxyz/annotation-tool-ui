@@ -14,7 +14,7 @@ const useStyles = makeStyles({
     height: '100%',
   },
   customTable: {
-    '&.MuiDataGrid-root .MuiDataGrid-cell:focus': {
+    '& .MuiDataGrid-root .MuiDataGrid-cell:focus': {
       outline: 'none !important',
     },
     '& .MuiDataGrid-renderingZone': {
