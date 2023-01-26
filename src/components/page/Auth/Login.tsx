@@ -107,7 +107,7 @@ export const Login: React.FC<Props> = () => {
     const response = await login(params);
     
     if (response.error) {
-      errorMessage = 'InternalServerError';
+      errorMessage = response.error;
     }
     else if (response.data && response.data.reason) {
       errorMessage = response.data.reason;
@@ -122,7 +122,6 @@ export const Login: React.FC<Props> = () => {
 
     // Ensure token is exists
     if (!!response.data?.token) {
-      console.log(response.data.token);
       localStorage.setItem('access_token', response.data?.token);
       setSnackbarMessage('Login successful');
       router.push('/');

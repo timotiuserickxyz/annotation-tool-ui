@@ -63,7 +63,7 @@ export type LoginResponse = {
 };
 
 export async function login(params: LoginParams): Promise<Response<LoginResponse>> {
-    const login_url = AUTH_URL + '/api/user/signin';
+    const login_url = '/api/user/signin';
     const { data, error } = await postExternal(login_url, {
         params,
     });

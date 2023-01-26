@@ -1,4 +1,5 @@
 import { Response } from './types/base';
+import router from 'next/router';
 
 interface RequestInitExtend extends RequestInit {
   params?: {
@@ -9,7 +10,7 @@ interface RequestInitExtend extends RequestInit {
 
 // TODO 環境変数
 export const API_URL = 'http://localhost:5042/api/v0';
-export const AUTH_URL = 'https://employeeauthwebapijpdevl01.azurewebsites.net'
+export const AUTH_URL = 'https://employeeauthwebapijpdevl01.azurewebsites.net';
 
 export const fetcher = async <T = any>(
   path: string,
@@ -36,6 +37,13 @@ export const fetcher = async <T = any>(
     return text ? JSON.parse(text) : {};
   }
 
+  const err = res.statusText;
+  if (err == 'Unauthorized')
+  {
+    localStorage.removeItem('access_token');
+    router.push('/login');
+  }
+
   return Promise.reject({
     ...error,
   });
@@ -57,10 +65,9 @@ export const post = async (
     body,
   });
 
-  const text = await res.text();
-  const error = text ? JSON.parse(text) : {};
-
   if (res.ok) {
+    const text = await res.text();
+
     return {
       data: text ? JSON.parse(text) : {},
       error: null,
@@ -68,9 +75,16 @@ export const post = async (
     };
   }
 
+  const err = res.statusText;
+  if (err == 'Unauthorized')
+  {
+    localStorage.removeItem('access_token');
+    router.push('/login');
+  }
+
   return {
     data: null,
-    error,
+    error: res.statusText,
     loading: false,
   };
 };
@@ -91,10 +105,9 @@ export const put = async (
     body,
   });
 
-  const text = await res.text();
-  const error = text ? JSON.parse(text) : {};
-
   if (res.ok) {
+    const text = await res.text();
+
     return {
       data: text ? JSON.parse(text) : {},
       error: null,
@@ -102,9 +115,16 @@ export const put = async (
     };
   }
 
+  const err = res.statusText;
+  if (err == 'Unauthorized')
+  {
+    localStorage.removeItem('access_token');
+    router.push('/login');
+  }
+
   return {
     data: null,
-    error,
+    error: res.statusText,
     loading: false,
   };
 };
@@ -125,10 +145,9 @@ export const remove = async (
     body,
   });
 
-  const text = await res.text();
-  const error = text ? JSON.parse(text) : {};
-
   if (res.ok) {
+    const text = await res.text();
+
     return {
       data: text ? JSON.parse(text) : {},
       error: null,
@@ -136,9 +155,16 @@ export const remove = async (
     };
   }
 
+  const err = res.statusText;
+  if (err == 'Unauthorized')
+  {
+    localStorage.removeItem('access_token');
+    router.push('/login');
+  }
+
   return {
     data: null,
-    error,
+    error: res.statusText,
     loading: false,
   };
 };
@@ -152,63 +178,33 @@ export const postExternal = async (
     ...(init?.ignoreContentType ? {} : { 'Content-Type': 'application/json' }),
     ...init?.headers,
   };
-  let result;
-  let err;
-  await fetch(`${path}`, {
+  const res = await fetch(`${AUTH_URL}${path}`, {
     ...init,
     headers,
     method: init?.method ?? 'POST',
     body,
-  })
-    .then(async (res) => {
-      const getURL = await `${API_URL}${path}`;
-      console.log(getURL);
-      const getBody = await body;
-      console.log(getBody);
-      const text = await res.text();
-      result = text ? JSON.parse(text) : {};
-      err = !res.ok ? result : null;
-    })
-    .catch((error) => {
-      err = error;
-    });
-
-  return {
-    data: !err ? result : null,
-    error: err ? err : null,
-    loading: false,
-  };
-};
-
-// TODO 環境変数
-const DUMMY_API_URL = 'https://jsonplaceholder.typicode.com';
-
-export const dummyfetcher = async <T = any>(
-  path: string,
-  init?: RequestInitExtend,
-): Promise<T> => {
-  const query = new URLSearchParams(init?.params);
-  const headers: HeadersInit = {
-    ...{ 'Content-Type': 'application/json' },
-    ...init?.headers,
-  };
-
-  const res = await fetch(
-    `${DUMMY_API_URL}${path}${init?.params ? `?${query}` : ''}`,
-    {
-      ...init,
-      headers,
-    },
-  );
-
-  const text = await res.text();
-  const error = text ? JSON.parse(text) : {};
+  });
 
   if (res.ok) {
-    return text ? JSON.parse(text) : {};
+    const text = await res.text();
+
+    return {
+      data: text ? JSON.parse(text) : {},
+      error: null,
+      loading: false,
+    };
   }
 
-  return Promise.reject({
-    ...error,
-  });
+  const err = res.statusText;
+  if (err == 'Unauthorized')
+  {
+    localStorage.removeItem('access_token');
+    router.push('/login');
+  }
+
+  return {
+    data: null,
+    error: res.statusText,
+    loading: false,
+  };
 };
