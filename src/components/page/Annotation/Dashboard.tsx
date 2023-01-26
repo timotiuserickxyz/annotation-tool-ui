@@ -256,7 +256,6 @@ export const Dashboard: React.FC<Props> = () => {
     }
     
     // Refresh
-    // mutate(getAPIUrl('annotation', 'getProjectDetail', {projectName: selectedProjectName}));
     await mutate(getAPIUrl('annotation', 'getProjectDataList', {projectName: selectedProjectName}));
 
     setSnackbarMessage('Saving successful');

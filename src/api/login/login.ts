@@ -1,4 +1,4 @@
-import { AUTH_URL, postExternal } from '../core';
+import { postExternal } from '../core';
 import { Response } from '../types/base';
 
 interface TeamMember {
