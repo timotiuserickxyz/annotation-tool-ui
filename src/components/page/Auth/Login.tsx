@@ -91,7 +91,8 @@ export const Login: React.FC<Props> = () => {
     setPassword(value);
   };
 
-  const authenticateUser = async() => {
+  const authenticateUser = async(event:any) => {
+    event.preventDefault();
     setSnackbarMessage('Authenticating...');
     setOpenSnackbar(true);
     setIsLoading(true);
@@ -144,32 +145,34 @@ export const Login: React.FC<Props> = () => {
             <Typography variant="h5">Annotation Tool</Typography>
           </div>
           <div className={classes.formContainer}>
-            <TextField
-              variant="outlined"
-              label="Username"
-              className={classes.customForm}
-              autoFocus={true}
-              value={username}
-              onChange={handleChangeUsername}
-            />
-            <br/>
-            <br/>
-            <TextField
-              variant="outlined"
-              type="password"
-              label="Password"
-              className={classes.customForm}
-              value={password}
-              onChange={handleChangePassword}
-            />
-            <br/>
-            <br/>
-            <Button
-              variant="contained"
-              className={classes.customForm}
-              onClick={authenticateUser}>
-              Submit
-            </Button>
+            <form onSubmit={authenticateUser}>
+              <TextField
+                variant="outlined"
+                label="Username"
+                className={classes.customForm}
+                autoFocus={true}
+                value={username}
+                onChange={handleChangeUsername}
+              />
+              <br/>
+              <br/>
+              <TextField
+                variant="outlined"
+                type="password"
+                label="Password"
+                className={classes.customForm}
+                value={password}
+                onChange={handleChangePassword}
+              />
+              <br/>
+              <br/>
+              <Button
+                type="submit"
+                variant="contained"
+                className={classes.customForm}>
+                Submit
+              </Button>
+            </form>
           </div>
         </div>
         <br/>
