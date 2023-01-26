@@ -243,7 +243,7 @@ export const Dashboard: React.FC<Props> = () => {
     }
 
     if (response.error) {
-      errorMessage = 'InternalServerError';
+      errorMessage = response.error;
     }
     else if (response.data && response.data.error) {
       errorMessage = response.data.error.message;
@@ -418,7 +418,7 @@ export const Dashboard: React.FC<Props> = () => {
     const response = await deleteProjectData(selectedProjectName, selectedProjectData.record_id);
 
     if (response.error) {
-      errorMessage = 'InternalServerError';
+      errorMessage = response.error;
     }
     else if (response.data && response.data.error) {
       errorMessage = response.data.error.message;
@@ -450,7 +450,7 @@ export const Dashboard: React.FC<Props> = () => {
     const response = await clearProjectData(selectedProjectName, rawFileList[selectedRawFileIndex].name);
 
     if (response.error) {
-      errorMessage = 'InternalServerError';
+      errorMessage = response.error;
     }
     else if (response.data && response.data.error) {
       errorMessage = response.data.error.message;
@@ -478,7 +478,7 @@ export const Dashboard: React.FC<Props> = () => {
     const response = await exportProjectData(selectedProjectName);
 
     if (response.error) {
-      errorMessage = 'InternalServerError';
+      errorMessage = response.error;
     }
     else if (response.data && response.data.error) {
       errorMessage = response.data.error.message;

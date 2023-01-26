@@ -199,7 +199,7 @@ export const DataSource: React.FC<Props> = () => {
     const response = await createRawFolder(newRawFolderName);
 
     if (response.error) {
-      errorMessage = 'InternalServerError';
+      errorMessage = response.error;
     }
     else if (response.data && response.data.error) {
       errorMessage = response.data.error.message;
@@ -237,7 +237,7 @@ export const DataSource: React.FC<Props> = () => {
     const response = await createWavFolder(newWavFolderName);
 
     if (response.error) {
-      errorMessage = 'InternalServerError';
+      errorMessage = response.error;
     }
     else if (response.data && response.data.error) {
       errorMessage = response.data.error.message;
@@ -290,7 +290,7 @@ export const DataSource: React.FC<Props> = () => {
     const response = await uploadRawFile(selectedRawFolderName, newRawFiles);
 
     if (response.error) {
-      errorMessage = 'InternalServerError';
+      errorMessage = response.error;
     }
     else if (response.data && response.data.error) {
       errorMessage = response.data.error.message;
@@ -347,7 +347,7 @@ export const DataSource: React.FC<Props> = () => {
     const response = await uploadWavFile(selectedWavFolderName, newWavFiles);
 
     if (response.error) {
-      errorMessage = 'InternalServerError';
+      errorMessage = response.error;
     }
     else if (response.data && response.data.error) {
       errorMessage = response.data.error.message;

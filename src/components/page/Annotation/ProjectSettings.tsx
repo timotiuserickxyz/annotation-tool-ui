@@ -181,19 +181,19 @@ export const ProjectSettings: React.FC<Props> = () => {
       description: newDescription
     }
 
-    let createProjectErrorMessage = '';
+    let errorMessage = '';
 
-    const createProjectResponse = await postProject(params);
+    const response = await postProject(params);
 
-    if (createProjectResponse.error) {
-      createProjectErrorMessage = 'InternalServerError';
+    if (response.error) {
+      errorMessage = response.error;
     }
-    else if (createProjectResponse.data && createProjectResponse.data.error) {
-      createProjectErrorMessage = createProjectResponse.data.error.message;
+    else if (response.data && response.data.error) {
+      errorMessage = response.data.error.message;
     }
 
-    if (createProjectErrorMessage != '') {
-      setSnackbarMessage(createProjectErrorMessage);
+    if (errorMessage != '') {
+      setSnackbarMessage(errorMessage);
       setOpenSnackbar(true);
       return;
     }
@@ -235,19 +235,19 @@ export const ProjectSettings: React.FC<Props> = () => {
       description: newDescription
     }
 
-    let editProjectErrorMessage = '';
+    let errorMessage = '';
 
-    const editProjectResponse = await putProject(selectedProjectName, params);
+    const response = await putProject(selectedProjectName, params);
 
-    if (editProjectResponse.error) {
-      editProjectErrorMessage = 'InternalServerError';
+    if (response.error) {
+      errorMessage = response.error;
     }
-    else if (editProjectResponse.data && editProjectResponse.data.error) {
-      editProjectErrorMessage = editProjectResponse.data.error.message;
+    else if (response.data && response.data.error) {
+      errorMessage = response.data.error.message;
     }
 
-    if (editProjectErrorMessage != '') {
-      setSnackbarMessage(editProjectErrorMessage);
+    if (errorMessage != '') {
+      setSnackbarMessage(errorMessage);
       setOpenSnackbar(true);
       return;
     }
@@ -274,7 +274,7 @@ export const ProjectSettings: React.FC<Props> = () => {
     const response = await deleteProject(selectedProjectName);
 
     if (response.error) {
-      errorMessage = 'InternalServerError';
+      errorMessage = response.error;
     }
     else if (response.data && response.data.error) {
       errorMessage = response.data.error.message;
@@ -327,7 +327,7 @@ export const ProjectSettings: React.FC<Props> = () => {
     const response = await postProjectLabel(params);
 
     if (response.error) {
-      errorMessage = 'InternalServerError';
+      errorMessage = response.error;
     }
     else if (response.data && response.data.error) {
       errorMessage = response.data.error.message;
@@ -362,7 +362,7 @@ export const ProjectSettings: React.FC<Props> = () => {
     const response = await deleteProjectLabel(selectedProjectName, selectedProjectLabel);
 
     if (response.error) {
-      errorMessage = 'InternalServerError';
+      errorMessage = response.error;
     }
     else if (response.data && response.data.error) {
       errorMessage = response.data.error.message;
