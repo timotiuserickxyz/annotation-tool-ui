@@ -18,6 +18,7 @@ export const fetcher = async <T = any>(
 ): Promise<T> => {
   const query = new URLSearchParams(init?.params);
   const headers: HeadersInit = {
+    'Authorization': 'Bearer ' + (localStorage.getItem('access_token') ?? ''),
     ...{ 'Content-Type': 'application/json' },
     ...init?.headers,
   };
@@ -55,6 +56,7 @@ export const post = async (
 ): Promise<Response<any>> => {
   const body = init?.body ?? JSON.stringify(init?.params);
   const headers: HeadersInit = {
+    'Authorization': 'Bearer ' + (localStorage.getItem('access_token') ?? ''),
     ...(init?.ignoreContentType ? {} : { 'Content-Type': 'application/json' }),
     ...init?.headers,
   };
@@ -95,6 +97,7 @@ export const put = async (
 ): Promise<Response<any>> => {
   const body = init?.body ?? JSON.stringify(init?.params);
   const headers: HeadersInit = {
+    'Authorization': 'Bearer ' + (localStorage.getItem('access_token') ?? ''),
     ...{ 'Content-Type': 'application/json' },
     ...init?.headers,
   };
@@ -135,6 +138,7 @@ export const remove = async (
 ): Promise<Response<any>> => {
   const body = init?.body ?? JSON.stringify(init?.params);
   const headers: HeadersInit = {
+    'Authorization': 'Bearer ' + (localStorage.getItem('access_token') ?? ''),
     ...{ 'Content-Type': 'application/json' },
     ...init?.headers,
   };
