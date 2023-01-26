@@ -9,6 +9,7 @@ interface RequestInitExtend extends RequestInit {
 
 // TODO 環境変数
 export const API_URL = 'http://localhost:5042/api/v0';
+export const AUTH_URL = 'https://employeeauthwebapijpdevl01.azurewebsites.net'
 
 export const fetcher = async <T = any>(
   path: string,
@@ -138,6 +139,43 @@ export const remove = async (
   return {
     data: null,
     error,
+    loading: false,
+  };
+};
+
+export const postExternal = async (
+  path: string,
+  init?: RequestInitExtend,
+): Promise<Response<any>> => {
+  const body = init?.body ?? JSON.stringify(init?.params);
+  const headers: HeadersInit = {
+    ...(init?.ignoreContentType ? {} : { 'Content-Type': 'application/json' }),
+    ...init?.headers,
+  };
+  let result;
+  let err;
+  await fetch(`${path}`, {
+    ...init,
+    headers,
+    method: init?.method ?? 'POST',
+    body,
+  })
+    .then(async (res) => {
+      const getURL = await `${API_URL}${path}`;
+      console.log(getURL);
+      const getBody = await body;
+      console.log(getBody);
+      const text = await res.text();
+      result = text ? JSON.parse(text) : {};
+      err = !res.ok ? result : null;
+    })
+    .catch((error) => {
+      err = error;
+    });
+
+  return {
+    data: !err ? result : null,
+    error: err ? err : null,
     loading: false,
   };
 };

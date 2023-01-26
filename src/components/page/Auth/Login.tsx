@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
+import { login } from '../../../api/login/login';
+import { useRouter } from 'next/router';
 
 import {
   Button,
@@ -69,6 +71,7 @@ interface Props {}
 
 export const Login: React.FC<Props> = () => {
   const classes = useStyles();
+  const router = useRouter();
 
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const handleCloseSnackbar = () => setOpenSnackbar(false);
@@ -91,11 +94,44 @@ export const Login: React.FC<Props> = () => {
   const authenticateUser = async() => {
     setSnackbarMessage('Authenticating...');
     setOpenSnackbar(true);
-    setIsLoading(!isLoading);
+    setIsLoading(true);
+    
+    const params = {
+      userName: username,
+      password: password,
+      rememberMe: true,
+    }
 
-    // Todo: login logic here
-    // 
-    // 
+    let errorMessage = '';
+
+    const response = await login(params);
+    
+    if (response.error) {
+      errorMessage = 'InternalServerError';
+    }
+    else if (response.data && response.data.reason) {
+      errorMessage = response.data.reason;
+    }
+
+    if (errorMessage != '') {
+      setSnackbarMessage(errorMessage);
+      setIsLoading(false);
+      setOpenSnackbar(true);
+      return;
+    }
+
+    // Ensure token is exists
+    if (!!response.data?.token) {
+      console.log(response.data.token);
+      localStorage.setItem('access_token', response.data?.token);
+      setSnackbarMessage('Login successful');
+      router.push('/');
+    } else {
+      setSnackbarMessage('No token is supplied');
+    }
+
+    setIsLoading(false);
+    setOpenSnackbar(true);
   };
 
   return (
