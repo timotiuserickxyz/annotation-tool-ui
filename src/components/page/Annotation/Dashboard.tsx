@@ -128,29 +128,29 @@ export const Dashboard: React.FC<Props> = () => {
   const handleCloseClearProjectDataModal = () => setOpenClearProjectDataModal(false);
 
   const tempProjectList = getProjectList();
-  const projectList = !!tempProjectList.data ? tempProjectList.data.projects.map((t) => {
+  const projectList = tempProjectList.data && tempProjectList.data.projects ? tempProjectList.data.projects.map((t) => {
     return {...t};
   }) : [];
 
   const tempProjectDetail = getProjectDetail(selectedProjectName);
-  const selectedProjectDescription = !!tempProjectDetail && !!tempProjectDetail.data ? tempProjectDetail.data.description : [];
-  const selectedProjectChunkingType = !!tempProjectDetail && !!tempProjectDetail.data ? tempProjectDetail.data.chunking_type : [];
-  const selectedProjectLabelList = !!tempProjectDetail && !!tempProjectDetail.data ? tempProjectDetail.data.label_option : [];
-  const rawFileFolderPath = !!tempProjectDetail && !!tempProjectDetail.data ? tempProjectDetail.data.raw_source_path : '';
-  const rawFileFolderName = (!!rawFileFolderPath ? rawFileFolderPath.split('/').pop() : '') as string;
+  const selectedProjectDescription = tempProjectDetail && tempProjectDetail.data ? tempProjectDetail.data.description : [];
+  const selectedProjectChunkingType = tempProjectDetail && tempProjectDetail.data ? tempProjectDetail.data.chunking_type : [];
+  const selectedProjectLabelList = tempProjectDetail && tempProjectDetail.data ? tempProjectDetail.data.label_option : [];
+  const rawFileFolderPath = tempProjectDetail && tempProjectDetail.data ? tempProjectDetail.data.raw_source_path : '';
+  const rawFileFolderName = (rawFileFolderPath ? rawFileFolderPath.split('/').pop() : '') as string;
 
   const tempRawFileList = getRawFileList(rawFileFolderName);
-  const rawFileList = !!tempRawFileList && !!tempRawFileList.data ? tempRawFileList.data.files.map((t, id) => {
+  const rawFileList = tempRawFileList && tempRawFileList.data && tempRawFileList.data.files ? tempRawFileList.data.files.map((t, id) => {
     return {id: id, ...t};
   }) : [];
 
   const rawRawFileData = getRawFileDataList(rawFileFolderName, (selectedRawFileIndex >= 0 && rawFileList[selectedRawFileIndex]) ? rawFileList[selectedRawFileIndex].name : '');
-  const rawFileData = !!rawRawFileData && !!rawRawFileData.data && Array.isArray(rawRawFileData.data) ? rawRawFileData.data.map((t) => {
+  const rawFileData = rawRawFileData && rawRawFileData.data && Array.isArray(rawRawFileData.data) ? rawRawFileData.data.map((t) => {
     return {...t};
   }) : [];
 
   const tempProjectData = getProjectDataList(selectedProjectName);
-  const projectData = !!tempProjectData && !!tempProjectData.data ? tempProjectData.data.data.map((t) => {
+  const projectData = tempProjectData && tempProjectData.data && tempProjectData.data.data ? tempProjectData.data.data.map((t) => {
     return {...t};
   }) : [];
 
