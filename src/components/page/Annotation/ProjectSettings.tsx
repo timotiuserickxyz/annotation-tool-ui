@@ -112,17 +112,17 @@ export const ProjectSettings: React.FC<Props> = () => {
 
 
   const tempProjectList = getProjectList();
-  const projectList = !!tempProjectList.data ? tempProjectList.data.projects.map((t, id) => {
+  const projectList = tempProjectList.data && tempProjectList.data.projects ? tempProjectList.data.projects.map((t, id) => {
     return {id: id, ...t};
   }) : [];
 
   const tempRawFolderList = getRawFolderList();
-  const rawFolderList = !!tempRawFolderList.data ? tempRawFolderList.data.directories.map((t) => {
+  const rawFolderList = tempRawFolderList.data && tempRawFolderList.data.directories ? tempRawFolderList.data.directories.map((t) => {
     return {...t};
   }) : [];
 
   const tempWavFolderList = getWavFolderList();
-  const wavFolderList = !!tempWavFolderList.data ? tempWavFolderList.data.directories.map((t) => {
+  const wavFolderList = tempWavFolderList.data && tempWavFolderList.data.directorie ? tempWavFolderList.data.directories.map((t) => {
     return {...t};
   }) : [];
 

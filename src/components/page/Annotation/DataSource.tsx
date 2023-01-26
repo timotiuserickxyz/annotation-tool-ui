@@ -146,22 +146,22 @@ export const DataSource: React.FC<Props> = () => {
   const [snackbarMessage, setSnackbarMessage] = useState<string>('');
 
   const tempRawFolderList = getRawFolderList();
-  const rawFolderList = !!tempRawFolderList.data ? tempRawFolderList.data.directories.map((t, id) => {
+  const rawFolderList = tempRawFolderList.data && tempRawFolderList.data.directories ? tempRawFolderList.data.directories.map((t, id) => {
     return {id: id, ...t};
   }) : [];
 
   const tempWavFolderList = getWavFolderList();
-  const wavFolderList = !!tempWavFolderList.data ? tempWavFolderList.data.directories.map((t, id) => {
+  const wavFolderList = tempWavFolderList.data && tempWavFolderList.data.directories ? tempWavFolderList.data.directories.map((t, id) => {
     return {id: id, ...t};
   }) : [];
 
   const tempRawFileList = getRawFileList(selectedRawFolderIndex >= 0 ? rawFolderList[selectedRawFolderIndex].name : '');
-  const rawFileList = !!tempRawFileList && !!tempRawFileList.data ? tempRawFileList.data.files.map((t, id) => {
+  const rawFileList = tempRawFileList && tempRawFileList.data && tempRawFileList.data.files ? tempRawFileList.data.files.map((t, id) => {
     return {id: id, ...t};
   }) : [];
 
   const tempWavFileList = getWavFileList(selectedWavFolderIndex >= 0 ? wavFolderList[selectedWavFolderIndex].name : '');
-  const wavFileList = !!tempWavFileList && !!tempWavFileList.data ? tempWavFileList.data.files.map((t, id) => {
+  const wavFileList = tempWavFileList && tempWavFileList.data && tempWavFileList.data.files ? tempWavFileList.data.files.map((t, id) => {
     return {id: id, ...t};
   }) : [];
 
