@@ -1,6 +1,6 @@
 import React from 'react';
 import Typography from '@material-ui/core/Typography';
-import { Button, Container } from '@material-ui/core';
+import { Container } from '@material-ui/core';
 
 import { PersistentDrawerLeft } from '../PersistentDrawerLeft';
 import { Navigation } from './Navigation';
@@ -15,10 +15,10 @@ export const Layout: React.FC<Props> = ({ children }) => {
   
   const isUserLoggedIn: boolean = true;//Boolean(typeof window !== 'undefined' ? localStorage.getItem('access_token') : '');
 
-  const handleLogout = () => {
-    localStorage.removeItem('access_token');
-    router.push('/auth/login');
-  };
+  // const handleLogout = () => {
+  //   localStorage.removeItem('access_token');
+  //   router.push('/auth/login');
+  // };
 
   if (isUserLoggedIn)
   {
