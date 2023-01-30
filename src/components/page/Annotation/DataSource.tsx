@@ -225,7 +225,7 @@ export const DataSource: React.FC<Props> = () => {
   };
 
   const createWavFolderAndRefresh = async() => {
-    if (newRawFolderName == '')
+    if (newWavFolderName == '')
     {
       setSnackbarMessage('Audio folder name is empty');
       setOpenSnackbar(true);
