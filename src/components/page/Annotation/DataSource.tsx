@@ -146,22 +146,22 @@ export const DataSource: React.FC<Props> = () => {
   const [snackbarMessage, setSnackbarMessage] = useState<string>('');
 
   const tempRawFolderList = getRawFolderList();
-  const rawFolderList = !!tempRawFolderList.data ? tempRawFolderList.data.directories.map((t, id) => {
+  const rawFolderList = tempRawFolderList.data && tempRawFolderList.data.directories ? tempRawFolderList.data.directories.map((t, id) => {
     return {id: id, ...t};
   }) : [];
 
   const tempWavFolderList = getWavFolderList();
-  const wavFolderList = !!tempWavFolderList.data ? tempWavFolderList.data.directories.map((t, id) => {
+  const wavFolderList = tempWavFolderList.data && tempWavFolderList.data.directories ? tempWavFolderList.data.directories.map((t, id) => {
     return {id: id, ...t};
   }) : [];
 
   const tempRawFileList = getRawFileList(selectedRawFolderIndex >= 0 ? rawFolderList[selectedRawFolderIndex].name : '');
-  const rawFileList = !!tempRawFileList && !!tempRawFileList.data ? tempRawFileList.data.files.map((t, id) => {
+  const rawFileList = tempRawFileList && tempRawFileList.data && tempRawFileList.data.files ? tempRawFileList.data.files.map((t, id) => {
     return {id: id, ...t};
   }) : [];
 
   const tempWavFileList = getWavFileList(selectedWavFolderIndex >= 0 ? wavFolderList[selectedWavFolderIndex].name : '');
-  const wavFileList = !!tempWavFileList && !!tempWavFileList.data ? tempWavFileList.data.files.map((t, id) => {
+  const wavFileList = tempWavFileList && tempWavFileList.data && tempWavFileList.data.files ? tempWavFileList.data.files.map((t, id) => {
     return {id: id, ...t};
   }) : [];
 
@@ -199,7 +199,7 @@ export const DataSource: React.FC<Props> = () => {
     const response = await createRawFolder(newRawFolderName);
 
     if (response.error) {
-      errorMessage = 'InternalServerError';
+      errorMessage = response.error;
     }
     else if (response.data && response.data.error) {
       errorMessage = response.data.error.message;
@@ -225,7 +225,7 @@ export const DataSource: React.FC<Props> = () => {
   };
 
   const createWavFolderAndRefresh = async() => {
-    if (newRawFolderName == '')
+    if (newWavFolderName == '')
     {
       setSnackbarMessage('Audio folder name is empty');
       setOpenSnackbar(true);
@@ -237,7 +237,7 @@ export const DataSource: React.FC<Props> = () => {
     const response = await createWavFolder(newWavFolderName);
 
     if (response.error) {
-      errorMessage = 'InternalServerError';
+      errorMessage = response.error;
     }
     else if (response.data && response.data.error) {
       errorMessage = response.data.error.message;
@@ -290,7 +290,7 @@ export const DataSource: React.FC<Props> = () => {
     const response = await uploadRawFile(selectedRawFolderName, newRawFiles);
 
     if (response.error) {
-      errorMessage = 'InternalServerError';
+      errorMessage = response.error;
     }
     else if (response.data && response.data.error) {
       errorMessage = response.data.error.message;
@@ -347,7 +347,7 @@ export const DataSource: React.FC<Props> = () => {
     const response = await uploadWavFile(selectedWavFolderName, newWavFiles);
 
     if (response.error) {
-      errorMessage = 'InternalServerError';
+      errorMessage = response.error;
     }
     else if (response.data && response.data.error) {
       errorMessage = response.data.error.message;

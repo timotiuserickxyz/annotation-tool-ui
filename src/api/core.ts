@@ -1,4 +1,5 @@
 import { Response } from './types/base';
+import router from 'next/router';
 
 interface RequestInitExtend extends RequestInit {
   params?: {
@@ -9,6 +10,7 @@ interface RequestInitExtend extends RequestInit {
 
 // TODO 環境変数
 export const API_URL = 'http://20.27.33.74:5042/api/v0';
+export const AUTH_URL = 'https://employeeauthwebapijpdevl01.azurewebsites.net';
 
 export const fetcher = async <T = any>(
   path: string,
@@ -16,6 +18,7 @@ export const fetcher = async <T = any>(
 ): Promise<T> => {
   const query = new URLSearchParams(init?.params);
   const headers: HeadersInit = {
+    'Authorization': 'Bearer ' + (localStorage.getItem('access_token') ?? ''),
     ...{ 'Content-Type': 'application/json' },
     ...init?.headers,
   };
@@ -35,6 +38,13 @@ export const fetcher = async <T = any>(
     return text ? JSON.parse(text) : {};
   }
 
+  const err = res.statusText;
+  if (err == 'Unauthorized')
+  {
+    localStorage.removeItem('access_token');
+    router.push('/login');
+  }
+
   return Promise.reject({
     ...error,
   });
@@ -46,6 +56,7 @@ export const post = async (
 ): Promise<Response<any>> => {
   const body = init?.body ?? JSON.stringify(init?.params);
   const headers: HeadersInit = {
+    'Authorization': 'Bearer ' + (localStorage.getItem('access_token') ?? ''),
     ...(init?.ignoreContentType ? {} : { 'Content-Type': 'application/json' }),
     ...init?.headers,
   };
@@ -56,10 +67,9 @@ export const post = async (
     body,
   });
 
-  const text = await res.text();
-  const error = text ? JSON.parse(text) : {};
-
   if (res.ok) {
+    const text = await res.text();
+
     return {
       data: text ? JSON.parse(text) : {},
       error: null,
@@ -67,9 +77,16 @@ export const post = async (
     };
   }
 
+  const err = res.statusText;
+  if (err == 'Unauthorized')
+  {
+    localStorage.removeItem('access_token');
+    router.push('/login');
+  }
+
   return {
     data: null,
-    error,
+    error: res.statusText,
     loading: false,
   };
 };
@@ -80,6 +97,7 @@ export const put = async (
 ): Promise<Response<any>> => {
   const body = init?.body ?? JSON.stringify(init?.params);
   const headers: HeadersInit = {
+    'Authorization': 'Bearer ' + (localStorage.getItem('access_token') ?? ''),
     ...{ 'Content-Type': 'application/json' },
     ...init?.headers,
   };
@@ -90,10 +108,9 @@ export const put = async (
     body,
   });
 
-  const text = await res.text();
-  const error = text ? JSON.parse(text) : {};
-
   if (res.ok) {
+    const text = await res.text();
+
     return {
       data: text ? JSON.parse(text) : {},
       error: null,
@@ -101,9 +118,16 @@ export const put = async (
     };
   }
 
+  const err = res.statusText;
+  if (err == 'Unauthorized')
+  {
+    localStorage.removeItem('access_token');
+    router.push('/login');
+  }
+
   return {
     data: null,
-    error,
+    error: res.statusText,
     loading: false,
   };
 };
@@ -114,6 +138,7 @@ export const remove = async (
 ): Promise<Response<any>> => {
   const body = init?.body ?? JSON.stringify(init?.params);
   const headers: HeadersInit = {
+    'Authorization': 'Bearer ' + (localStorage.getItem('access_token') ?? ''),
     ...{ 'Content-Type': 'application/json' },
     ...init?.headers,
   };
@@ -124,10 +149,9 @@ export const remove = async (
     body,
   });
 
-  const text = await res.text();
-  const error = text ? JSON.parse(text) : {};
-
   if (res.ok) {
+    const text = await res.text();
+
     return {
       data: text ? JSON.parse(text) : {},
       error: null,
@@ -135,42 +159,56 @@ export const remove = async (
     };
   }
 
+  const err = res.statusText;
+  if (err == 'Unauthorized')
+  {
+    localStorage.removeItem('access_token');
+    router.push('/login');
+  }
+
   return {
     data: null,
-    error,
+    error: res.statusText,
     loading: false,
   };
 };
 
-// TODO 環境変数
-const DUMMY_API_URL = 'https://jsonplaceholder.typicode.com';
-
-export const dummyfetcher = async <T = any>(
+export const postExternal = async (
   path: string,
   init?: RequestInitExtend,
-): Promise<T> => {
-  const query = new URLSearchParams(init?.params);
+): Promise<Response<any>> => {
+  const body = init?.body ?? JSON.stringify(init?.params);
   const headers: HeadersInit = {
-    ...{ 'Content-Type': 'application/json' },
+    ...(init?.ignoreContentType ? {} : { 'Content-Type': 'application/json' }),
     ...init?.headers,
   };
-
-  const res = await fetch(
-    `${DUMMY_API_URL}${path}${init?.params ? `?${query}` : ''}`,
-    {
-      ...init,
-      headers,
-    },
-  );
-
-  const text = await res.text();
-  const error = text ? JSON.parse(text) : {};
+  const res = await fetch(`${AUTH_URL}${path}`, {
+    ...init,
+    headers,
+    method: init?.method ?? 'POST',
+    body,
+  });
 
   if (res.ok) {
-    return text ? JSON.parse(text) : {};
+    const text = await res.text();
+
+    return {
+      data: text ? JSON.parse(text) : {},
+      error: null,
+      loading: false,
+    };
   }
 
-  return Promise.reject({
-    ...error,
-  });
+  const err = res.statusText;
+  if (err == 'Unauthorized')
+  {
+    localStorage.removeItem('access_token');
+    router.push('/login');
+  }
+
+  return {
+    data: null,
+    error: res.statusText,
+    loading: false,
+  };
 };
