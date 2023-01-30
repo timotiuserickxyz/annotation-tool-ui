@@ -7,7 +7,7 @@ import { Navigation } from './Navigation';
 import Link from '../../base/Link';
 import { pathMap } from '../../../router/router';
 import { Login } from '../../page/Auth/Login';
-import router from 'next/router';
+// import router from 'next/router';
 
 interface Props {}
 
