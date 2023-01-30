@@ -122,7 +122,7 @@ export const ProjectSettings: React.FC<Props> = () => {
   }) : [];
 
   const tempWavFolderList = getWavFolderList();
-  const wavFolderList = tempWavFolderList.data && tempWavFolderList.data.directorie ? tempWavFolderList.data.directories.map((t) => {
+  const wavFolderList = tempWavFolderList.data && tempWavFolderList.data.directories ? tempWavFolderList.data.directories.map((t) => {
     return {...t};
   }) : [];
 
