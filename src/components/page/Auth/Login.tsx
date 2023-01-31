@@ -123,9 +123,11 @@ export const Login: React.FC<Props> = () => {
 
     // Ensure token is exists
     if (!!response.data?.token) {
-      localStorage.setItem('access_token', response.data?.token);
       setSnackbarMessage('Login successful');
+      
       router.push('/');
+      localStorage.setItem('access_token', response.data?.token);
+      window.dispatchEvent(new Event("storage"));
     } else {
       setSnackbarMessage('No token is supplied');
     }

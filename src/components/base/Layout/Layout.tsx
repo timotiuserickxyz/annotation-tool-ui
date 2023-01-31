@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Typography from '@material-ui/core/Typography';
 import { Button, Container } from '@material-ui/core';
 
@@ -12,12 +12,31 @@ import router from 'next/router';
 interface Props {}
 
 export const Layout: React.FC<Props> = ({ children }) => {
+
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState<boolean>(true);
+
+  useEffect(() => {
+    function checkUserData() {
+      const isLoggedIn = Boolean(localStorage.getItem('access_token'));
+      setIsUserLoggedIn(isLoggedIn);
+
+      if (!isLoggedIn) {
+        router.push('/auth/login');
+      }
+    }
+
+    checkUserData();
   
-  const isUserLoggedIn: boolean = Boolean(typeof window !== 'undefined' ? localStorage.getItem('access_token') : '');
+    window.addEventListener('storage', checkUserData);
+  
+    return () => {
+      window.removeEventListener('storage', checkUserData);
+    }
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
-    router.push('/login');
+    window.dispatchEvent(new Event("storage"));
   };
 
   if (isUserLoggedIn)
