@@ -205,6 +205,10 @@ export default function Waveform({title, selectedAudioPath, startTime, endTime, 
             regions: []
           })
         ],
+        xhr: { requestHeaders: [{
+            key: "Authorization",
+            value: 'Bearer ' + (localStorage.getItem('access_token') ?? '')
+        }]}
       });
 
       const filePath = audioPathList[i];

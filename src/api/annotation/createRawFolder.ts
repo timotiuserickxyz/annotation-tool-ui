@@ -11,7 +11,7 @@ export async function createRawFolder(param1: string): Promise<Response<Result>>
     folder_name: param1
   }
   
-  const { data, error } = await post(getAPIUrl('annotation', 'createRawFolder', {folderName: param1}), {
+  const { data, error } = await post(getAPIUrl('annotation', 'createRawFolder'), {
     params
   });
   

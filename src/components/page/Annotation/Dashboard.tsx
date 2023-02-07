@@ -221,6 +221,7 @@ export const Dashboard: React.FC<Props> = () => {
     }
 
     const params = {
+      project_name: selectedProjectName,
       file_name: rawFileList[selectedRawFileIndex].name,
       channel: selectedProjectChunkingType == 'Talk Unit' ? selectedRawFileData.Channel : 0,
       sequence_number: selectedProjectChunkingType == 'Talk Unit' ? selectedRawFileData.Sequence_number : -1,
@@ -233,12 +234,10 @@ export const Dashboard: React.FC<Props> = () => {
 
     if (selectedProjectData == null)
     {
-      // Create
-      response = await postProjectData(selectedProjectName, params);
+      response = await postProjectData(params);
     }
     else
     {
-      // Update
       response = await putProjectData(selectedProjectName, selectedProjectData.record_id, params);
     }
 
