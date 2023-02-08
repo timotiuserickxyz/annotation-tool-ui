@@ -7,7 +7,7 @@ export const pathMap = {
   },
   annotation: {
     getProjectList: '/annotation-project/list',
-    getProjectDetail: '/annotation-project/id/:projectName',
+    getProjectDetail: '/annotation-project/detail/:projectName',
     postProject: '/annotation-project/new',
     putProject: '/annotation-project/config/update/:projectName',
     deleteProject: '/annotation-project/delete/:projectName',
@@ -29,6 +29,9 @@ export const pathMap = {
     createWavFolder: '/wav-data/folder/new',
     uploadRawFile: '/dataset/source/file/upload',
     uploadWavFile: '/wav-data/file/upload',
+    getProjectAggregatedDataList: '/annotation-project/data/aggregated/list/:projectName',
+    downloadProjectAggregatedData: '/annotation-project/data/aggregated/download/:projectName',
+    exportProjectAggregatedData: '/annotation-project/data/aggregated/export/:projectName',
   },
 };
 
