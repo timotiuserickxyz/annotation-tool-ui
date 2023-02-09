@@ -104,9 +104,7 @@ export const MultipleAnnotation: React.FC<Props> = () => {
   
   useEffect(() => {
     if (projectDetail && tempThresholdAgreementLevel != projectDetail.threshold_agreement_level.toString()) {
-      if (projectDetail.threshold_agreement_level.toString() != null && projectDetail.threshold_agreement_level.toString() != 'null') {
-        setTempThresholdAgreementLevel(projectDetail ? projectDetail.threshold_agreement_level.toString() : '');
-      }
+      setTempThresholdAgreementLevel(projectDetail ? projectDetail.threshold_agreement_level.toString() : '');
     }
   }, [projectDetail]);
 
