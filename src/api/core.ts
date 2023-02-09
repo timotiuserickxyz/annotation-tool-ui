@@ -1,5 +1,4 @@
 import { Response } from './types/base';
-import router from 'next/router';
 
 interface RequestInitExtend extends RequestInit {
   params?: {
