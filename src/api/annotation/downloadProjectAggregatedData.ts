@@ -1,8 +1,8 @@
 import { getAPIUrl } from '../../utils/path';
 import { API_URL } from '../core';
 
-export function downloadProjectData(param: string) {
-  fetch(API_URL + getAPIUrl('annotation', 'downloadProjectData', {projectName: param}),
+export function downloadProjectAggregatedData(param: string) {
+  fetch(API_URL + getAPIUrl('annotation', 'downloadProjectAggregatedData', {projectName: param}),
     {
       headers: new Headers(
         {
@@ -27,7 +27,7 @@ export function downloadProjectData(param: string) {
     const url = window.URL.createObjectURL(blob);
 
     const anchor = document.createElement('a');
-    anchor.download = param + '_' + (localStorage.getItem('user_name') ?? '') + '.csv';
+    anchor.download = param + '.csv';
     anchor.href = url;
     anchor.click();
   });

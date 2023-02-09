@@ -2,6 +2,7 @@ import React from 'react';
 import HomeOutlinedIcon from '@material-ui/icons/HomeOutlined';
 import SettingsIcon from '@material-ui/icons/Settings';
 import FolderIcon from '@material-ui/icons/Folder';
+import PeopleIcon from '@material-ui/icons/People';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -27,6 +28,11 @@ const navTop = {
     label: 'Project Settings',
     icon: <SettingsIcon />,
     path: pathMap.projectSettings.path,
+  },
+  multipleAnnotation: {
+    label: 'Multiple Annotation',
+    icon: <PeopleIcon />,
+    path: pathMap.multipleAnnotation.path,
   },
 };
 
@@ -59,6 +65,15 @@ export const Navigation: React.FC<Props> = () => {
           <ListItem button>
             <ListItemIcon>{navTop.projectSettings.icon}</ListItemIcon>
             <ListItemText primary={navTop.projectSettings.label} />
+          </ListItem>
+        </Link>
+        <Link
+          href={navTop.multipleAnnotation.path}
+          style={{ textDecoration: 'none', color: 'rgba(0, 0, 0, 0.87)' }}
+        >
+          <ListItem button>
+            <ListItemIcon>{navTop.multipleAnnotation.icon}</ListItemIcon>
+            <ListItemText primary={navTop.multipleAnnotation.label} />
           </ListItem>
         </Link>
       </List>

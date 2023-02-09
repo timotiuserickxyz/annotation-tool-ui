@@ -8,12 +8,14 @@ type Result = {
 
 export async function uploadWavFile(param1: string, files: FileList): Promise<Response<Result>> {
   const body = new FormData();
+
+  body.append('folder_name', param1);
   
   for (let fileIndex = 0; fileIndex < files.length; fileIndex++) {
     body.append('file' + fileIndex, files[fileIndex]);
   }
 
-  const { data, error } = await post(getAPIUrl('annotation', 'uploadWavFile', {folderName: param1}), {
+  const { data, error } = await post(getAPIUrl('annotation', 'uploadWavFile'), {
     ignoreContentType: true,
     body
   });

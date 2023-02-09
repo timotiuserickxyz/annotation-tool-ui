@@ -42,7 +42,7 @@ export const fetcher = async <T = any>(
   if (err == 'Unauthorized')
   {
     localStorage.removeItem('access_token');
-    router.push('/login');
+    window.dispatchEvent(new Event("storage"));
   }
 
   return Promise.reject({
@@ -81,7 +81,7 @@ export const post = async (
   if (err == 'Unauthorized')
   {
     localStorage.removeItem('access_token');
-    router.push('/login');
+    window.dispatchEvent(new Event("storage"));
   }
 
   return {
@@ -122,7 +122,7 @@ export const put = async (
   if (err == 'Unauthorized')
   {
     localStorage.removeItem('access_token');
-    router.push('/login');
+    window.dispatchEvent(new Event("storage"));
   }
 
   return {
@@ -163,7 +163,7 @@ export const remove = async (
   if (err == 'Unauthorized')
   {
     localStorage.removeItem('access_token');
-    router.push('/login');
+    window.dispatchEvent(new Event("storage"));
   }
 
   return {
@@ -203,7 +203,7 @@ export const postExternal = async (
   if (err == 'Unauthorized')
   {
     localStorage.removeItem('access_token');
-    router.push('/login');
+    window.dispatchEvent(new Event("storage"));
   }
 
   return {

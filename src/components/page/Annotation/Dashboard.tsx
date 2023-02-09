@@ -15,7 +15,6 @@ import { putProjectData } from '../../../api/annotation/putProjectData';
 import { deleteProjectData } from '../../../api/annotation/deleteProjectData';
 import { clearProjectData } from '../../../api/annotation/clearProjectData';
 import { downloadProjectData } from '../../../api/annotation/downloadProjectData';
-import { exportProjectData } from '../../../api/annotation/exportProjectData';
 
 import { DashboardRawFileList } from '../../base/Annotation/DashboardRawFileList';
 import { AnnotateData } from '../../base/Annotation/AnnotateData';
@@ -30,6 +29,7 @@ import {
   DialogContentText,
   DialogTitle,
   Snackbar,
+  CircularProgress,
 } from '@material-ui/core';
 
 const useStyles = makeStyles({
@@ -47,6 +47,7 @@ const useStyles = makeStyles({
   },
   customDropdown: {
     float: 'left',
+    height: '40px',
     marginRight: '10px',
     textAlign: 'center',
     paddingLeft: '10px',
@@ -81,6 +82,19 @@ const useStyles = makeStyles({
     height: '100%',
     zIndex: 100,
     backgroundColor: 'white',
+  },
+  loadingBoxContainer: {
+    position: 'relative',
+    top: '0',
+    left: '0',
+    width: '100%',
+    height: '100%',
+    zIndex: 100,
+    backgroundColor: 'rgba(150, 150, 150, 0.5)',
+  },
+  loadingIcon: {
+    width: '100px !important',
+    height: '100px !important',
   },
   annotateDataContainer: {
     width: '35%',
@@ -119,7 +133,8 @@ export const Dashboard: React.FC<Props> = () => {
   const [selectedLabel, setSelectedLabel] = useState<string>('');
   const [selectedComment, setSelectedComment] = useState<string>('');
 
-  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [refresh, setRefresh] = useState<boolean>(false);
 
   const [openDeleteProjectDataModal, setOpenDeleteProjectDataModal] = useState<boolean>(false);
   const handleCloseDeleteProjectDataModal = () => setOpenDeleteProjectDataModal(false);
@@ -199,7 +214,7 @@ export const Dashboard: React.FC<Props> = () => {
   }, [rawFileData]);
 
   useEffect(() => {
-    if (isSaving == true
+    if (refresh == true
       && selectedProjectName != ''
       && selectedRawFileIndex != -1
       && selectedRawFileData
@@ -208,9 +223,9 @@ export const Dashboard: React.FC<Props> = () => {
       const dataIndex = selectedDataTableIndex - 1;
       refreshSelection(dataIndex);
 
-      setIsSaving(false);
+      setRefresh(false);
     }
-  }, [isSaving]);
+  }, [refresh]);
 
   const saveAndRefreshData = async() => {
     if (selectedLabel == '')
@@ -221,6 +236,7 @@ export const Dashboard: React.FC<Props> = () => {
     }
 
     const params = {
+      project_name: selectedProjectName,
       file_name: rawFileList[selectedRawFileIndex].name,
       channel: selectedProjectChunkingType == 'Talk Unit' ? selectedRawFileData.Channel : 0,
       sequence_number: selectedProjectChunkingType == 'Talk Unit' ? selectedRawFileData.Sequence_number : -1,
@@ -228,17 +244,16 @@ export const Dashboard: React.FC<Props> = () => {
       comment: selectedComment,
     }
 
+    setLoading(true);
     let response: any = null;
     let errorMessage = '';
 
     if (selectedProjectData == null)
     {
-      // Create
-      response = await postProjectData(selectedProjectName, params);
+      response = await postProjectData(params);
     }
     else
     {
-      // Update
       response = await putProjectData(selectedProjectName, selectedProjectData.record_id, params);
     }
 
@@ -261,7 +276,8 @@ export const Dashboard: React.FC<Props> = () => {
     setSnackbarMessage('Saving successful');
     setOpenSnackbar(true);
 
-    setIsSaving(true);
+    setLoading(false);
+    setRefresh(true);
   };
 
   const handleChangeLabel = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -412,6 +428,7 @@ export const Dashboard: React.FC<Props> = () => {
   };
 
   const deleteProjectDataAndRefresh = async () => {
+    setLoading(true);
     let errorMessage = '';
 
     const response = await deleteProjectData(selectedProjectName, selectedProjectData.record_id);
@@ -436,7 +453,8 @@ export const Dashboard: React.FC<Props> = () => {
     setSnackbarMessage('Delete annotation successful');
     setOpenSnackbar(true);
 
-    setIsSaving(true);
+    setLoading(false);
+    setRefresh(true);
   };
 
   const prepareClearProjectData = () => {
@@ -444,6 +462,7 @@ export const Dashboard: React.FC<Props> = () => {
   };
 
   const clearProjectDataAndRefresh = async () => {
+    setLoading(true);
     let errorMessage = '';
 
     const response = await clearProjectData(selectedProjectName, rawFileList[selectedRawFileIndex].name);
@@ -468,29 +487,8 @@ export const Dashboard: React.FC<Props> = () => {
     setSnackbarMessage('Clear all annotation successful');
     setOpenSnackbar(true);
 
-    setIsSaving(true);
-  };
-
-  const handleExport = async () => {
-    let errorMessage = '';
-
-    const response = await exportProjectData(selectedProjectName);
-
-    if (response.error) {
-      errorMessage = response.error;
-    }
-    else if (response.data && response.data.error) {
-      errorMessage = response.data.error.message;
-    }
-
-    if (errorMessage != '') {
-      setSnackbarMessage(errorMessage);
-      setOpenSnackbar(true);
-      return;
-    }
-
-    setSnackbarMessage('Export project data successful');
-    setOpenSnackbar(true);
+    setLoading(false);
+    setRefresh(true);
   };
 
   const handleDownload = () => {
@@ -523,9 +521,6 @@ export const Dashboard: React.FC<Props> = () => {
             </IconButton>
             <Button variant="contained" className={classes.headerItem} onClick={handleDownload}>
                 Download
-            </Button>
-            <Button variant="contained" className={classes.headerItem} onClick={handleExport}>
-                Export to AutoML
             </Button>
           </div>
         ) : (
@@ -598,6 +593,18 @@ export const Dashboard: React.FC<Props> = () => {
               <IconButton onClick={handleHideExplanation} aria-label="Close" style={{position: 'absolute', top: '10px', right: '10px', padding: '5px', color: 'gray'}}>
                 <HighlightOff />
               </IconButton>
+            </div>
+          ) : (
+            <div></div>
+          )}
+
+          { loading == true ? (
+            <div className={classes.loadingBoxContainer}>
+              <div style={{position: 'absolute', width: '100%', height: '100%', display: 'flex', alignItems: 'center'}}>
+                <span style={{width: '100%', marginTop: '-100px', textAlign: 'center', whiteSpace: 'pre-line'}}>
+                  <CircularProgress className={classes.loadingIcon} />
+                </span>
+              </div>
             </div>
           ) : (
             <div></div>

@@ -15,5 +15,9 @@ export const pathMap = {
     path: '/annotation/project-settings',
     label: 'Project Settings',
   },
+  multipleAnnotation: {
+    path: '/annotation/multiple',
+    label: 'Multiple Annotation',
+  },
 };
 export type PathMapKey = keyof typeof pathMap;

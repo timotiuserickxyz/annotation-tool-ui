@@ -9,11 +9,13 @@ type Result = {
 export async function uploadRawFile(param1: string, files: FileList): Promise<Response<Result>> {
   const body = new FormData();
 
+  body.append('folder_name', param1);
+
   for (let fileIndex = 0; fileIndex < files.length; fileIndex++) {
     body.append('file' + fileIndex, files[fileIndex]);
   }
 
-  const { data, error } = await post(getAPIUrl('annotation', 'uploadRawFile', {folderName: param1}), {
+  const { data, error } = await post(getAPIUrl('annotation', 'uploadRawFile'), {
     ignoreContentType: true,
     body
   });
