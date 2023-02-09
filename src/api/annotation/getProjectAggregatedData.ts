@@ -26,7 +26,7 @@ type ProjectAggregatedData = {
   project_name: string;
   threshold_agreement_level: number;
   last_updated_at: string;
-  // statistic_agreement_label: StatisticAgreementLevel;
+  statistic_agreement_label: StatisticAgreementLevel;
   data: AggregatedData[];
 } & ResponseStatus;
 
